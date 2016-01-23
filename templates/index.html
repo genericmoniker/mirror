@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mirror</title>
+    <link href="{{ url_for('static', filename='css/main.css') }}"
+          rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='css/weather-icons.css') }}"
+          rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,700'
+          rel='stylesheet' type='text/css'>
+</head>
+<body>
+<div id="content">
+    <div id="weather">
+        <table bordercolor="red">
+            <tr><td colspan="3"><span id="weather_location"></span></td> </tr>
+            <tr>
+                <td rowspan="2" style="text-align: center; padding: 10px">
+                    <i id="weather_icon"></i>
+                </td>
+                <td style="text-align: center; padding: 10px">
+                    <span id="weather_main"></span>
+                </td>
+                <td colspan="2">
+                    <span id="weather_temp"></span>
+                </td>
+            </tr>
+            <tr>
+                <td><span id="weather_high"></span></td>
+                <td><span id="weather_low"></span></td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+            </tr>
+        </table>
+    </div>
+    <br><br><br>
+    <div>
+        <span id="time"></span>
+        <span id="date"></span>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/jquery-2.2.0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
+<script language="JavaScript">
+    $( document ).ready(function() {
+        updateTime();
+        setInterval(updateTime, 1000);
+        updateWeather();
+        setInterval(updateWeather, 60000);
+    });
+
+    function updateTime() {
+        var now = moment();
+        $("#time").html(now.format("h:mm a"));
+        $("#date").html(now.format("dddd, MMMM Do YYYY"));
+    }
+
+    function updateWeather() {
+        $.getJSON("/weather", function(json) {
+            $("#weather_icon").addClass(json.icon_class);
+            $("#weather_temp").html(Math.round(json.temp) + "°");
+            $("#weather_location").html(json.location);
+            $("#weather_main").html(json.main);
+        })
+    }
+</script>
+</body>
+</html>
