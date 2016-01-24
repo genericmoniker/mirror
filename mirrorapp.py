@@ -13,6 +13,11 @@ def root():
     return render_template('index.html')
 
 
+@app.route('/alive')
+def alive():
+    return 'OK'
+
+
 @app.route('/weather')
 def current_weather():
     return jsonify(weather.current_conditions(app.config))
