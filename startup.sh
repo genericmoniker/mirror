@@ -10,5 +10,5 @@ done
 
 # start the browser
 epiphany-browser http://localhost:5000/ &
-sleep 15
+sleep 30
 xte "key F11" -x:0

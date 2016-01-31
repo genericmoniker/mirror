@@ -13,25 +13,61 @@
 <body>
 <div id="content">
     <div id="weather">
-        <table bordercolor="red">
-            <tr><td colspan="3"><span id="weather_location"></span></td> </tr>
+        <table>
             <tr>
-                <td rowspan="2" style="text-align: center; padding: 10px">
-                    <i id="weather_icon"></i>
-                </td>
-                <td style="text-align: center; padding: 10px">
+                <td colspan="4"><span id="weather_location"></span></td>
+            </tr>
+            <tr>
+                <td id="weather_icon_cell" colspan="2" rowspan="2">
+                    <i id="weather_icon" class="large"></i><br>
                     <span id="weather_main"></span>
                 </td>
-                <td colspan="2">
-                    <span id="weather_temp"></span>
+                <td colspan="2" class="large">
+                    <span id="weather_temp"></span>°
                 </td>
             </tr>
+            <!--<tr class="small">-->
+                <!--<td>⬆ <span id="weather_temp_max"></span>°</td>-->
+                <!--<td>⬇ <span id="weather_temp_min"></span>°</td>-->
+            <!--</tr>-->
             <tr>
-                <td><span id="weather_high"></span></td>
-                <td><span id="weather_low"></span></td>
+                <td colspan="2" class="small">
+                    <i class="wi wi-sunrise"></i>
+                    <span id="weather_sunrise">sunrise</span><br>
+                    <i class="wi wi-sunset"></i>
+                    <span id="weather_sunset">sunset</span>
+                </td>
             </tr>
-            <tr>
-                <td colspan="2"></td>
+            <tr class="small"><td colspan="4">&nbsp;</td></tr>
+            <tr id="forecast_0" class="small">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="forecast_1" class="small">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="forecast_2" class="small">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="forecast_3" class="small">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="forecast_4" class="small">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
             </tr>
         </table>
     </div>
@@ -49,6 +85,8 @@
         setInterval(updateTime, 1000);
         updateWeather();
         setInterval(updateWeather, 60000);
+        updateForecast();
+        setInterval(updateForecast, 360000);
     });
 
     function updateTime() {
@@ -59,11 +97,33 @@
 
     function updateWeather() {
         $.getJSON("/weather", function(json) {
-            $("#weather_icon").addClass(json.icon_class);
-            $("#weather_temp").html(Math.round(json.temp) + "°");
             $("#weather_location").html(json.location);
             $("#weather_main").html(json.main);
-        })
+            $("#weather_icon").addClass(json.icon_class);
+            $("#weather_temp").html(Math.round(json.temp));
+            $("#weather_temp_max").html(json.temp_max);
+            $("#weather_temp_min").html(json.temp_min);
+            var sunrise = moment.unix(json.sunrise).local();
+            $("#weather_sunrise").html(sunrise.format("h:mm a"));
+            var sunset = moment.unix(json.sunset).local();
+            $("#weather_sunset").html(sunset.format("h:mm a"));
+        });
+    }
+
+    function updateForecast() {
+        $.getJSON("/forecast", function(json) {
+            var limit = Math.min(5, json.days.length);
+            for (var i = 0; i < limit; i++) {
+                var day = json.days[i];
+                var date = moment.unix(day.date).local();
+                $("#forecast_" + i).html(
+                    "<td>" + date.format("ddd") + "</td>" +
+                    "<td><i class='" + day.icon_class + "'></i></td>" +
+                    "<td>⬆ " + day.temp_max + "°</td>" +
+                    "<td>⬇ " + day.temp_min + "°</td>"
+                );
+            }
+        });
     }
 </script>
 </body>

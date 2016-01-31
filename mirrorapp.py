@@ -23,5 +23,10 @@ def current_weather():
     return jsonify(weather.current_conditions(app.config))
 
 
+@app.route('/forecast')
+def forecast():
+    return jsonify(weather.forecast(app.config))
+
+
 if __name__ == '__main__':
     app.run()

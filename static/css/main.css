@@ -8,16 +8,22 @@ body, html {
     font-family: 'Roboto', sans-serif;
     font-size: 40px;
     font-weight: 300;
+    overflow: hidden;  # no scroll bars, please
 }
 
 #content {
     margin: 20px;
 }
 
-#weather_icon {
+#weather_icon_cell {
+    text-align: center;
+    padding-right: 10px;
+}
+
+.large {
     font-size: 80px;
 }
 
-#weather_temp {
-    font-size: 60px;
+.small {
+    font-size: 20px;
 }
