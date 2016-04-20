@@ -20,6 +20,16 @@ body, html {
     padding-right: 10px;
 }
 
+#weather {
+  float:left;
+  width:48%;
+}
+
+#datetime {
+   float:right;
+   width:48%;
+}
+
 .large {
     font-size: 100px;
 }
