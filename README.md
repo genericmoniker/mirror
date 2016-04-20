@@ -19,6 +19,12 @@ Copy `autostart` in ~/.config/lxsession/LXDE-pi/autostart
 
 If you want, use the `scroff.sh` and `scron.sh` scripts in a cron job to
 schedule when the screen will be off/on. Those need to be run by root.
+
+For example, turn on at 6 AM, off at 11 PM:
+
+    0 6  * * * /home/pi/scron.sh
+    0 23 * * * /home/pi/scroff.sh
+
 https://www.raspberrypi.org/documentation/linux/usage/cron.md
 
 

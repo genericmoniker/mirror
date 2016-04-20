@@ -21,13 +21,14 @@ body, html {
 }
 
 #weather {
-  float:left;
-  width:48%;
+    float:left;
+    width:48%;
 }
 
 #datetime {
-   float:right;
-   width:48%;
+    float:right;
+    width:48%;
+    text-align: right;
 }
 
 .large {
