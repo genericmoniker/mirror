@@ -22,8 +22,8 @@ schedule when the screen will be off/on. Those need to be run by root.
 
 For example, turn on at 6 AM, off at 11 PM:
 
-    0 6  * * * /home/pi/scron.sh
-    0 23 * * * /home/pi/scroff.sh
+    0 6  * * * /home/pi/mirror/scron.sh
+    0 23 * * * /home/pi/mirror/scroff.sh
 
 https://www.raspberrypi.org/documentation/linux/usage/cron.md
 
@@ -31,10 +31,10 @@ https://www.raspberrypi.org/documentation/linux/usage/cron.md
 Python 3 Setup
 --------------
 
-pyvenv ~/.envs/mirror
-. ~/.envs/mirror/bin/activate
-cd mirror
-pip install -r requirements.txt
+    pyvenv ~/.envs/mirror
+    . ~/.envs/mirror/bin/activate
+    cd mirror
+    pip install -r requirements.txt
 
 Create instance/config.py in the mirror directory, with:
 
