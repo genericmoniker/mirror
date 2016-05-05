@@ -26,10 +26,6 @@
                     <span id="weather_temp"></span>°
                 </td>
             </tr>
-            <!--<tr class="small">-->
-                <!--<td>⬆ <span id="weather_temp_max"></span>°</td>-->
-                <!--<td>⬇ <span id="weather_temp_min"></span>°</td>-->
-            <!--</tr>-->
             <tr>
                 <td colspan="2" class="small">
                     <i class="wi wi-sunrise"></i>
@@ -79,7 +75,7 @@
 <script src="{{ url_for('static', filename='js/jquery-2.2.0.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
 <script language="JavaScript">
-    $( document ).ready(function() {
+    $(document).ready(function() {
         updateTime();
         setInterval(updateTime, 1000);
         updateWeather();
@@ -98,10 +94,9 @@
         $.getJSON("/weather", function(json) {
             $("#weather_location").html(json.location);
             $("#weather_main").html(json.main);
-            $("#weather_icon").addClass(json.icon_class);
+            $("#weather_icon").removeClass();
+            $("#weather_icon").addClass('large ' + json.icon_class);
             $("#weather_temp").html(Math.round(json.temp));
-            $("#weather_temp_max").html(json.temp_max);
-            $("#weather_temp_min").html(json.temp_min);
             var sunrise = moment.unix(json.sunrise).local();
             $("#weather_sunrise").html(sunrise.format("h:mm a"));
             var sunset = moment.unix(json.sunset).local();
