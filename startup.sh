@@ -9,6 +9,4 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:5000/ali
 done
 
 # start the browser
-epiphany-browser http://localhost:5000/ &
-sleep 30
-xte "key F11" -x:0
+@chromium --noerrdialogs --kiosk http://localhost:5000 --incognito

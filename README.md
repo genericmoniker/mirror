@@ -9,9 +9,13 @@ Raspberry Pi Setup
 ------------------
 
 Packages:
-* epiphany-browser - display the application
+
+* chromium - display the application
 * unclutter - hide the mouse
-* xautomate - epiphany full-screen hack
+
+Tip: Error running chromium, "Failed to load NSS libraries"? Try:
+
+    sudo ln -s /usr/lib/arm-linux-gnueabihf/nss/ /usr/lib/nss
 
 Clone this repo to `~/mirror`.
 
