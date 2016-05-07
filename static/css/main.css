@@ -11,6 +11,10 @@ body, html {
     overflow: hidden;  # no scroll bars, please
 }
 
+td {
+    padding: 5px;
+}
+
 #content {
     margin: 20px;
 }
@@ -37,4 +41,8 @@ body, html {
 
 .small {
     font-size: 30px;
+}
+
+.tiny {
+    font-size: 15px;
 }

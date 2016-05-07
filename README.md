@@ -19,7 +19,7 @@ Tip: Error running chromium, "Failed to load NSS libraries"? Try:
 
 Clone this repo to `~/mirror`.
 
-Copy `autostart` in ~/.config/lxsession/LXDE-pi/autostart
+Copy `autostart` to ~/.config/lxsession/LXDE-pi/autostart
 
 If you want, use the `scroff.sh` and `scron.sh` scripts in a cron job to
 schedule when the screen will be off/on. Those need to be run by root.
@@ -42,11 +42,5 @@ Python 3 Setup
 
 Create instance/config.py in the mirror directory, with:
 
-    OPENWEATHERMAP_API_KEY = '<your API key here>'
-
-To Do
------
-
-* Bug showing yesterday's weather forecast
-* Would cron work as well for startup? 
-  https://www.raspberrypi.org/documentation/linux/usage/cron.md
+    FORECAST_API_KEY = '<your forecast.io api key here>'
+    FORECAST_LOCATION = '<lat>,<long>'

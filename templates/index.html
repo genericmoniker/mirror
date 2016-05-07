@@ -13,56 +13,49 @@
 <body>
 <div id="content">
     <div id="weather">
-        <table>
+        <div class="large">
+            <i id="weather_icon"></i>
+            <span id="weather_temp"></span>°
+        </div>
+        <div>
+            <span id="weather_summary"></span>
+        </div>
+        <table class="small"> <!-- 5 columns wide -->
             <tr>
-                <td colspan="4"><span id="weather_location"></span></td>
+                <td colspan="5">Feels like <span id="weather_feels"></span>°</td>
             </tr>
             <tr>
-                <td id="weather_icon_cell" colspan="2" rowspan="2">
-                    <i id="weather_icon" class="large"></i><br>
-                    <span id="weather_main"></span>
-                </td>
-                <td colspan="2" class="large">
-                    <span id="weather_temp"></span>°
+                <td colspan="5">
+                    <i class="wi wi-strong-wind"></i>
+                    <span id="weather_wind"></span><sup class="tiny">mph</sup>
                 </td>
             </tr>
             <tr>
-                <td colspan="2" class="small">
+                <td colspan="5">
                     <i class="wi wi-sunrise"></i>
-                    <span id="weather_sunrise">sunrise</span><br>
+                    <span id="weather_sunrise">sunrise</span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5">
                     <i class="wi wi-sunset"></i>
                     <span id="weather_sunset">sunset</span>
                 </td>
             </tr>
-            <tr class="small"><td colspan="4">&nbsp;</td></tr>
-            <tr id="forecast_0" class="small">
-                <td></td>
-                <td></td>
-                <td></td>
+            <tr><td colspan="4">&nbsp;</td></tr>
+            <tr id="forecast_0">
                 <td></td>
             </tr>
-            <tr id="forecast_1" class="small">
-                <td></td>
-                <td></td>
-                <td></td>
+            <tr id="forecast_1">
                 <td></td>
             </tr>
-            <tr id="forecast_2" class="small">
-                <td></td>
-                <td></td>
-                <td></td>
+            <tr id="forecast_2">
                 <td></td>
             </tr>
-            <tr id="forecast_3" class="small">
-                <td></td>
-                <td></td>
-                <td></td>
+            <tr id="forecast_3">
                 <td></td>
             </tr>
-            <tr id="forecast_4" class="small">
-                <td></td>
-                <td></td>
-                <td></td>
+            <tr id="forecast_4">
                 <td></td>
             </tr>
         </table>
@@ -77,11 +70,11 @@
 <script language="JavaScript">
     $(document).ready(function() {
         updateTime();
-        setInterval(updateTime, 1000);
+        setInterval(updateTime, 1 * 1000);
         updateWeather();
-        setInterval(updateWeather, 60000);
+        setInterval(updateWeather, 60 * 1000);
         updateForecast();
-        setInterval(updateForecast, 360000);
+        setInterval(updateForecast, 60 * 60 * 1000);
     });
 
     function updateTime() {
@@ -92,33 +85,53 @@
 
     function updateWeather() {
         $.getJSON("/weather", function(json) {
-            $("#weather_location").html(json.location);
-            $("#weather_main").html(json.main);
             $("#weather_icon").removeClass();
-            $("#weather_icon").addClass('large ' + json.icon_class);
-            $("#weather_temp").html(Math.round(json.temp));
-            var sunrise = moment.unix(json.sunrise).local();
-            $("#weather_sunrise").html(sunrise.format("h:mm a"));
-            var sunset = moment.unix(json.sunset).local();
-            $("#weather_sunset").html(sunset.format("h:mm a"));
+            $("#weather_icon").addClass('large ' + iconClass(json.icon));
+            $("#weather_temp").html(Math.round(json.temperature));
+            $("#weather_summary").html(json.summary);
+            $("#weather_feels").html(Math.round(json.apparentTemperature));
+            $("#weather_wind").html(Math.round(json.windSpeed));
         });
     }
 
     function updateForecast() {
         $.getJSON("/forecast", function(json) {
-            var limit = Math.min(5, json.days.length);
-            for (var i = 0; i < limit; i++) {
-                var day = json.days[i];
-                var date = moment.unix(day.date).local();
+            var limit = Math.min(5, json.data.length);
+            var today = json.data[0];
+            var sunrise = moment.unix(today.sunriseTime).local();
+            $("#weather_sunrise").html(sunrise.format("h:mm a"));
+            var sunset = moment.unix(today.sunsetTime).local();
+            $("#weather_sunset").html(sunset.format("h:mm a"));
+            $("#forecast_0").html(
+                "<td>Today</td>" +
+                forecastCells(today)
+            );
+            for (var i = 1; i < limit; i++) {
+                var day = json.data[i];
+                var date = moment.unix(day.time).local();
                 $("#forecast_" + i).html(
                     "<td>" + date.format("ddd") + "</td>" +
-                    "<td><i class='" + day.icon_class + "'></i></td>" +
-                    "<td>⬆ " + day.temp_max + "°</td>" +
-                    "<td>⬇ " + day.temp_min + "°</td>"
+                    forecastCells(day)
                 );
             }
         });
     }
+
+    function forecastCells(day) {
+        var rain = Math.round(day.precipProbability * 100);
+        return (
+            "<td><i class='" + iconClass(day.icon) + "'></i></td>" +
+            "<td>↑ <b>" + Math.round(day.temperatureMax) + "°</b></td>" +
+            "<td>↓ " + Math.round(day.temperatureMin) + "°</td>" +
+            "<td><i class='wi wi-umbrella'></i> " + rain +
+            "<sup class='tiny'>%</sup></td>"
+         );
+    }
+
+    function iconClass(icon) {
+        return 'wi wi-forecast-io-' + icon;
+    }
+
 </script>
 </body>
 </html>
