@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, jsonify, render_template
 
+import agenda
 import weather
 
 app = Flask(__name__, instance_relative_config=True)
@@ -26,6 +27,11 @@ def current_weather():
 @app.route('/forecast')
 def forecast():
     return jsonify(weather.forecast(app.config))
+
+
+@app.route('/agenda')
+def upcoming_agenda():
+    return jsonify(agenda.get_agenda())
 
 
 if __name__ == '__main__':

@@ -64,6 +64,11 @@
         <span id="time" class="large"></span><br>
         <span id="date"></span>
     </div>
+    <div id="agenda">
+        <br>
+        <table id="agenda_items" class="small">
+        </table>
+    </div>
 </div>
 <script src="{{ url_for('static', filename='js/jquery-2.2.0.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
@@ -75,6 +80,8 @@
         setInterval(updateWeather, 60 * 1000);
         updateForecast();
         setInterval(updateForecast, 60 * 60 * 1000);
+        updateAgenda();
+        setInterval(updateAgenda, 2 * 60 * 1000);
     });
 
     function updateTime() {
@@ -132,6 +139,28 @@
         return 'wi wi-forecast-io-' + icon;
     }
 
+    function updateAgenda() {
+        $.getJSON("/agenda", function(json) {
+            var rows = "";
+            for (var i = 0; i < json.items.length; i++) {
+                var row = "<tr>";
+                var item = json.items[i];
+                if ('dateTime' in item.start) {
+                    var start = moment(item.start.dateTime);
+                    row += "<td>" + start.format("h:mm a") + "</td>";
+                } else {
+                    // all day event
+                    row += "<td></td>";
+                }
+                row += "<td>" + item.summary + "</td>";
+                rows += row;
+            }
+            if (json.items.length == 0) {
+                rows += "<tr><td colspan='2'>Nothing more today</td></tr>";
+            }
+            $("#agenda_items").html(rows);
+        });
+    }
 </script>
 </body>
 </html>

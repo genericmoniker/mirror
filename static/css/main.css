@@ -35,6 +35,10 @@ td {
     text-align: right;
 }
 
+#agenda {
+    float: right;
+}
+
 .large {
     font-size: 100px;
 }
