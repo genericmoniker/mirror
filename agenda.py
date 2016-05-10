@@ -7,6 +7,7 @@ import datetime
 import os
 
 import httplib2
+import tzlocal
 from googleapiclient import discovery
 from oauth2client import client
 from oauth2client import file
@@ -64,14 +65,13 @@ def get_agenda_data():
 
 
 def get_event_range():
-    start = datetime.datetime.utcnow()
-    tomorrow = start + datetime.timedelta(days=1)
-    stop = datetime.datetime(
-        year=tomorrow.year,
-        month=tomorrow.month,
-        day=tomorrow.day
+    start = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+    tz = tzlocal.get_localzone()
+    end_of_day = datetime.datetime.now().replace(
+        hour=23, minute=59, second=59, microsecond=999999
     )
-    return start.isoformat() + 'Z', stop.isoformat() + 'Z'
+    stop = tz.localize(end_of_day).astimezone(tz=datetime.timezone.utc)
+    return start.isoformat(), stop.isoformat()
 
 
 def event_sort_key_function(event):
