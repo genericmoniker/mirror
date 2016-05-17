@@ -25,18 +25,26 @@ td {
 }
 
 #weather {
-    float:left;
-    width:48%;
+    float: left;
+    width: 48%;
 }
 
 #datetime {
-    float:right;
-    width:48%;
+    float: right;
+    width: 48%;
     text-align: right;
 }
 
 #agenda {
     float: right;
+    width: 48%;
+}
+
+#agenda td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 400px;
 }
 
 .large {
