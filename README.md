@@ -59,3 +59,17 @@ Google Calendars. This will save google_calendar_creds.json into the
 instance directory, which will allow the mirror access. You can do this
 on a desktop machine and copy google_calendar_creds.json to your Pi if 
 that's easier.
+
+### Tasks ###
+
+Tasks are pulled from Trello cards. There are several items to set in
+instance/config.py. First are [API keys](https://trello.com/app-key), 
+while the last couple are used to choose which Boards/Lists are
+displayed.
+
+TRELLO_API_KEY = '<api key here>'
+TRELLO_API_SECRET = '<api secret here>'
+TRELLO_TOKEN = '<token here>'
+TRELLO_TOKEN_SECRET = '<token secret here>'
+TRELLO_BOARD_RE = '<board selection regular expression>'
+TRELLO_LIST_RE = '<list selection regular expression>'

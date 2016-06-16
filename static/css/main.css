@@ -13,6 +13,7 @@ body, html {
 
 td {
     padding: 5px;
+    vertical-align: top;
 }
 
 #content {
@@ -45,6 +46,13 @@ td {
     text-overflow: ellipsis;
     white-space: nowrap;
     max-width: 400px;
+}
+
+#tasks {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-height: 600px;
 }
 
 .large {

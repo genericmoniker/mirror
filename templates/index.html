@@ -69,6 +69,11 @@
         <table id="agenda_items" class="small">
         </table>
     </div>
+    <div id="tasks">
+        <table>
+            <tr id="task_lists" class="small"></tr>
+        </table>
+    </div>
 </div>
 <script src="{{ url_for('static', filename='js/jquery-2.2.0.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
@@ -82,6 +87,8 @@
         setInterval(updateForecast, 60 * 60 * 1000);
         updateAgenda();
         setInterval(updateAgenda, 2 * 60 * 1000);
+        updateTasks();
+        setInterval(updateTasks, 5 * 60 * 1000);
     });
 
     function updateTime() {
@@ -159,6 +166,23 @@
                 rows += "<tr><td colspan='2'>Nothing more today</td></tr>";
             }
             $("#agenda_items").html(rows);
+        });
+    }
+
+    function updateTasks() {
+        $.getJSON("/tasks", function(json) {
+            var cells = "";
+            for (var i = 0; i < json.items.length; i++) {
+                var cell = "<td>";
+                var item = json.items[i];
+                cell += "<b>" + item.name + "</b><ul>";
+                for (var j = 0; j < item.tasks.length; j++) {
+                    cell += "<li>" + item.tasks[j] + "</li>";
+                }
+                cell += "</ul></td>";
+                cells += cell;
+            }
+            $("#task_lists").html(cells);
         });
     }
 </script>

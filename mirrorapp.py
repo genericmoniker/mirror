@@ -2,6 +2,7 @@
 from flask import Flask, jsonify, render_template
 
 import agenda
+import tasks
 import weather
 
 app = Flask(__name__, instance_relative_config=True)
@@ -32,6 +33,11 @@ def forecast():
 @app.route('/agenda')
 def upcoming_agenda():
     return jsonify(agenda.get_agenda())
+
+
+@app.route('/tasks')
+def task_lists():
+    return jsonify(tasks.get_task_lists(app.config))
 
 
 if __name__ == '__main__':
