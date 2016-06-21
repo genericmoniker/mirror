@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import re
+from datetime import datetime
+
+import pytz
 from trello import TrelloClient
 from werkzeug.contrib.cache import SimpleCache
 
@@ -41,18 +44,28 @@ def get_task_lists_data(config):
     board_re = re.compile(config.get('TRELLO_BOARD_RE').encode('UTF-8'))
     list_re = re.compile(config.get('TRELLO_LIST_RE').encode('UTF-8'))
     boards = client.list_boards()
+    now = datetime.utcnow().replace(tzinfo=pytz.utc)
     # noinspection PyTypeChecker
     for board in boards:
         if board_re.search(board.name):
             cards = board.get_cards()
             for list_ in board.get_lists(None):
                 if list_re.search(list_.name):
-                    task_lists['items'].append(list_dict(list_, cards))
+                    task_lists['items'].append(list_dict(list_, cards, now))
     return task_lists
 
 
-def list_dict(list_, cards):
+def list_dict(list_, cards, now):
     return dict(
         name=list_.name,
-        tasks=[c.name for c in cards if c.list_id == list_.id]
+        tasks=[task_from_card(c, now) for c in cards if c.list_id == list_.id]
+    )
+
+
+def task_from_card(card, now):
+    return dict(
+        name=card.name,
+        due_date=card.due_date,
+        labels=[label.name for label in card.labels],
+        overdue=card.due_date and card.due_date < now,
     )

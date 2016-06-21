@@ -177,7 +177,7 @@
                 var item = json.items[i];
                 cell += "<b>" + item.name + "</b><ul>";
                 for (var j = 0; j < item.tasks.length; j++) {
-                    cell += "<li>" + item.tasks[j] + "</li>";
+                    cell += "<li>" + item.tasks[j].name + "</li>";
                 }
                 cell += "</ul></td>";
                 cells += cell;
