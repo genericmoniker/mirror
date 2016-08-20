@@ -69,15 +69,15 @@
         <table id="agenda_items" class="small">
         </table>
     </div>
-    <div id="tasks">
-        <table>
-            <tr id="task_lists" class="small"></tr>
-        </table>
+    <div id="rotator">
+        <iframe id="rotator_frame"></iframe>
     </div>
 </div>
 <script src="{{ url_for('static', filename='js/jquery-2.2.0.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
 <script language="JavaScript">
+    ROTATE_COUNTER = 0;
+
     $(document).ready(function() {
         updateTime();
         setInterval(updateTime, 1 * 1000);
@@ -87,8 +87,8 @@
         setInterval(updateForecast, 60 * 60 * 1000);
         updateAgenda();
         setInterval(updateAgenda, 2 * 60 * 1000);
-        updateTasks();
-        setInterval(updateTasks, 5 * 60 * 1000);
+        updateRotator();
+        setInterval(updateRotator, 30 * 1000);
     });
 
     function updateTime() {
@@ -169,21 +169,13 @@
         });
     }
 
-    function updateTasks() {
-        $.getJSON("/tasks", function(json) {
-            var cells = "";
-            for (var i = 0; i < json.items.length; i++) {
-                var cell = "<td>";
-                var item = json.items[i];
-                cell += "<b>" + item.name + "</b><ul>";
-                for (var j = 0; j < item.tasks.length; j++) {
-                    cell += "<li>" + item.tasks[j].name + "</li>";
-                }
-                cell += "</ul></td>";
-                cells += cell;
-            }
-            $("#task_lists").html(cells);
+    function updateRotator() {
+        var frame = $("#rotator_frame");
+        frame.fadeOut(1000, function () {
+            frame.attr("src", "/rotate?counter=" + ROTATE_COUNTER);
+            frame.fadeIn(1000);
         });
+        ROTATE_COUNTER += 1;
     }
 </script>
 </body>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Temple</title>
+    <link href="{{ url_for('static', filename='css/main.css') }}"
+          rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,700'
+          rel='stylesheet' type='text/css'>
+    <style type="text/css">
+        .bottom {
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+        }
+    </style>
+</head>
+<body>
+<div id="content">
+    <div id="picture" style="float: left; width: 50%; text-align: center;">
+        <img src="{{ url_for('static', filename='img/temple.png') }}"
+             style="width: 80%; height: 80%;" />
+    </div>
+    <div id="text" style="float: right;">
+        <div class="bottom large">See yourself<br>in the temple</div>
+    </div>
+</div>
+</body>
+</html>

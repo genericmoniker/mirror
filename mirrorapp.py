@@ -1,5 +1,7 @@
-# -*- coding: utf-8 -*-
 from flask import Flask, jsonify, render_template
+from pathlib import Path
+
+from flask import request
 
 import agenda
 import tasks
@@ -13,6 +15,16 @@ app.config.from_pyfile('config.py')
 @app.route('/')
 def root():
     return render_template('index.html')
+
+
+@app.route('/rotate')
+def rotate_page():
+    counter = int(request.args.get('counter'))
+    path = Path(app.root_path, app.template_folder)
+    pages = list(path.glob('rotate_*.html'))
+    template = pages[counter % len(pages)]
+    relative = str(template.relative_to(path))
+    return render_template(relative)
 
 
 @app.route('/alive')
