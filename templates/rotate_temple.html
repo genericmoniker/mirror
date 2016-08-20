@@ -8,22 +8,29 @@
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,700'
           rel='stylesheet' type='text/css'>
     <style type="text/css">
-        .bottom {
-          position: absolute;
-          bottom: 0;
-          left: 50%;
+        td {
+            padding: 15px;
+        }
+
+        .right {
+            text-align: right;
+            vertical-align: bottom;
         }
     </style>
 </head>
 <body>
 <div id="content">
-    <div id="picture" style="float: left; width: 50%; text-align: center;">
-        <img src="{{ url_for('static', filename='img/temple.png') }}"
-             style="width: 80%; height: 80%;" />
-    </div>
-    <div id="text" style="float: right;">
-        <div class="bottom large">See yourself<br>in the temple</div>
-    </div>
+    <table>
+        <tr>
+            <td width="49%">
+                <img src="{{ url_for('static', filename='img/temple.png') }}"
+                width="100%">
+            </td>
+            <td width="49%" class="right">
+                See yourself <br> in the temple
+            </td>
+        </tr>
+    </table>
 </div>
 </body>
 </html>

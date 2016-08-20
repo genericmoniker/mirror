@@ -170,11 +170,7 @@
     }
 
     function updateRotator() {
-        var frame = $("#rotator_frame");
-        frame.fadeOut(1000, function () {
-            frame.attr("src", "/rotate?counter=" + ROTATE_COUNTER);
-            frame.fadeIn(1000);
-        });
+        $("#rotator_frame").attr("src", "/rotate?counter=" + ROTATE_COUNTER);
         ROTATE_COUNTER += 1;
     }
 </script>
