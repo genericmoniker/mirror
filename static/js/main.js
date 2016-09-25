@@ -1,4 +1,5 @@
-ROTATE_COUNTER = 0;
+ROTATE_COUNT = 0;
+ROTATE_INDEX = 0;
 
 $(document).ready(function() {
     updateTime();
@@ -9,7 +10,7 @@ $(document).ready(function() {
     setInterval(updateForecast, 60 * 60 * 1000);
     updateAgenda();
     setInterval(updateAgenda, 2 * 60 * 1000);
-    updateRotator();
+    initRotator();
     setInterval(updateRotator, 30 * 1000);
 });
 
@@ -91,7 +92,32 @@ function updateAgenda() {
     });
 }
 
+function initRotator() {
+    $.getJSON("/rotate_count", function(json) {
+        ROTATE_COUNT = json.count;
+        console.log('initRotator: count=' + ROTATE_COUNT);
+        $("#rotator").empty();
+        for (var i = 0; i < ROTATE_COUNT; i ++) {
+            $("#rotator").append($('<iframe/>', {
+                id: 'rotate_' + i,
+                class: 'rotator_frame',
+                style: 'display: none',
+                src: '/rotate?counter=' + i,
+            }));
+        }
+        updateRotator();
+    });
+}
+
 function updateRotator() {
-    $("#rotator_frame").attr("src", "/rotate?counter=" + ROTATE_COUNTER);
-    ROTATE_COUNTER += 1;
+    console.log('updateRotator: index=' + ROTATE_INDEX);
+    for (var i = 0; i < ROTATE_COUNT; i ++) {
+        var id = "#rotate_" + i;
+        if (i == ROTATE_INDEX) {
+            $(id).css('display', 'block');
+        } else {
+            $(id).css('display', 'none');
+        }
+    }
+    ROTATE_INDEX = (ROTATE_INDEX < ROTATE_COUNT - 1) ? ROTATE_INDEX + 1 : 0;
 }

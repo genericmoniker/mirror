@@ -17,6 +17,15 @@ def root():
     return render_template('index.html')
 
 
+@app.route('/rotate_count')
+def rotate_page_count():
+    path = Path(app.root_path, app.template_folder)
+    pages = list(path.glob('rotate_*.html'))
+    return jsonify({
+        'count': len(pages)
+    })
+
+
 @app.route('/rotate')
 def rotate_page():
     counter = int(request.args.get('counter'))

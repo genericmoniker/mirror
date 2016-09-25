@@ -18,7 +18,10 @@
 </div>
 <script src="{{ url_for('static', filename='js/jquery-2.2.0.min.js') }}"></script>
 <script language="JavaScript">
-    $(document).ready(updateTasks())
+    $(document).ready(function() {
+        updateTasks();
+        setInterval(updateTasks, 5 * 60 * 1000);
+    });
 
     function updateTasks() {
         $.getJSON("/tasks", function(json) {
