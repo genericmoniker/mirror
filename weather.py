@@ -2,7 +2,7 @@
 
 """Weather data backed by the Dark Sky Forecast API.
 
-https://developer.forecast.io/docs/v2
+https://darksky.net/dev/
 """
 
 import requests
@@ -16,7 +16,7 @@ cache = SimpleCache()
 
 
 def build_url(config):
-    return 'https://api.forecast.io/forecast/{key}/{loc}'.format(
+    return 'https://api.darksky.net/forecast/{key}/{loc}'.format(
         key=config.get('FORECAST_API_KEY'),
         loc=config.get('FORECAST_LOCATION'),
         exclude='minutely,hourly',
