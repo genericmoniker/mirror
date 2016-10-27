@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Temple</title>
+    <link href="{{ url_for('static', filename='css/main.css') }}"
+          rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,700'
+          rel='stylesheet' type='text/css'>
+    <style type="text/css">
+        td {
+            padding: 30px;
+        }
+
+        .right {
+            text-align: right;
+            vertical-align: bottom;
+        }
+    </style>
+</head>
+<body>
+<div id="content">
+    <table>
+        <tr>
+            <td width="49%">
+                <img src="{{ url_for('static', filename='img/sail.png') }}"
+                width="100%">
+            </td>
+            <td width="49%" class="right">
+                We can't direct the wind, but we can adjust the sails. For
+                maximum happiness, peace and contentment, may we <i>choose</i>
+                a positive attitude.  -- Thomas S. Monson
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>
