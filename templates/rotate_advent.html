@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Advent</title>
+    <link href="{{ url_for('static', filename='css/main.css') }}"
+          rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,700'
+          rel='stylesheet' type='text/css'>
+    <style type="text/css">
+        td {
+            padding: 30px;
+        }
+
+        .right {
+            text-align: right;
+            vertical-align: bottom;
+        }
+    </style>
+</head>
+<body>
+<div id="content">
+    <table>
+        <tr>
+            <td width="49%">
+                <img
+                    id="image"
+                    src="{{ url_for('static', filename='img/advent1.png') }}"
+                    width="100%">
+            </td>
+            <td id='text' width="49%" class="right">
+                Advent
+            </td>
+        </tr>
+    </table>
+</div>
+<script src="{{ url_for('static', filename='js/jquery-2.2.0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/rotate_advent.js') }}"></script>
+</body>
+</html>
