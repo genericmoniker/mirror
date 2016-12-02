@@ -32,6 +32,11 @@ function updateVerse() {
     var date = moment().date();
     var verse = verses[date % 24 - 1]
     $("#text").html(verse);
+    if (verse.length > 120) {
+        $("#text").addClass('small');
+    } else {
+        $("#text").removeClass('small');
+    }
     var random = getRandomInt(1, 3);
     var imgSrc = $("#image").attr("src");
     var imgSrcNew = imgSrc.replace(/\d/, random);
