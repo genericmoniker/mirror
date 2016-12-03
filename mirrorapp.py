@@ -4,6 +4,7 @@ from pathlib import Path
 from flask import request
 
 import agenda
+import messages
 import tasks
 import weather
 
@@ -59,6 +60,11 @@ def upcoming_agenda():
 @app.route('/tasks')
 def task_lists():
     return jsonify(tasks.get_task_lists(app.config))
+
+
+@app.route('/message')
+def message():
+    return messages.get_message()
 
 
 if __name__ == '__main__':

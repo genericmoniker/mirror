@@ -10,8 +10,9 @@ $(document).ready(function() {
     setInterval(updateForecast, 60 * 60 * 1000);
     updateAgenda();
     setInterval(updateAgenda, 2 * 60 * 1000);
-    initRotator();
-    setInterval(updateRotator, 30 * 1000);
+    initMessage();
+    //initRotator();
+    //setInterval(updateRotator, 30 * 1000);
 });
 
 function updateTime() {
@@ -92,15 +93,23 @@ function updateAgenda() {
     });
 }
 
+function initMessage() {
+    $("#message").append($('<iframe/>', {
+        class: 'message_frame',
+        style: 'display: block',
+        src: '/message',
+    }));
+}
+
 function initRotator() {
     $.getJSON("/rotate_count", function(json) {
         ROTATE_COUNT = json.count;
         console.log('initRotator: count=' + ROTATE_COUNT);
-        $("#rotator").empty();
+        $("#message").empty();
         for (var i = 0; i < ROTATE_COUNT; i ++) {
-            $("#rotator").append($('<iframe/>', {
+            $("#message").append($('<iframe/>', {
                 id: 'rotate_' + i,
-                class: 'rotator_frame',
+                class: 'message_frame',
                 style: 'display: none',
                 src: '/rotate?counter=' + i,
             }));

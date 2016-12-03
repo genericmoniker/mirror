@@ -48,14 +48,14 @@ td {
     max-width: 400px;
 }
 
-#rotator {
+#message {
     position: fixed;
     bottom: 0;
     width: 100%;
     height: 50%;
 }
 
-.rotator_frame {
+.message_frame {
     width: 100%;
     height: 100%;
     border: none;
