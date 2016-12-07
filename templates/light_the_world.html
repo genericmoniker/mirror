@@ -63,7 +63,7 @@
         var tomorrow = moment().add(1, 'day').startOf('day');
         var diff = tomorrow.diff(moment()) + 60 * 1000;  // + a little buffer
         console.log('reload message page ms: ' + diff);
-        setTimeout(location.reload, diff);
+        setTimeout(function() { location.reload(); }, diff);
     });
 </script>
 </body>

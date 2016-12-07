@@ -31,6 +31,9 @@ For example, turn on at 6 AM, off at 11 PM:
 
 https://www.raspberrypi.org/documentation/linux/usage/cron.md
 
+You'll also need to create an `instance` directory, and configure
+services as described below.
+
 
 Python 3 Setup
 --------------
