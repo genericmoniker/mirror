@@ -55,6 +55,11 @@ td {
     height: 55%;
 }
 
+#weather_alert_title {
+    margin-top: 30px;
+    font-weight: bold;
+}
+
 .message_frame {
     width: 100%;
     height: 100%;

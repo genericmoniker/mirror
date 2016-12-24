@@ -61,3 +61,13 @@ def forecast(config):
     """
     data = get_weather_data(config)
     return data['daily']
+
+
+def alerts(config):
+    """Get any current weather alerts for the configured coordinates.
+
+    :param config: Flask app config object.
+    :return: dict of weather alert data.
+    """
+    data = get_weather_data(config)
+    return data.get('alerts', {})

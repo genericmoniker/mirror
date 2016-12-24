@@ -52,6 +52,11 @@ def forecast():
     return jsonify(weather.forecast(app.config))
 
 
+@app.route('/weather_alerts')
+def weather_alerts():
+    return jsonify(weather.alerts(app.config))
+
+
 @app.route('/agenda')
 def upcoming_agenda():
     return jsonify(agenda.get_agenda())

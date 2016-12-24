@@ -6,6 +6,8 @@ $(document).ready(function() {
     setInterval(updateTime, 1 * 1000);
     updateWeather();
     setInterval(updateWeather, 60 * 1000);
+    updateWeatherAlerts();
+    setInterval(updateWeatherAlerts, 60 * 1000);
     updateForecast();
     setInterval(updateForecast, 60 * 60 * 1000);
     updateAgenda();
@@ -29,6 +31,18 @@ function updateWeather() {
         $("#weather_summary").html(json.summary);
         $("#weather_feels").html(Math.round(json.apparentTemperature));
         $("#weather_wind").html(Math.round(json.windSpeed));
+    });
+}
+
+function updateWeatherAlerts() {
+    $.getJSON("/weather_alerts", function(json) {
+        if (json.length > 0) {
+            $("#weather_alert").css('display', 'block');
+            $("#weather_alert_title").html(json[0].title);
+        } else {
+            $("#weather_alert").css('display', 'none');
+            $("#weather_alert_title").html('');
+        }
     });
 }
 
