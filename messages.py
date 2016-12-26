@@ -8,6 +8,7 @@ def get_message():
     if now.month == 12 and now.day in range(1, 26):
         context = light_the_world_data(now)
         return render_template('light_the_world.html', **context)
+    return render_template('blank.html')
 
 
 def light_the_world_data(now):
