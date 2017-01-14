@@ -1,14 +1,158 @@
 import datetime
 
 from flask import render_template
+from flask import url_for
 
 
 def get_message():
     now = datetime.datetime.now()
-    if now.month == 12 and now.day in range(1, 26):
-        context = light_the_world_data(now)
-        return render_template('light_the_world.html', **context)
-    return render_template('blank.html')
+    # if now.month == 12 and now.day in range(1, 26):
+    #     context = light_the_world_data(now)
+    #     return render_template('light_the_world.html', **context)
+    context = fifty_two_stories_data(now)
+    return render_template('52stories.html', **context)
+
+
+def fifty_two_stories_data(now):
+    monthly = (
+        # January
+        (
+            'Goals & Achievements',
+            (
+                'What goals do you hope to achieve this year?',
+                'What is something you taught yourself to do without help '
+                'from anyone else?',
+                'What goals are you actively working toward right now?',
+                'What would you want your friends and family to learn about '
+                'making and achieving goals from your example?',
+                'What will be the greatest achievement of your life?',
+            )
+        ),
+        # February
+        (
+            'Love & Friendship',
+            (
+                'Do you know the story of how your grandparents met and fell in love?',
+                'What have been the most important and valued friendships in your life?',
+                'Who was your first best friend? Are you still in contact with each other?',
+                'What qualitites in friends do you most admire?',
+            )
+        ),
+        # March
+        (
+            'Goals & Achievements',
+            (
+                'What were your favorite hobbies and pastimes in your childhood?',
+                'Do you like to dabble in lots of different hobbies? If so, what are they?',
+                'What hobbies, interests, and talents do you have in common with your parents, grandparents, and other ancestors?',
+                'Who taught you how to work? What would you want your children and grandchildren to learn from your example?',
+                'What are some of your greatest career achievements so far?',
+            )
+        ),
+        # April
+        (
+            'Home & Hearth',
+            (
+                'What was your childhood home like?',
+                'What kinds of things did you collect and display in your childhood bedroom?',
+                'How many different homes or apartments have you lived in throughout your life?',
+                'What do you love most about where you live now?',
+                'What are the barest essentials you would need to make any place a home?',
+            )
+        ),
+        # May
+        (
+            'Mothers & Motherhood',
+            (
+                'How has your mother or being a mother enriched your life?',
+                'What lessons have you learned from your grandmothers’ life experiences?',
+                'What are some of the stories you loved hearing from your mother’s youth? From your grandmothers’ younger days?',
+                'What is the best thing about your relationship with your mother or grandmother?',
+                'Who are some important mother figures besides your own mother who have been influential in your life?',
+            )
+        ),
+        # June
+        (
+            'Fathers & Fatherhood',
+            (
+                'What did you enjoy doing with your father when you were a child?',
+                'What life lessons have you learned from your father?',
+                'What are some of the stories you loved hearing from your father’s youth? From your grandfathers’ younger days?',
+                'What are some of the signature phrases, quotes, or sayings that remind you of your dad? Of your grandfathers?',
+                'Who are some important father figures besides your own father who have been influential in your life?',
+            )
+        ),
+        # July
+        (
+            'Events & Milestones',
+            (
+                'What do you know about the day you were born?',
+                'What were the biggest momentous events in your life and how have they changed you as a person?',
+                'What decisions have you made that have had a long-lasting positive effect on your life?',
+                'How does your family celebrate significant milestones?',
+                'What events and milestones are you still anticipating and looking forward to?',
+            )
+        ),
+        # August
+        (
+            'Travels & Vacations',
+            (
+                'What were your most common childhood vacations like—road trips, visits to grandma’s house, camping trips, weekends at the lake or the beach?',
+                'Do you have one special vacation spot that you return to again and again?  What do you love about it?',
+                'What are all the different modes of transport you’ve used?',
+                'What are the most memorable meals or exotic foods you’ve tried on any of your travels?',
+                'What destinations are on your vacation wish list?',
+            )
+        ),
+        # September
+        (
+            'Education & School',
+            (
+                'Who was your most beloved teacher? Why?',
+                'What are your memories of school lunch?',
+                'What subjects did you excel at in school? Which were hardest for you?',
+                'What extracurricular activities did you get involved in?',
+                'What valuable lessons have you learned from school that have helped you in your life?',
+            )
+        ),
+        # October
+        (
+            'Values & Beliefs',
+            (
+                'If you had to pinpoint three main values that your parents lived by and tried to instill in you, what would they be?',
+                'What personal values do you hold most dear?',
+                'What values do you feel are most important to pass down to posterity?',
+                'What were the faith and religious traditions of your ancestors?',
+            )
+        ),
+        # November
+        (
+            'Causes & Convictions',
+            (
+                'What motto or creed do you live by?',
+                'In what ways do you sacrifice your time to volunteer in your community?',
+                'How has your life been enriched by your commitment to causes?',
+                'Is there someone in your life who has inspired you to care more about community and global issues?',
+                'How has your commitment to make the world a better place evolved throughout your life?',
+            )
+        ),
+        # December
+        (
+            'Holidays & Traditions',
+            (
+                'What were some of your favorite holiday traditions in childhood?',
+                'Which were your top three favorite holidays when you were a child? Why?',
+                'Which of your childhood holiday traditions have you continued into adulthood?',
+                'What are the most memorable and treasured gifts you have received in your life?',
+                'What different occasions do you celebrate each year?',
+            )
+        ),
+    )[now.month - 1]
+    icon_name = 'img/52stories-{:02}.png'.format(now.month)
+    icon = url_for('static', filename=icon_name)
+    category, questions = monthly
+    question = questions[now.day // 7]
+    return dict(question=question, category=category, icon=icon)
 
 
 def light_the_world_data(now):

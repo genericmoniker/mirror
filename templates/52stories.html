@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}52Stories{% endblock %}
+{% block content %}
+    <img src="{{ url_for('static', filename='img/52stories.png') }}"/>
+    <p>{{ question }}</p>
+    <p class="small" style="vertical-align: middle; color: #e1e1e1">
+        <img src="{{ icon }}"/> {{ category }}
+    </p>
+{% endblock %}
