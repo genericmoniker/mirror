@@ -36,12 +36,16 @@ td {
     text-align: right;
 }
 
-#agenda {
+#cash_flow {
+    text-align: right;
+}
+
+#agenda, #coming_up {
     float: right;
     width: 48%;
 }
 
-#agenda td {
+#agenda td, #coming_up td {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -52,7 +56,7 @@ td {
     position: fixed;
     bottom: 0;
     width: 100%;
-    height: 55%;
+    height: 35%;
 }
 
 #weather_alert_title {

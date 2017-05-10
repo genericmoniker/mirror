@@ -63,13 +63,24 @@
             <div id="weather_alert_title"></div>
         </div>
     </div>
+
     <div id="datetime">
         <span id="time" class="large"></span><br>
         <span id="date"></span>
     </div>
+    <!--
+    <div id="cash_flow">
+        <canvas id="cash_flow_canvas" width="550" height="100"></canvas>
+    </div>
+    -->
     <div id="agenda">
         <br>
         <table id="agenda_items" class="small">
+        </table>
+    </div>
+    <div id="coming_up">
+        <br>
+        <table id="coming_up_items" class="small">
         </table>
     </div>
     <div id="message">
@@ -78,5 +89,6 @@
 <script src="{{ url_for('static', filename='js/jquery-2.2.0.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/numline.js') }}"></script>
 </body>
 </html>

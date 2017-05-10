@@ -4,14 +4,21 @@ ROTATE_INDEX = 0;
 $(document).ready(function() {
     updateTime();
     setInterval(updateTime, 1 * 1000);
+
     updateWeather();
     setInterval(updateWeather, 60 * 1000);
     updateWeatherAlerts();
     setInterval(updateWeatherAlerts, 60 * 1000);
     updateForecast();
     setInterval(updateForecast, 60 * 60 * 1000);
+
+    //updateCashFlow();
+
     updateAgenda();
     setInterval(updateAgenda, 2 * 60 * 1000);
+    updateComingUp();
+    setInterval(updateComingUp, 10 * 60 * 1000);
+
     initMessage();
     //initRotator();
     //setInterval(updateRotator, 30 * 1000);
@@ -84,6 +91,10 @@ function iconClass(icon) {
     return 'wi wi-forecast-io-' + icon;
 }
 
+function updateCashFlow() {
+    drawNumberLine($("#cash_flow_canvas").get(0), -5, 15, 1);
+}
+
 function updateAgenda() {
     $.getJSON("/agenda", function(json) {
         var rows = "";
@@ -104,6 +115,26 @@ function updateAgenda() {
             rows += "<tr><td colspan='2'>Nothing more today</td></tr>";
         }
         $("#agenda_items").html(rows);
+    });
+}
+
+function updateComingUp() {
+    $.getJSON("/coming-up", function(json) {
+        console.log("coming up item count: " + json.items.length)
+        var rows = "";
+        for (var i = 0; i < json.items.length; i++) {
+            var row = "<tr>";
+            var item = json.items[i];
+            row += "<td>" + item.summary + "</td>";
+            var start = moment(item.start.date);
+            var fromNow = start.fromNow();
+            if (fromNow.indexOf("hour") != -1) {
+                fromNow = "tomorrow";
+            }
+            row += "<td>" + fromNow + "</td>"
+            rows += row;
+        }
+        $("#coming_up_items").html(rows);
     });
 }
 

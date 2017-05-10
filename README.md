@@ -3,7 +3,7 @@ mirror
 
 Smart/Magic Mirror 
 
-WARNING: Work-in-progress
+WARNING: Work-in-progress; meets my needs but isn't fully generalized.
 
 Raspberry Pi Setup
 ------------------
@@ -43,9 +43,20 @@ Python 3 Setup
     cd mirror
     pip install -r requirements.txt
 
+For configuring other services, you'll need to create `instance/config.py` in
+the mirror directory, with contents described below.
+
+### Sentry Logging ###
+
+You can get a free "hobbyist" account at https://sentry.io. This will let you
+get alerts if something goes wrong in the application.
+
+Then add a SENTRY_CONFIG dictionary to `instance/config.py` like that shown in
+the [documentation](https://docs.sentry.io/clients/python/integrations/flask/).
+
 ### Weather ###
 
-Create instance/config.py in the mirror directory, with:
+Add these values to `instance/config.py`:
 
     FORECAST_API_KEY = '<your forecast.io api key here>'
     FORECAST_LOCATION = '<lat>,<long>'
