@@ -22,9 +22,12 @@ Clone this repo to `~/mirror`.
 Copy `autostart` to ~/.config/lxsession/LXDE-pi/autostart
 
 If you want, use the `scroff.sh` and `scron.sh` scripts in a cron job to
-schedule when the screen will be off/on. Those need to be run by root.
+schedule when the screen will be off/on. Those need to be run by root. To edit
+cron jobs, run:
 
-For example, turn on at 6 AM, off at 11 PM:
+    sudo crontab -e
+
+For example, turn on at 6 AM, off at 11 PM, add these lines:
 
     0 6  * * * /home/pi/mirror/scron.sh
     0 23 * * * /home/pi/mirror/scroff.sh
@@ -87,3 +90,16 @@ TRELLO_TOKEN = '<token here>'
 TRELLO_TOKEN_SECRET = '<token secret here>'
 TRELLO_BOARD_RE = '<board selection regular expression>'
 TRELLO_LIST_RE = '<list selection regular expression>'
+
+
+Troubleshooting
+---------------
+
+If the browser doesn't come up when starting the Pi, it's likely that the
+Python application had an exception while starting. You can check that by ssh
+into the Pi and running:
+
+```
+cd ~/mirror
+~/.envs/mirror/bin/python3 mirrorapp.py
+```

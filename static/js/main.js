@@ -3,31 +3,42 @@ ROTATE_INDEX = 0;
 
 $(document).ready(function() {
     updateTime();
-    setInterval(updateTime, 1 * 1000);
+    setInterval(updateTime, moment.duration(1, 'seconds').asMilliseconds());
+
+    updateCountdown();
+    setInterval(updateCountdown, moment.duration(1, 'hours').asMilliseconds());
 
     updateWeather();
-    setInterval(updateWeather, 60 * 1000);
+    setInterval(updateWeather, moment.duration(60, 'seconds').asMilliseconds());
     updateWeatherAlerts();
-    setInterval(updateWeatherAlerts, 60 * 1000);
+    setInterval(updateWeatherAlerts, moment.duration(60, 'seconds').asMilliseconds());
     updateForecast();
-    setInterval(updateForecast, 60 * 60 * 1000);
+    setInterval(updateForecast, moment.duration(1, 'hour').asMilliseconds());
 
     //updateCashFlow();
 
     updateAgenda();
-    setInterval(updateAgenda, 2 * 60 * 1000);
+    setInterval(updateAgenda, moment.duration(2, 'minutes').asMilliseconds());
     updateComingUp();
-    setInterval(updateComingUp, 10 * 60 * 1000);
+    setInterval(updateComingUp, moment.duration(10, 'minutes').asMilliseconds());
 
     initMessage();
     //initRotator();
-    //setInterval(updateRotator, 30 * 1000);
+    //setInterval(updateRotator, moment.duration(30, 'seconds').asMilliseconds());
 });
 
 function updateTime() {
     var now = moment();
     $("#time").html(now.format("h:mm a"));
     $("#date").html(now.format("dddd, MMMM Do YYYY"));
+}
+
+function updateCountdown() {
+    var now = moment();
+    var then = moment("2017-11-08");
+    var days = then.diff(now, 'days');
+    var days_string = days === 1 ? ' day' : ' days';
+    $("#countdown").html('MTC in ' + days + days_string);
 }
 
 function updateWeather() {

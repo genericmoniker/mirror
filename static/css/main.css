@@ -36,6 +36,12 @@ td {
     text-align: right;
 }
 
+#countdown {
+    float: right;
+    width: 48%;
+    text-align: right;
+}
+
 #cash_flow {
     text-align: right;
 }
