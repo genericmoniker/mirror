@@ -5,14 +5,15 @@ from flask import request
 from raven.contrib.flask import Sentry
 
 import agenda
-# import bank
 import messages
 import tasks
 import weather
+from log import setup_logging
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config')
 app.config.from_pyfile('config.py')
+setup_logging(app.config.get('LOG_FILE_PATH'))
 if 'SENTRY_CONFIG' in app.config.keys():
     sentry = Sentry(app)
 
@@ -79,11 +80,6 @@ def task_lists():
 @app.route('/message')
 def message():
     return messages.get_message()
-
-
-# @app.route('/banks')
-# def bank_balances():
-#     return jsonify(bank.get_bank_acct_balances(app.config))
 
 
 if __name__ == '__main__':
