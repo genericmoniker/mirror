@@ -1,5 +1,12 @@
-flask
-requests
-google-api-python-client
-tzlocal
+apscheduler==3.3.1
+flask==0.11.1
+google-api-python-client==1.5.1
+oauth2client==2.2.0  # A newer version is available, incompatible with Google.
+raven[flask]==6.0.0
+requests==2.10.0
+tzlocal==1.2.2
 -e git+https://github.com/sarumont/py-trello.git@1325e31#egg=py-trello
+
+# Development requirements:
+pip-tools==1.8.0
+pytest

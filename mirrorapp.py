@@ -1,3 +1,4 @@
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, jsonify, render_template
 from pathlib import Path
 
@@ -49,17 +50,17 @@ def alive():
 
 @app.route('/weather')
 def current_weather():
-    return jsonify(weather.current_conditions(app.config))
+    return jsonify(weather.current_conditions())
 
 
 @app.route('/forecast')
 def forecast():
-    return jsonify(weather.forecast(app.config))
+    return jsonify(weather.forecast())
 
 
 @app.route('/weather_alerts')
 def weather_alerts():
-    return jsonify(weather.alerts(app.config))
+    return jsonify(weather.alerts())
 
 
 @app.route('/agenda')
@@ -83,4 +84,8 @@ def message():
 
 
 if __name__ == '__main__':
-    app.run()
+    sched = BackgroundScheduler()
+    agenda.init_cache(app.config, sched)
+    weather.init_cache(app.config, sched)
+    sched.start()
+    app.run(debug=False)

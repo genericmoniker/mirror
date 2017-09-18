@@ -1,10 +1,13 @@
-# -*- coding: utf-8 -*-
 import re
 from datetime import datetime
 
 import pytz
 from trello import TrelloClient
 from werkzeug.contrib.cache import SimpleCache
+
+# TODO: Update if the client starts using this again.
+# * Use custom Trello client from chorebot
+# * Switch to new cache model
 
 CACHE_TIMEOUT = 5 * 60
 

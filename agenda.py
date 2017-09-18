@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
-
 """Agenda data from Google Calendar.
 
 """
 import datetime
 import os
+from functools import partial
 
 import httplib2
 import tzlocal
@@ -12,35 +11,47 @@ from googleapiclient import discovery
 from oauth2client import client
 from oauth2client import file
 from oauth2client import tools
-from werkzeug.contrib.cache import SimpleCache
+
+from cache import Cache
 
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 APPLICATION_NAME = 'Magic Mirror'
 CLIENT_SECRET = 'google_client_id.json'
 CREDENTIALS = 'google_calendar_creds.json'
 HERE = os.path.dirname(__file__)
-AGENDA_CACHE_TIMEOUT = 2 * 60
-COMING_UP_CACHE_TIMEOUT = 10 * 60
+AGENDA_REFRESH_MINUTES = 5
+COMING_UP_REFRESH_MINUTES = 10
 
-cache = SimpleCache()
+agenda_cache = None
+coming_up_cache = None
+
+
+def init_cache(_config, scheduler):
+    global agenda_cache, coming_up_cache
+    agenda_cache = Cache(
+        scheduler,
+        'Refresh Agenda',
+        AGENDA_REFRESH_MINUTES,
+        partial(get_agenda_data, get_agenda_event_range)
+    )
+    coming_up_cache = Cache(
+        scheduler,
+        'Refresh Coming Up',
+        COMING_UP_REFRESH_MINUTES,
+        partial(get_agenda_data, get_coming_up_event_range, all_day_filter)
+    )
 
 
 def get_agenda():
     """Get the agenda for the current day."""
-    data = cache.get('agenda')
-    if data is None:
-        data = get_agenda_data(get_agenda_event_range)
-        cache.set('agenda', data, AGENDA_CACHE_TIMEOUT)
-    return data
+    assert agenda_cache, 'init_cache must be called first!'
+    return agenda_cache.get()
 
 
 def get_coming_up():
     """Get all-day events in the next week."""
-    data = cache.get('coming-up')
-    if data is None:
-        data = get_agenda_data(get_coming_up_event_range, all_day_filter)
-        cache.set('coming-up', data, COMING_UP_CACHE_TIMEOUT)
-    return data
+    assert coming_up_cache, 'init_cache must be called first!'
+    return coming_up_cache.get()
 
 
 def get_credentials():
@@ -55,7 +66,7 @@ def get_credentials_store():
     return file.Storage(credentials_file)
 
 
-def no_filter(event):
+def no_filter(_event):
     return True
 
 

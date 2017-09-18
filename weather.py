@@ -4,15 +4,32 @@
 
 https://darksky.net/dev/
 """
+from functools import partial
 
 import requests
-from werkzeug.contrib.cache import SimpleCache
-from werkzeug.http import parse_cache_control_header
-from werkzeug.datastructures import ResponseCacheControl
 
-CACHE_MIN_SECONDS = 2 * 60
+from cache import Cache
 
-cache = SimpleCache()
+# For the "free" tier, we're limited to 1000 requests per day.
+# A 2 minute refresh results in 60 * 24 / 2 = 720 requests.
+REFRESH_MINUTES = 2
+
+cache = None
+
+
+def init_cache(config, scheduler):
+    """Initialize the weather data cache.
+
+    :param config: Flask app config object.
+    :param scheduler: Scheduler to periodically update the data.
+    """
+    global cache
+    cache = Cache(
+        scheduler,
+        'Refresh Weather',
+        REFRESH_MINUTES,
+        partial(get_weather_data, build_url(config))
+    )
 
 
 def build_url(config):
@@ -23,51 +40,32 @@ def build_url(config):
     )
 
 
-def get_cache_timeout(r):
-    # Cache the weather data at a rate that the upstream service dictates, but
-    # that also keeps us easily within the 1000 requests per day free limit.
-    header = r.headers.get('Cache-Control')
-    control = parse_cache_control_header(header, cls=ResponseCacheControl)
-    try:
-        return max(control.max_age, CACHE_MIN_SECONDS)
-    except TypeError:
-        return CACHE_MIN_SECONDS
+def get_weather_data(url):
+    return requests.get(url).json()
 
 
-def get_weather_data(config):
-    data = cache.get('forecast')
-    if data is None:
-        r = requests.get(build_url(config))
-        data = r.json()
-        cache.set('forecast', data, get_cache_timeout(r))
-    return data
-
-
-def current_conditions(config):
+def current_conditions():
     """Get the current weather conditions for the configured coordinates.
 
-    :param config: Flask app config object.
     :return: dict of weather data.
     """
-    data = get_weather_data(config)
-    return data['currently']
+    assert cache, 'init_cache must be called first!'
+    return cache.get()['currently']
 
 
-def forecast(config):
+def forecast():
     """Get the weather forecast for the configured coordinates.
 
-    :param config: Flask app config object.
     :return: dict of weather data.
     """
-    data = get_weather_data(config)
-    return data['daily']
+    assert cache, 'init_cache must be called first!'
+    return cache.get()['daily']
 
 
-def alerts(config):
+def alerts():
     """Get any current weather alerts for the configured coordinates.
 
-    :param config: Flask app config object.
     :return: dict of weather alert data.
     """
-    data = get_weather_data(config)
-    return data.get('alerts', {})
+    assert cache, 'init_cache must be called first!'
+    return cache.get().get('alerts', {})
