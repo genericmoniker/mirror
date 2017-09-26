@@ -50,17 +50,7 @@ def alive():
 
 @app.route('/weather')
 def current_weather():
-    return jsonify(weather.current_conditions())
-
-
-@app.route('/forecast')
-def forecast():
-    return jsonify(weather.forecast())
-
-
-@app.route('/weather_alerts')
-def weather_alerts():
-    return jsonify(weather.alerts())
+    return jsonify(weather.get_weather())
 
 
 @app.route('/agenda')

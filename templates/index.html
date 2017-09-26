@@ -12,87 +12,34 @@
 </head>
 <body>
 <div id="content">
-    <div id="weather">
-        <div class="large">
-            <i id="weather_icon"></i>
-            <span id="weather_temp"></span>°
-        </div>
-        <div>
-            <span id="weather_summary"></span>
-        </div>
-        <table class="small"> <!-- 5 columns wide -->
-            <tr>
-                <td colspan="5">Feels like <span id="weather_feels"></span>°</td>
-            </tr>
-            <tr>
-                <td colspan="5">
-                    <i class="wi wi-strong-wind"></i>
-                    <span id="weather_wind"></span><sup class="tiny">mph</sup>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="5">
-                    <i class="wi wi-sunrise"></i>
-                    <span id="weather_sunrise">sunrise</span>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="5">
-                    <i class="wi wi-sunset"></i>
-                    <span id="weather_sunset">sunset</span>
-                </td>
-            </tr>
-            <tr><td colspan="4">&nbsp;</td></tr>
-            <tr id="forecast_0">
-                <td></td>
-            </tr>
-            <tr id="forecast_1">
-                <td></td>
-            </tr>
-            <tr id="forecast_2">
-                <td></td>
-            </tr>
-            <tr id="forecast_3">
-                <td></td>
-            </tr>
-            <tr id="forecast_4">
-                <td></td>
-            </tr>
-        </table>
-        <div id="weather_alert" class="small">
-            <div id="weather_alert_title"></div>
-        </div>
-    </div>
-
-    <div id="datetime">
-        <span id="time" class="large"></span><br>
-        <span id="date"></span>
-    </div>
-
-    <div id="countdown" class="small">
-    </div>
+    <weather class="left"></weather>
+    <clock class="right"></clock>
+    <countdown class="right" label="MTC in" date="2017-11-08"></countdown>
+    <agenda class="right"></agenda>
+    <coming-up class="right"></coming-up>
 
     <!--
     <div id="cash_flow">
         <canvas id="cash_flow_canvas" width="550" height="100"></canvas>
     </div>
     -->
-    <div id="agenda">
-        <br>
-        <table id="agenda_items" class="small">
-        </table>
-    </div>
-    <div id="coming_up">
-        <br>
-        <table id="coming_up_items" class="small">
-        </table>
-    </div>
     <div id="message">
     </div>
 </div>
+<!-- Riot Tags -->
+<script data-src="{{ url_for('static', filename='tag/weather.tag') }}" type="riot/tag"></script>
+<script data-src="{{ url_for('static', filename='tag/clock.tag') }}" type="riot/tag"></script>
+<script data-src="{{ url_for('static', filename='tag/countdown.tag') }}" type="riot/tag"></script>
+<script data-src="{{ url_for('static', filename='tag/agenda.tag') }}" type="riot/tag"></script>
+<script data-src="{{ url_for('static', filename='tag/coming_up.tag') }}" type="riot/tag"></script>
+
+<script src="{{ url_for('static', filename='js/riot+compiler.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/jquery-2.2.0.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/numline.js') }}"></script>
+<script>
+    riot.mount('*')
+</script>
 </body>
 </html>
