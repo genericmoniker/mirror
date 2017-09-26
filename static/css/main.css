@@ -20,42 +20,8 @@ td {
     margin: 20px;
 }
 
-#weather_icon_cell {
-    text-align: center;
-    padding-right: 10px;
-}
-
-#weather {
-    float: left;
-    width: 48%;
-}
-
-#datetime {
-    float: right;
-    width: 48%;
-    text-align: right;
-}
-
-#countdown {
-    float: right;
-    width: 48%;
-    text-align: right;
-}
-
 #cash_flow {
     text-align: right;
-}
-
-#agenda, #coming_up {
-    float: right;
-    width: 48%;
-}
-
-#agenda td, #coming_up td {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 400px;
 }
 
 #message {
@@ -65,9 +31,15 @@ td {
     height: 35%;
 }
 
-#weather_alert_title {
-    margin-top: 30px;
-    font-weight: bold;
+.left {
+    float: left;
+    width: 48%;
+}
+
+.right {
+    float: right;
+    width: 48%;
+    text-align: right;
 }
 
 .message_frame {

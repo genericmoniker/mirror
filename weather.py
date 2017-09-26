@@ -44,28 +44,10 @@ def get_weather_data(url):
     return requests.get(url).json()
 
 
-def current_conditions():
-    """Get the current weather conditions for the configured coordinates.
+def get_weather():
+    """Get the weather data for the configured coordinates.
 
     :return: dict of weather data.
     """
     assert cache, 'init_cache must be called first!'
-    return cache.get()['currently']
-
-
-def forecast():
-    """Get the weather forecast for the configured coordinates.
-
-    :return: dict of weather data.
-    """
-    assert cache, 'init_cache must be called first!'
-    return cache.get()['daily']
-
-
-def alerts():
-    """Get any current weather alerts for the configured coordinates.
-
-    :return: dict of weather alert data.
-    """
-    assert cache, 'init_cache must be called first!'
-    return cache.get().get('alerts', {})
+    return cache.get()
