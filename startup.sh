@@ -9,4 +9,4 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:5000/ali
 done
 
 # start the browser
-chromium --noerrdialogs --kiosk http://localhost:5000 --incognito &
+/var/lib/chromium-browser/chromium-browser --incognitops --noerrdialogs --disable-session-crashed-bubble --disable-infobars --kiosk http://localhost:5000 &

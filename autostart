@@ -1,3 +1,6 @@
+@lxpanel --profile LXDE-pi
+@pcmanfm --desktop --profile LXDE-pi
+
 @bash ~/mirror/startup.sh
 @xset s off
 @xset -dpms

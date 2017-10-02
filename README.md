@@ -8,18 +8,33 @@ WARNING: Work-in-progress; meets my needs but isn't fully generalized.
 Raspberry Pi Setup
 ------------------
 
-Packages:
+Using Raspbian Stretch.
 
-* chromium - display the application
-* unclutter - hide the mouse
+Install the unclutter package to hide the mouse cursor.
 
-Tip: Error running chromium, "Failed to load NSS libraries"? Try:
+    sudo apt-get install unclutter
 
-    sudo ln -s /usr/lib/arm-linux-gnueabihf/nss/ /usr/lib/nss
+You might want to rotate the display if your monitor is hung vertically. Edit
+/boot/config.txt:
+
+    sudo nano /boot/config.txt
+
+Add a line to the end of the file:
+
+    display_rotate=1
+
+The value indicates the orientation:
+
+| Value  | Orientation |
+|---|---------------|
+| 0 | Normal |
+| 1 | 90 degrees |
+| 2 | 180 degrees |
+| 3 | 270 degrees |
 
 Clone this repo to `~/mirror`.
 
-Copy `autostart` to ~/.config/lxsession/LXDE-pi/autostart
+Copy the lines in `autostart` to ~/.config/lxsession/LXDE-pi/autostart
 
 If you want, use the `scroff.sh` and `scron.sh` scripts in a cron job to
 schedule when the screen will be off/on. Those need to be run by root. To edit
@@ -41,7 +56,7 @@ services as described below.
 Python 3 Setup
 --------------
 
-    pyvenv ~/.envs/mirror
+    python3 -m venv .envs/mirror
     . ~/.envs/mirror/bin/activate
     cd mirror
     pip install -r requirements.txt
