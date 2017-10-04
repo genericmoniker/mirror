@@ -10,7 +10,7 @@ Raspberry Pi Setup
 
 Using Raspbian Stretch.
 
-Install the unclutter package to hide the mouse cursor.
+Install the unclutter package for hiding the mouse cursor.
 
     sudo apt-get install unclutter
 
@@ -21,7 +21,7 @@ You might want to rotate the display if your monitor is hung vertically. Edit
 
 Add a line to the end of the file:
 
-    display_rotate=1
+    display_rotate=3
 
 The value indicates the orientation:
 
@@ -34,7 +34,18 @@ The value indicates the orientation:
 
 Clone this repo to `~/mirror`.
 
-Copy the lines in `autostart` to ~/.config/lxsession/LXDE-pi/autostart
+Copy the mirror-server systemd service unit file and enable it:
+
+    sudo cp ~/mirror/system/mirror-server.service /etc/systemd/system/
+    sudo systemctl enable mirror-server
+
+Make a backup of your autostart file (just in case):
+
+    cp ~/.config/lxsession/LXDE-pi/autostart ~/.config/lxsession/LXDE-pi/autostart.bak
+
+Copy the `autostart` file from the project:
+
+    cp ~/mirror/system/autostart ~/.config/lxsession/LXDE-pi/autostart
 
 If you want, use the `scroff.sh` and `scron.sh` scripts in a cron job to
 schedule when the screen will be off/on. Those need to be run by root. To edit
@@ -42,10 +53,10 @@ cron jobs, run:
 
     sudo crontab -e
 
-For example, turn on at 6 AM, off at 11 PM, add these lines:
+For example, turn on at 5:50 AM, off at 11 PM, add these lines:
 
-    0 6  * * * /home/pi/mirror/scron.sh
-    0 23 * * * /home/pi/mirror/scroff.sh
+    50 5  * * * /home/pi/mirror/system/scron.sh
+    0 23  * * * /home/pi/mirror/system/scroff.sh
 
 https://www.raspberrypi.org/documentation/linux/usage/cron.md
 
@@ -59,6 +70,7 @@ Python 3 Setup
     python3 -m venv .envs/mirror
     . ~/.envs/mirror/bin/activate
     cd mirror
+    pip install wheel
     pip install -r requirements.txt
 
 For configuring other services, you'll need to create `instance/config.py` in
@@ -110,9 +122,13 @@ TRELLO_LIST_RE = '<list selection regular expression>'
 Troubleshooting
 ---------------
 
-If the browser doesn't come up when starting the Pi, it's likely that the
-Python application had an exception while starting. You can check that by ssh
-into the Pi and running:
+If the browser doesn't show the right data when starting the Pi, it's likely
+that the Python application had an exception while starting. You can check that
+by ssh into the Pi and running:
+
+    sudo systemctl status mirror-server
+
+If you want to run the application stand-alone:
 
 ```
 cd ~/mirror

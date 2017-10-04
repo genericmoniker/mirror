@@ -1,0 +1,12 @@
+[Unit]
+Description=Mirror Application Server
+
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/mirror
+ExecStart=/home/pi/.envs/mirror/bin/python3 mirrorapp.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
