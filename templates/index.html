@@ -13,11 +13,14 @@
 <body>
 <div id="content">
     <weather class="left"></weather>
-    <clock class="right"></clock>
-    <countdown class="right" label="MTC in" date="2017-11-08"></countdown>
-    <agenda class="right"></agenda>
-    <coming-up class="right"></coming-up>
-
+    <div class="right">
+        <clock></clock>
+        <countdown label="MTC in" date="2017-11-08"></countdown>
+        <div class="small">&nbsp;</div>
+        <agenda></agenda>
+        <div class="small">&nbsp;</div>
+        <coming-up></coming-up>
+    </div>
     <!--
     <div id="cash_flow">
         <canvas id="cash_flow_canvas" width="550" height="100"></canvas>

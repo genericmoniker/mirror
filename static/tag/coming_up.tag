@@ -1,18 +1,18 @@
 <coming-up>
-    <br>
-    <table class="small">
-        <tr each={items}>
-            <td>{summary}</td>
-            <td>{fromNow}</td>
-        </tr>
-    </table>
+
+    <div class="small">
+        <div each={items} class="item">
+            {summary} {fromNow}
+        </div>
+    </div>
 
     <style>
-        td {
+        .item {
+            padding: 5px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 400px;
+            width: auto;
         }
     </style>
     <script>

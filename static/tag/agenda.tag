@@ -1,5 +1,4 @@
 <agenda>
-    <br>
     <table class="small">
         <tr each={items}>
             <td>{start}</td>
@@ -13,6 +12,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             max-width: 400px;
+            text-align: left;
         }
     </style>
 
