@@ -1,5 +1,7 @@
 """Agenda data from Google Calendar.
 
+Google API reference:
+https://developers.google.com/resources/api-libraries/documentation/calendar/v3/python/latest/
 """
 import datetime
 import os
@@ -38,7 +40,7 @@ def init_cache(_config, scheduler):
         scheduler,
         'Refresh Coming Up',
         COMING_UP_REFRESH_MINUTES,
-        partial(get_agenda_data, get_coming_up_event_range, all_day_filter)
+        partial(get_agenda_data, get_coming_up_event_range, coming_up_filter)
     )
 
 
@@ -70,9 +72,14 @@ def no_filter(_event):
     return True
 
 
-def all_day_filter(event):
+def coming_up_filter(event):
     # All day events only have a date, not a dateTime.
-    return 'date' in event['start']
+    if 'dateTime' in event['start']:
+        return False
+    # For multi-day events, skip them if they've already started.
+    start = parse_date_utc_tz(event['start']['date'])
+    now = now_utc_tz()
+    return now < start
 
 
 def get_agenda_data(range_func, filter_func=no_filter):
@@ -96,7 +103,7 @@ def get_agenda_data(range_func, filter_func=no_filter):
 
 def get_agenda_event_range():
     """Get times from now until the end of the day."""
-    start = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+    start = now_utc_tz()
     tz = tzlocal.get_localzone()
     end_of_day = datetime.datetime.now().replace(
         hour=23, minute=59, second=59, microsecond=999999
@@ -107,7 +114,7 @@ def get_agenda_event_range():
 
 def get_coming_up_event_range():
     """Get times from tomorrow until a week later."""
-    now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+    now = now_utc_tz()
     start = now + datetime.timedelta(days=1)
     stop = start + datetime.timedelta(days=7)
     return start.isoformat(), stop.isoformat()
@@ -126,6 +133,20 @@ def get_user_permission():
     flow = client.flow_from_clientsecrets(client_id_file, SCOPES)
     flow.user_agent = APPLICATION_NAME
     tools.run_flow(flow, store)
+
+
+def now_utc_tz():
+    """Return the current time in UTC as a time zone aware datetime."""
+    return datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+
+
+def parse_date_utc_tz(date):
+    """Parse an ISO8601 date string as UTC.
+
+    If you want parsing of times and time zones, try the dateutil package.
+    """
+    parsed = datetime.datetime.strptime(date, '%Y-%m-%d')
+    return parsed.replace(tzinfo=datetime.timezone.utc)
 
 
 if __name__ == '__main__':
