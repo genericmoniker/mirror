@@ -7,6 +7,12 @@
     </table>
 
     <style>
+        table {
+            width: auto;
+            margin-right: 0px;
+            margin-left: auto;
+        }
+
         td {
             overflow: hidden;
             text-overflow: ellipsis;
