@@ -4,6 +4,7 @@ Google API reference:
 https://developers.google.com/resources/api-libraries/documentation/calendar/v3/python/latest/
 """
 import datetime
+import logging
 import os
 from functools import partial
 
@@ -15,6 +16,8 @@ from oauth2client import file
 from oauth2client import tools
 
 from cache import Cache
+
+logger = logging.getLogger(__name__)
 
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 APPLICATION_NAME = 'Magic Mirror'
@@ -77,9 +80,8 @@ def coming_up_filter(event):
     if 'dateTime' in event['start']:
         return False
     # For multi-day events, skip them if they've already started.
-    start = parse_date_utc_tz(event['start']['date'])
-    now = now_utc_tz()
-    return now < start
+    start = parse_date_tz(event['start']['date'])
+    return start > start_of_day_tz()
 
 
 def get_agenda_data(range_func, filter_func=no_filter):
@@ -103,20 +105,19 @@ def get_agenda_data(range_func, filter_func=no_filter):
 
 def get_agenda_event_range():
     """Get times from now until the end of the day."""
-    start = now_utc_tz()
-    tz = tzlocal.get_localzone()
-    end_of_day = datetime.datetime.now().replace(
-        hour=23, minute=59, second=59, microsecond=999999
-    )
-    stop = tz.localize(end_of_day).astimezone(tz=datetime.timezone.utc)
+    start = now_tz()
+    stop = end_of_day_tz()
+    logger.info('agenda range: %s - %s',
+                start.isoformat(), stop.isoformat())
     return start.isoformat(), stop.isoformat()
 
 
 def get_coming_up_event_range():
-    """Get times from tomorrow until a week later."""
-    now = now_utc_tz()
-    start = now + datetime.timedelta(days=1)
-    stop = start + datetime.timedelta(days=7)
+    """Get times from tomorrow until a week from today."""
+    start = start_of_day_tz() + datetime.timedelta(days=1)
+    stop = end_of_day_tz() + datetime.timedelta(days=6)
+    logger.info('coming up range: %s - %s',
+                start.isoformat(), stop.isoformat())
     return start.isoformat(), stop.isoformat()
 
 
@@ -135,18 +136,32 @@ def get_user_permission():
     tools.run_flow(flow, store)
 
 
-def now_utc_tz():
-    """Return the current time in UTC as a time zone aware datetime."""
-    return datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+def now_tz():
+    """Get the current local time as a time zone aware datetime."""
+    now = datetime.datetime.now(datetime.timezone.utc)
+    return now.astimezone()
 
 
-def parse_date_utc_tz(date):
-    """Parse an ISO8601 date string as UTC.
+def start_of_day_tz():
+    """Get the start of the current day as a time zone aware datetime."""
+    now = now_tz()
+    return now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+def end_of_day_tz():
+    """Get the end of the current day as a time zone aware datetime."""
+    now = now_tz()
+    return now.replace(hour=23, minute=59, second=59, microsecond=9999)
+
+
+def parse_date_tz(date):
+    """Parse an ISO8601 date string returning a time zone aware datetime.
 
     If you want parsing of times and time zones, try the dateutil package.
     """
     parsed = datetime.datetime.strptime(date, '%Y-%m-%d')
-    return parsed.replace(tzinfo=datetime.timezone.utc)
+    tz = tzlocal.get_localzone()
+    return tz.localize(parsed)
 
 
 if __name__ == '__main__':
