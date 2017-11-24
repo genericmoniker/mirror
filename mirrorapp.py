@@ -70,7 +70,7 @@ def task_lists():
 
 @app.route('/message')
 def message():
-    return messages.get_message()
+    return messages.get_message(app)
 
 
 if __name__ == '__main__':

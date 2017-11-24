@@ -1,14 +1,20 @@
 import datetime
+import json
 
-from flask import render_template
+import os
+from flask import render_template, Flask
 from flask import url_for
 
 
-def get_message():
+def get_message(app: Flask):
     now = datetime.datetime.now()
-    # if now.month == 12 and now.day in range(1, 26):
-    #     context = light_the_world_data(now)
-    #     return render_template('light_the_world.html', **context)
+    # now = datetime.datetime(year=2017, month=12, day=8)
+    if now.month == 12 and now.day in range(1, 26):
+        data_file = os.path.join(app.static_folder, 'ltw2017', 'data.json')
+        with open(data_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        context = data[now.day - 1]
+        return render_template('ltw2017.html', **context)
     context = fifty_two_stories_data(now)
     return render_template('52stories.html', **context)
 
