@@ -28,13 +28,13 @@
         }
 
         #ways_title {
-            font-size: 20px;
+            font-size: 25px;
             font-weight: 400;
         }
     </style>
 </head>
 <body>
-<div id="content" class="small">
+<div id="content">
 
     <div id="theme">
         <table width="100%">
@@ -47,17 +47,17 @@
                 </td>
                 <td id="verse">
                     <span>"{{ verse }}"</span><br>
-                    <span class="tiny">&mdash;<i>{{ ref }}</i></span>
+                    <span class="small">&mdash;<i>{{ ref }}</i></span>
                 </td>
             </tr>
         </table>
     </div>
 
-    <div id="explanation">
+    <div id="explanation" class="small">
         <p>{{ text }}</p>
     </div>
 
-    <div id="ways" style="display:none">
+    <div id="ways" class="small" style="display:none">
         <p id="ways_title">{{ ways_title }}</p>
         <ul>
           {% for way in ways %}
