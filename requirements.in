@@ -8,5 +8,5 @@ tzlocal==1.2.2
 -e git+https://github.com/sarumont/py-trello.git@1325e31#egg=py-trello
 
 # Development requirements:
-pip-tools==1.8.0
+pip-tools==1.11.0
 pytest
