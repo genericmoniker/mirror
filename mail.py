@@ -9,7 +9,7 @@ import email
 def fetch_messages(app: Flask):
     """Fetch email messages from the configured IMAP account.
 
-    Only messages from the past 7 days that have "mirror" in the subject are
+    Only messages from the past 7 days that have "Mirror" in the subject are
     fetched.
 
     :return: list of dict with {'sender': <sender>, 'body': <body>}.
@@ -27,7 +27,7 @@ def fetch_messages(app: Flask):
     client.select_folder('INBOX')
     since = (datetime.now() - timedelta(days=7)).date()
     message_ids = client.search(
-        ['SINCE', since.strftime('%d-%b-%Y'), 'SUBJECT', 'mirror']
+        ['SINCE', since.strftime('%d-%b-%Y'), 'SUBJECT', 'Mirror']
     )
     raw_messages = client.fetch(message_ids, ['RFC822'])
     client.logout()

@@ -1,5 +1,6 @@
 import datetime
 import json
+from collections import namedtuple
 from functools import partial
 
 from flask import render_template, Flask, request
@@ -9,6 +10,8 @@ import mail
 from cache import Cache
 
 MESSAGE_REFRESH_MINUTES = 5
+
+Message = namedtuple('Message', 'template, context')
 
 cache = None
 
@@ -38,25 +41,28 @@ def get_message():
     messages = cache.get()
     request_message_number = int(request.args.get('n', 0))
     message_number = request_message_number % len(messages)
-    return messages[message_number]
+    message = messages[message_number]
+    # It might be nice if we put the rendered template in the cache, but the
+    # render_template function only works on a thread with a Flask app context.
+    return render_template(message.template, **message.context)
 
 
 def _get_ltw2017_message(app: Flask, now):
     data = _load_data(app, 'ltw2017', 'data.json')
     context = data[now.day - 1]
-    return render_template('ltw2017.html', **context)
+    return Message('ltw2017.html', context)
 
 
 def _get_52stories_message(app: Flask, now: datetime):
     data = _load_data(app, '52stories', 'data.json')
     week_number = now.isocalendar()[1]
     context = data[week_number - 1]
-    return render_template('52stories.html', **context)
+    return Message('52stories.html', context)
 
 
 def _get_email_messages(app: Flask):
     messages = mail.fetch_messages(app)
-    return [render_template('email.html', **m) for m in messages]
+    return [Message('email.html', m) for m in messages]
 
 
 def _load_data(app: Flask, *path_segments):
