@@ -70,12 +70,13 @@ def task_lists():
 
 @app.route('/message')
 def message():
-    return messages.get_message(app)
+    return messages.get_message()
 
 
 if __name__ == '__main__':
     sched = BackgroundScheduler()
     agenda.init_cache(app.config, sched)
+    messages.init_cache(app, sched)
     weather.init_cache(app.config, sched)
     sched.start()
     app.run(debug=False)

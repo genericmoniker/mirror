@@ -12,15 +12,23 @@
 <body>
 <div id="content">{% block content %}{% endblock %}</div>
 <script src="{{ url_for('static', filename='js/jquery-2.2.0.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        // Reload the page tomorrow.
-        var tomorrow = moment().add(1, 'day').startOf('day');
-        var diff = tomorrow.diff(moment()) + 60 * 1000;  // + a little buffer
-        console.log('reload message page ms: ' + diff);
-        setTimeout(function() { location.reload(); }, diff);
+        // Reload the page for (potentially) a new message.
+        let reloadIntervalSeconds = 60;
+        setTimeout(function() { nextLocation(); }, reloadIntervalSeconds * 1000);
     });
+
+    function nextLocation() {
+        let params = new URLSearchParams(document.location.search.substring(1));
+        let n = params.get("n");
+        let messageNumber = n ? parseInt(n) : 0;
+        let next = messageNumber + 1;
+        if (next > 100) {
+            next = 0;
+        }
+        document.location.search = "?n=" + next;
+    }
 </script>
 </body>
 </html>

@@ -1,16 +1,44 @@
 import datetime
 import json
+from functools import partial
 
-from flask import render_template, Flask
+from flask import render_template, Flask, request
 from pathlib import Path
 
+import mail
+from cache import Cache
 
-def get_message(app: Flask):
+MESSAGE_REFRESH_MINUTES = 5
+
+cache = None
+
+
+def init_cache(app, scheduler):
+    global cache
+    cache = Cache(
+        scheduler,
+        'Refresh Messages',
+        MESSAGE_REFRESH_MINUTES,
+        partial(get_message_data, app),
+    )
+
+
+def get_message_data(app: Flask):
+    messages = []
     now = datetime.datetime.now()
-    # now = datetime.datetime(year=2017, month=12, day=8)
     if now.month == 12 and now.day in range(1, 26):
-        return _get_ltw2017_message(app, now)
-    return _get_52stories_message(app, now)
+        messages.append(_get_ltw2017_message(app, now))
+    messages.append(_get_52stories_message(app, now))
+    messages.extend(_get_email_messages(app))
+    return messages
+
+
+def get_message():
+    assert cache, 'init_cache must be called first!'
+    messages = cache.get()
+    request_message_number = int(request.args.get('n', 0))
+    message_number = request_message_number % len(messages)
+    return messages[message_number]
 
 
 def _get_ltw2017_message(app: Flask, now):
@@ -24,6 +52,11 @@ def _get_52stories_message(app: Flask, now: datetime):
     week_number = now.isocalendar()[1]
     context = data[week_number - 1]
     return render_template('52stories.html', **context)
+
+
+def _get_email_messages(app: Flask):
+    messages = mail.fetch_messages(app)
+    return [render_template('email.html', **m) for m in messages]
 
 
 def _load_data(app: Flask, *path_segments):

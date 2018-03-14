@@ -67,11 +67,13 @@ services as described below.
 Python 3 Setup
 --------------
 
-    python3 -m venv .envs/mirror
-    . ~/.envs/mirror/bin/activate
-    cd mirror
-    pip install wheel
-    pip install -r requirements.txt
+```bash
+python3 -m venv .envs/mirror
+. ~/.envs/mirror/bin/activate
+cd mirror
+pip install wheel
+pip install -r requirements.txt
+```
 
 For configuring other services, you'll need to create `instance/config.py` in
 the mirror directory, with contents described below.
@@ -88,8 +90,10 @@ the [documentation](https://docs.sentry.io/clients/python/integrations/flask/).
 
 Add these values to `instance/config.py`:
 
-    FORECAST_API_KEY = '<your forecast.io api key here>'
-    FORECAST_LOCATION = '<lat>,<long>'
+```py
+FORECAST_API_KEY = '<your forecast.io api key here>'
+FORECAST_LOCATION = '<lat>,<long>'
+```
 
 ### Agenda ###
 
@@ -104,20 +108,39 @@ instance directory, which will allow the mirror access. You can do this
 on a desktop machine and copy google_calendar_creds.json to your Pi if 
 that's easier.
 
+### Emails ###
+
+You can send an email with "Mirror" in the subject (case-insensitive) and have
+that appear on the mirror for a week, rotated with other bottom-half messages.
+To do that, you need to configure mail settings in the config file:
+
+```py
+IMAP_HOST = 'imap.gmail.com'
+IMAP_PORT = 993
+IMAP_USERNAME = 'somebody@sample.com'
+IMAP_PASSWORD = 'mysecretpassword'
+```
+If you want to use a Gmail account, you'll need to enable IMAP in the settings.
+Also, it might work best to use two-factor authentication and create an app
+password.
+
 ### Tasks ###
+
+(Currently disabled)
 
 Tasks are pulled from Trello cards. There are several items to set in
 instance/config.py. First are [API keys](https://trello.com/app-key), 
 while the last couple are used to choose which Boards/Lists are
 displayed.
 
+```py
 TRELLO_API_KEY = '<api key here>'
 TRELLO_API_SECRET = '<api secret here>'
 TRELLO_TOKEN = '<token here>'
 TRELLO_TOKEN_SECRET = '<token secret here>'
 TRELLO_BOARD_RE = '<board selection regular expression>'
 TRELLO_LIST_RE = '<list selection regular expression>'
-
+```
 
 Troubleshooting
 ---------------
@@ -130,7 +153,7 @@ by ssh into the Pi and running:
 
 If you want to run the application stand-alone:
 
-```
+```bash
 cd ~/mirror
 ~/.envs/mirror/bin/python3 mirrorapp.py
 ```
