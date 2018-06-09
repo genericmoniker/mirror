@@ -41,12 +41,25 @@
 
     <div class="small">
         <div id="weather_alert_title">{alert}</div>
+        <div class="marquee">{alert_desc}</div>
     </div>
 
     <style>
         #weather_alert_title {
             margin-top: 30px;
             font-weight: bold;
+        }
+        .marquee {
+            margin: 0 auto;
+            overflow: hidden;
+            white-space: nowrap;
+            box-sizing: border-box;
+            animation: marquee 50s linear infinite;
+        }
+
+        @keyframes marquee {
+            0%   { text-indent: 27.5em }
+            100% { text-indent: -105em }
         }
     </style>
 
@@ -95,11 +108,14 @@
 
         updateAlert(data) {
             var alert = ''
+            var desc = ''
             if (typeof data != 'undefined' && data.length > 0) {
                 alert = data[0].title
+                desc = data[0].description
             }
             this.update({
-                alert: alert
+                alert: alert,
+                alert_desc: desc
             })
         }
 
