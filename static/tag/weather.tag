@@ -41,7 +41,7 @@
 
     <div class="small">
         <div id="weather_alert_title">{alert}</div>
-        <div class="marquee">{alert_desc}</div>
+        <!--div class="marquee">{alert_desc}</div-->
     </div>
 
     <style>
@@ -49,6 +49,13 @@
             margin-top: 30px;
             font-weight: bold;
         }
+        /*
+
+        The marquee doesn't work too well... Choppy animation on the Pi,
+        doesn't scroll the whole message, and seems to cause some update
+        problem when there is a transition to having a weather alert and not
+        having a weather alert.
+
         .marquee {
             margin: 0 auto;
             overflow: hidden;
@@ -61,6 +68,7 @@
             0%   { text-indent: 27.5em }
             100% { text-indent: -105em }
         }
+        */
     </style>
 
     <script>
