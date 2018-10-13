@@ -5,8 +5,8 @@ https://developers.google.com/resources/api-libraries/documentation/calendar/v3/
 """
 import datetime
 import logging
-import os
 from functools import partial
+from pathlib import Path
 
 import httplib2
 import tzlocal
@@ -21,9 +21,9 @@ logger = logging.getLogger(__name__)
 
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 APPLICATION_NAME = 'Magic Mirror'
-CLIENT_SECRET = 'google_client_id.json'
-CREDENTIALS = 'google_calendar_creds.json'
-HERE = os.path.dirname(__file__)
+HERE = Path(__file__).parent
+CREDENTIALS_PATH = HERE / 'instance' / 'google_calendar_creds.json'
+CLIENT_SECRET_PATH = HERE / 'instance' / 'google_client_id.json'
 AGENDA_REFRESH_MINUTES = 5
 COMING_UP_REFRESH_MINUTES = 10
 
@@ -62,13 +62,18 @@ def get_coming_up():
 def get_credentials():
     store = get_credentials_store()
     credentials = store.get()
-    # say something helpful if not credentials or credentials.invalid
+    if not credentials:
+        raise Exception(
+            'No Google Calendar credentials available for agenda. '
+            'Check that {} is not missing or corrupt.'.format(CREDENTIALS_PATH)
+        )
+    if credentials.invalid:
+        raise Exception('Google Calendar credentials invalid for agenda.')
     return credentials
 
 
 def get_credentials_store():
-    credentials_file = os.path.join(HERE, 'instance', CREDENTIALS)
-    return file.Storage(credentials_file)
+    return file.Storage(str(CREDENTIALS_PATH))
 
 
 def no_filter(_event):
@@ -129,9 +134,8 @@ def event_sort_key_function(event):
 
 def get_user_permission():
     """Run through the OAuth flow to get credentials."""
-    client_id_file = os.path.join(HERE, 'instance', CLIENT_SECRET)
     store = get_credentials_store()
-    flow = client.flow_from_clientsecrets(client_id_file, SCOPES)
+    flow = client.flow_from_clientsecrets(str(CLIENT_SECRET_PATH), SCOPES)
     flow.user_agent = APPLICATION_NAME
     tools.run_flow(flow, store)
 

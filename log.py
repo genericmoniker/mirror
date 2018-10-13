@@ -18,7 +18,10 @@ def setup_logging(filename):
 def setup_file(filename, formatter):
     log_dir = os.path.dirname(filename)
     os.makedirs(log_dir, exist_ok=True)
-    file_handler = RotatingFileHandler(filename, maxBytes=10240, backupCount=5)
+    max_file_size = 2 ** 20  # one mebibyte
+    file_handler = RotatingFileHandler(
+        filename, maxBytes=max_file_size, backupCount=5
+    )
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
