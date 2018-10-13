@@ -1,5 +1,5 @@
 apscheduler==3.3.1
-flask==0.11.1
+flask==1.0.2
 google-api-python-client==1.5.1
 imapclient==2.0.0
 oauth2client==2.2.0  # A newer version is available, incompatible with Google.

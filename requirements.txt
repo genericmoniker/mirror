@@ -11,7 +11,7 @@ click==6.7                # via flask, pip-tools
 colorama==0.3.9           # via pytest
 contextlib2==0.5.5        # via raven
 first==2.0.1              # via pip-tools
-flask==0.11.1
+flask==1.0.2
 google-api-python-client==1.5.1
 httplib2==0.10.3          # via google-api-python-client, oauth2client
 imapclient==2.0.0
