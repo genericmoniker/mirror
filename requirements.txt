@@ -7,6 +7,8 @@
 apscheduler==3.3.1
 attrs==17.4.0             # via pytest
 blinker==1.4              # via raven
+certifi==2018.11.29       # via requests
+chardet==3.0.4            # via requests
 click==6.7                # via flask, pip-tools
 colorama==0.3.9           # via pytest
 contextlib2==0.5.5        # via raven
@@ -14,6 +16,7 @@ first==2.0.1              # via pip-tools
 flask==1.0.2
 google-api-python-client==1.5.1
 httplib2==0.10.3          # via google-api-python-client, oauth2client
+idna==2.7                 # via requests
 imapclient==2.0.0
 itsdangerous==0.24        # via flask
 jinja2==2.10              # via flask
@@ -27,10 +30,11 @@ pyasn1==0.4.2             # via oauth2client, pyasn1-modules, rsa
 pytest==3.4.2
 pytz==2018.3              # via apscheduler, tzlocal
 raven[flask]==6.0.0
-requests==2.10.0
+requests==2.20.1
 rsa==3.4.2                # via oauth2client
 simplejson==3.13.2        # via uritemplate
 six==1.11.0               # via apscheduler, google-api-python-client, imapclient, oauth2client, pip-tools, pytest
 tzlocal==1.2.2
 uritemplate==0.6          # via google-api-python-client
+urllib3==1.24.1           # via requests
 werkzeug==0.14.1          # via flask
