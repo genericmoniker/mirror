@@ -1,5 +1,6 @@
 import datetime
 import json
+import math
 from collections import namedtuple
 from functools import partial
 
@@ -29,8 +30,8 @@ def init_cache(app, scheduler):
 def get_message_data(app: Flask):
     messages = []
     now = datetime.datetime.now()
-    if now.month == 12 and now.day in range(1, 26):
-        messages.append(_get_ltw2017_message(app, now))
+    if now.month == 12:
+        messages.append(_get_ltw2018_message(app, now))
     messages.append(_get_52stories_message(app, now))
     messages.extend(_get_email_messages(app))
     return messages
@@ -47,10 +48,21 @@ def get_message():
     return render_template(message.template, **message.context)
 
 
-def _get_ltw2017_message(app: Flask, now):
-    data = _load_data(app, 'ltw2017', 'data.json')
-    context = data[now.day - 1]
-    return Message('ltw2017.html', context)
+def _ltw_week(dt):
+    if dt.day <= 8:
+        return 1
+    if dt.day <= 15:
+        return 2
+    if dt.day <= 22:
+        return 3
+    return 4
+
+
+def _get_ltw2018_message(app: Flask, now):
+    data = _load_data(app, 'ltw2018', 'data.json')
+    week_number = _ltw_week(now)
+    context = data[week_number - 1]
+    return Message('ltw2018.html', context)
 
 
 def _get_52stories_message(app: Flask, now: datetime):
