@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Weather data backed by the Dark Sky Forecast API.
 
 https://darksky.net/dev/

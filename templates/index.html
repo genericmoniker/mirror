@@ -12,7 +12,10 @@
 </head>
 <body>
 <div id="content">
-    <weather class="left"></weather>
+    <div class="left">
+        <weather></weather>
+        <worth></worth>
+    </div>
     <div class="right">
         <clock></clock>
         <countup label="Missionary for" date="2017-11-08"></countup>
@@ -21,11 +24,6 @@
         <div class="small">&nbsp;</div>
         <coming-up></coming-up>
     </div>
-    <!--
-    <div id="cash_flow">
-        <canvas id="cash_flow_canvas" width="550" height="100"></canvas>
-    </div>
-    -->
     <div id="message">
     </div>
 </div>
@@ -36,12 +34,13 @@
 <script data-src="{{ url_for('static', filename='tag/countup.tag') }}" type="riot/tag"></script>
 <script data-src="{{ url_for('static', filename='tag/agenda.tag') }}" type="riot/tag"></script>
 <script data-src="{{ url_for('static', filename='tag/coming_up.tag') }}" type="riot/tag"></script>
+<script data-src="{{ url_for('static', filename='tag/worth.tag') }}" type="riot/tag"></script>
 
 <script src="{{ url_for('static', filename='js/riot+compiler.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/jquery-2.2.0.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<script src="{{ url_for('static', filename='js/numline.js') }}"></script>
 <script>
     riot.mount('*')
 </script>

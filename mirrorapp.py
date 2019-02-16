@@ -7,8 +7,8 @@ from raven.contrib.flask import Sentry
 
 import agenda
 import messages
-import tasks
 import weather
+import worth
 from log import setup_logging
 
 app = Flask(__name__, instance_relative_config=True)
@@ -53,6 +53,10 @@ def current_weather():
     return jsonify(weather.get_weather())
 
 
+@app.route('/worth')
+def current_worth():
+    return jsonify(worth.get_worth())
+
 @app.route('/agenda')
 def upcoming_agenda():
     return jsonify(agenda.get_agenda())
@@ -63,20 +67,19 @@ def upcoming_all_day_events():
     return jsonify(agenda.get_coming_up())
 
 
-@app.route('/tasks')
-def task_lists():
-    return jsonify(tasks.get_task_lists(app.config))
-
-
 @app.route('/message')
 def message():
     return messages.get_message()
 
 
+@app.before_first_request
+def startup():
+    scheduler = BackgroundScheduler()
+    agenda.init_cache(app.config, scheduler)
+    messages.init_cache(app, scheduler)
+    weather.init_cache(app.config, scheduler)
+    scheduler.start()
+
+
 if __name__ == '__main__':
-    sched = BackgroundScheduler()
-    agenda.init_cache(app.config, sched)
-    messages.init_cache(app, sched)
-    weather.init_cache(app.config, sched)
-    sched.start()
     app.run(debug=False)
