@@ -1,6 +1,10 @@
 # Project-specific
 instance
+data_samples
+
+# IDEs
 .idea
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -42,6 +46,7 @@ nosetests.xml
 coverage.xml
 *,cover
 .hypothesis/
+.pytest_cache
 
 # Translations
 *.mo
