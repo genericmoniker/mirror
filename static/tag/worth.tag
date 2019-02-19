@@ -22,6 +22,9 @@
         }
 
         updateChart(data) {
+            if (data.length == 0) {
+                return;  // nothing to show
+            }
             var ctx = this.refs.chart.getContext('2d');
             var points = data.length;
             var labels = this.lastDates(points);

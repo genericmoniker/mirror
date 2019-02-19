@@ -6,9 +6,11 @@ from flask import request
 from raven.contrib.flask import Sentry
 
 import agenda
+import database
 import messages
 import weather
 import worth
+import sys
 from log import setup_logging
 
 app = Flask(__name__, instance_relative_config=True)
@@ -28,9 +30,7 @@ def root():
 def rotate_page_count():
     path = Path(app.root_path, app.template_folder)
     pages = list(path.glob('rotate_*.html'))
-    return jsonify({
-        'count': len(pages)
-    })
+    return jsonify({'count': len(pages)})
 
 
 @app.route('/rotate')
@@ -57,6 +57,7 @@ def current_weather():
 def current_worth():
     return jsonify(worth.get_worth())
 
+
 @app.route('/agenda')
 def upcoming_agenda():
     return jsonify(agenda.get_agenda())
@@ -74,12 +75,26 @@ def message():
 
 @app.before_first_request
 def startup():
+    database.init()
     scheduler = BackgroundScheduler()
     agenda.init_cache(app.config, scheduler)
     messages.init_cache(app, scheduler)
     weather.init_cache(app.config, scheduler)
+    worth.init(scheduler)
     scheduler.start()
 
 
+def setup_application():
+    database.init()
+    database.db.connect()
+    try:
+        worth.setup()
+    finally:
+        database.db.close()
+
+
 if __name__ == '__main__':
-    app.run(debug=False)
+    if len(sys.argv) > 1 and sys.argv[1] == '--setup':
+        setup_application()
+    else:
+        app.run(debug=False)
