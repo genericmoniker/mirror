@@ -64,11 +64,13 @@ You'll also need to create an `instance` directory, and configure
 services as described below.
 
 
-Python 3 Setup
---------------
+Python 3.5 Setup
+----------------
 
 ```bash
-python3 -m venv .envs/mirror
+sudo apt-get update
+sudo apt-get install libffi-dev libssl-dev
+python3 -m venv ~/.envs/mirror
 . ~/.envs/mirror/bin/activate
 cd mirror
 pip install wheel

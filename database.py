@@ -1,7 +1,6 @@
 from cryptography.fernet import Fernet
 from peewee import SqliteDatabase, Model, CharField, DateField, IntegerField
 
-from os import fspath
 from pathlib import Path
 
 import datetime
@@ -10,7 +9,7 @@ HERE = Path(__file__).parent
 DB_PATH = HERE / 'instance' / 'mirror.db'
 KEY_PATH = HERE / 'instance' / 'mirror.key'
 
-db = SqliteDatabase(fspath(DB_PATH))
+db = SqliteDatabase(str(DB_PATH))
 key = None
 
 
