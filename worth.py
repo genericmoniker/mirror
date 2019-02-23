@@ -44,9 +44,15 @@ def _update_worth():
     username = get_secret('PC_USERNAME')
     password = get_secret('PC_PASSWORD')
     data = _fetch_accounts_data(username, password)
-    value = data['spData']['networth']
-    value = round(value)
+    value = _calculate_worth(data)
     add_net_worth_value(value)
+    return value
+
+
+def _calculate_worth(data):
+    cash = data['spData']['cashAccountsTotal']
+    credit = data['spData']['creditCardAccountsTotal']
+    value = round((cash - credit) / 1000)
     return value
 
 

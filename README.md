@@ -95,6 +95,23 @@ FORECAST_API_KEY = '<your forecast.io api key here>'
 FORECAST_LOCATION = '<lat>,<long>'
 ```
 
+### Worth ###
+
+If you use [Personal Capital](https://www.personalcapital.com/), you can set up
+the mirror to show a simplified graph of "net worth". This is just the total of
+cash accounts minus the total of credit accounts, to give a quick spending 
+metric. The value is shown rounded to the nearest $1000, and doesn't actually
+show a dollar sign anywhere.
+
+To set it up, run:
+```bash
+~/.envs/mirror/bin/python3 mirrorapp.py --setup 
+```
+It will prompt you for your username and password, and will go through the
+two-factor process (send an SMS to your registered phone number).
+
+Your credentials are stored in a well-obfuscated form in `instance/mirror.db`.
+
 ### Agenda ###
 
 Follow [steps a through f here](https://goo.gl/5ao8u2) to get a client 
