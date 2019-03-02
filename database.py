@@ -9,7 +9,7 @@ HERE = Path(__file__).parent
 DB_PATH = HERE / 'instance' / 'mirror.db'
 KEY_PATH = HERE / 'instance' / 'mirror.key'
 
-db = SqliteDatabase(str(DB_PATH))
+db = SqliteDatabase(None)
 key = None
 
 
@@ -60,14 +60,20 @@ def get_net_worth_values():
     return [nw.value for nw in NetWorth.select(NetWorth.value)]
 
 
-def add_net_worth_value(value, date=None, max_days=5):
+def add_net_worth_value(value, date=None, max_days=30):
     date = date or datetime.date.today()
     cut_off = date - datetime.timedelta(days=max_days)
     NetWorth.delete().where(NetWorth.date <= cut_off).execute()
-    return NetWorth.replace(date=date, value=value).execute()
+    entry = NetWorth.get_or_none(NetWorth.date == date)
+    if entry:
+        entry.value = value
+    else:
+        entry = NetWorth(date=date, value=value)
+    entry.save()
 
 
 def init():
+    db.init(str(DB_PATH))
     db.connect()
     db.create_tables([Secret, NetWorth])
     db.close()

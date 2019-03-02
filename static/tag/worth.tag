@@ -1,7 +1,13 @@
 <worth>
     <div>
-        <canvas ref="chart" height="100"></canvas>
+        <canvas ref="chart"></canvas>
     </div>
+
+    <style>
+        canvas {
+            width: 400px !important;
+        }
+    </style>
 
     <script>
         // Get an array of the day of the month for the last n days.
@@ -21,10 +27,16 @@
                 .map(Number.prototype.valueOf, 0);
         }
 
+        // Scale fixed point value (cents) to thousands of dollars.
+        scaleData(data) {
+            return data.map(function(x) { return x / 100000; });
+        }
+
         updateChart(data) {
             if (data.length == 0) {
                 return;  // nothing to show
             }
+            data = this.scaleData(data);
             var ctx = this.refs.chart.getContext('2d');
             var points = data.length;
             var labels = this.lastDates(points);
@@ -50,13 +62,15 @@
                 },
                 options: {
                     legend: {display: false},
-                    tooltips: {enabled: false}
+                    tooltips: {enabled: false},
+                    responsive: true,
+                    maintainAspectRatio: false                    
                 }
             });            
         }
 
         tick() {
-            $.getJSON("/worth", function(json) {
+            $.getJSON("/worth?limit=10", function(json) {
                 this.updateChart(json.values)
             }.bind(this))
         }

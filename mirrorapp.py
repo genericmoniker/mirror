@@ -55,7 +55,8 @@ def current_weather():
 
 @app.route('/worth')
 def current_worth():
-    return jsonify(worth.get_worth())
+    limit = int(request.args.get('limit', 30))
+    return jsonify(worth.get_worth(limit))
 
 
 @app.route('/agenda')

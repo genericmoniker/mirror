@@ -34,10 +34,10 @@ def init(scheduler):
     )
 
 
-def get_worth():
+def get_worth(limit):
     """Get net worth for the past several days."""
     values = get_net_worth_values() or [_update_worth()]
-    return {'values': values}
+    return {'values': values[-limit:]}
 
 
 def _update_worth():
