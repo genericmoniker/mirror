@@ -45,6 +45,7 @@ def _update_worth():
     password = get_secret('PC_PASSWORD')
     data = _fetch_accounts_data(username, password)
     value = _calculate_worth(data)
+    value = int(value * 100)  # Store as a fixed point decimal (or cents).
     add_net_worth_value(value)
     return value
 
@@ -52,8 +53,9 @@ def _update_worth():
 def _calculate_worth(data):
     cash = data['spData']['cashAccountsTotal']
     credit = data['spData']['creditCardAccountsTotal']
-    value = round((cash - credit) / 1000)
-    return value
+    net = cash - credit
+    logger.info('cash: %s, credit: %s, net: %s', cash, credit, net)
+    return net
 
 
 def _fetch_accounts_data(username, password, interactive=False):

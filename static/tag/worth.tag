@@ -64,7 +64,19 @@
                     legend: {display: false},
                     tooltips: {enabled: false},
                     responsive: true,
-                    maintainAspectRatio: false                    
+                    maintainAspectRatio: false,                    
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                fontColor: "white",
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                fontColor: "white",
+                            }
+                        }]
+                    }
                 }
             });            
         }
