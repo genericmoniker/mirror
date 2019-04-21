@@ -11,7 +11,7 @@ atomicwrites==1.3.0       # via pytest
 attrs==19.1.0             # via pytest
 blinker==1.4              # via raven
 certifi==2019.3.9         # via requests
-cffi==1.12.2              # via cryptography
+cffi==1.12.3              # via cryptography
 chardet==3.0.4            # via requests
 click==7.0                # via flask, pip-tools
 colorama==0.4.1           # via pylint, pytest
@@ -30,6 +30,7 @@ markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via pylint
 more-itertools==7.0.0     # via pytest
 oauth2client==2.2.0
+pathlib2==2.3.3           # via pytest
 peewee==3.8.2
 personalcapital==1.0.1
 pip-tools==3.3.2
@@ -39,16 +40,16 @@ pyasn1-modules==0.2.4     # via oauth2client
 pyasn1==0.4.5             # via oauth2client, pyasn1-modules, rsa
 pycparser==2.19           # via cffi
 pylint==2.3.1
-pytest==4.4.0
+pytest==4.4.1
 pytz==2019.1              # via apscheduler, tzlocal
 raven[flask]==6.0.0
 requests==2.20.1
 rsa==4.0                  # via oauth2client
 simplejson==3.16.0        # via uritemplate
-six==1.12.0               # via apscheduler, astroid, cryptography, google-api-python-client, imapclient, oauth2client, pip-tools, pytest
-typed-ast==1.3.1          # via astroid
+six==1.12.0               # via apscheduler, astroid, cryptography, google-api-python-client, imapclient, oauth2client, pathlib2, pip-tools, pytest
+typed-ast==1.3.4          # via astroid
 tzlocal==1.2.2
 uritemplate==0.6          # via google-api-python-client
-urllib3==1.24.1           # via requests
+urllib3==1.24.2           # via requests
 werkzeug==0.15.2          # via flask
 wrapt==1.11.1             # via astroid
