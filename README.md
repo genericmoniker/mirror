@@ -117,15 +117,19 @@ Your credentials are stored in a well-obfuscated form in `instance/mirror.db`.
 ### Agenda ###
 
 Follow [steps a through f here](https://goo.gl/5ao8u2) to get a client 
-id json file, but save it as "google_client_id.json" in the instance 
+id json file, but save it as "google_client_id.json" in the `instance` 
 directory.
 
 Then run agenda.py, which will launch your default browser so that you
 can authorize the mirror application for read-only access to your 
 Google Calendars. This will save google_calendar_creds.json into the
-instance directory, which will allow the mirror access. You can do this
+`instance` directory, which will allow the mirror access. You can do this
 on a desktop machine and copy google_calendar_creds.json to your Pi if 
 that's easier.
+
+The agenda shows events for today, and "all-day" events for the next few days.
+If you want to have events farther out show up, you can put "mirror-countdown"
+in them somewhere (probably the description makes the most sense).
 
 ### Emails ###
 

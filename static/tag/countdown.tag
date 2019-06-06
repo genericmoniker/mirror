@@ -1,18 +1,39 @@
 <countdown>
-    <div class="small">{opts.label} {daysNumber} {daysString}</div>
+    <div class="small">
+        <div each={items} class="item">
+            {summary} {fromNow}
+        </div>
+    </div>
 
     <script>
-        tick() {
-            var now = moment()
-            var then = moment(opts.date)
-            var days = then.diff(now, 'days')
+        updateCountdown(data) {
+            var items = []
+            console.log("countdown item count: " + data.items.length)
+            for (var i = 0; i < data.items.length; i++) {
+                var item = data.items[i]
+                var start = moment(item.start.date)
+                var fromNow = start.fromNow()
+                if (fromNow.indexOf("hour") != -1) {
+                    fromNow = "tomorrow"
+                }
+                items.push({
+                    fromNow: fromNow,
+                    summary: item.summary
+                })
+            }
+
             this.update({
-                daysNumber: days,
-                daysString: days === 1 ? 'day' : 'days'
+                items: items
             })
         }
 
-        var timer = setInterval(this.tick, moment.duration(1, 'hour').asMilliseconds())
+        tick() {
+            $.getJSON("/countdown", function(json) {
+                this.updateCountdown(json)
+            }.bind(this))
+        }
+
+        var timer = setInterval(this.tick, moment.duration(10, 'minutes').asMilliseconds())
 
         this.on('mount', function() {
             this.tick()

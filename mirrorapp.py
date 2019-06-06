@@ -69,6 +69,11 @@ def upcoming_all_day_events():
     return jsonify(agenda.get_coming_up())
 
 
+@app.route('/countdown')
+def countdown_events():
+    return jsonify(agenda.get_countdown())
+
+
 @app.route('/message')
 def message():
     return messages.get_message()

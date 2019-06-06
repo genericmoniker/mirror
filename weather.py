@@ -39,7 +39,7 @@ def build_url(config):
 
 
 def get_weather_data(url):
-    return requests.get(url).json()
+    return requests.get(url, timeout=20).json()
 
 
 def get_weather():
