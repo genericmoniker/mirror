@@ -1,7 +1,7 @@
 <countdown>
     <div class="small">
         <div each={items} class="item">
-            {summary} {fromNow} ({fromNowDays} days)
+            {summary} {fromNow} {fromNowDays}
         </div>
     </div>
 
@@ -13,7 +13,10 @@
                 var item = data.items[i]
                 var start = moment(item.start.date)
                 var fromNow = start.fromNow()
-                var fromNowDays = start.diff(moment(), 'days')
+                var fromNowDays = ''
+                if (fromNow.indexOf('days') === -1) { 
+                    fromNowDays = '(' + start.diff(moment(), 'days') + ' days)'
+                }
                 if (fromNow.indexOf("hour") != -1) {
                     fromNow = "tomorrow"
                 }
