@@ -122,9 +122,9 @@ directory.
 
 Then run agenda.py, which will launch your default browser so that you
 can authorize the mirror application for read-only access to your 
-Google Calendars. This will save google_calendar_creds.json into the
+Google Calendars. This will save google_token.pickle into the
 `instance` directory, which will allow the mirror access. You can do this
-on a desktop machine and copy google_calendar_creds.json to your Pi if 
+on a desktop machine and copy google_token.pickle to your Pi if 
 that's easier.
 
 The agenda shows events for today, and "all-day" events for the next few days.
