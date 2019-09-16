@@ -5,16 +5,16 @@ https://developers.google.com/resources/api-libraries/documentation/calendar/v3/
 """
 import datetime
 import logging
+import pickle
+import threading
 from functools import partial
 from pathlib import Path
 
-import httplib2
 import tzlocal
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
-from oauth2client import client
-from oauth2client import file
-from oauth2client import tools
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
 
 from cache import Cache
 
@@ -23,7 +23,8 @@ logger = logging.getLogger(__name__)
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 APPLICATION_NAME = 'Magic Mirror'
 HERE = Path(__file__).parent
-CREDENTIALS_PATH = HERE / 'instance' / 'google_calendar_creds.json'
+CREDENTIALS_PATH = HERE / 'instance' / 'google_token.pickle'
+CREDENTIALS_LOCK = threading.Lock()
 CLIENT_SECRET_PATH = HERE / 'instance' / 'google_client_id.json'
 AGENDA_REFRESH_MINUTES = 5
 COMING_UP_REFRESH_MINUTES = 10
@@ -79,20 +80,29 @@ def get_countdown():
 
 
 def get_credentials():
-    store = get_credentials_store()
-    credentials = store.get()
-    if not credentials:
-        raise Exception(
-            'No Google Calendar credentials available for agenda. '
-            'Check that {} is not missing or corrupt.'.format(CREDENTIALS_PATH)
+    with CREDENTIALS_LOCK:
+        err = (
+            'Error loading Google credentials from {}. '
+            'Run agenda.py to generate a new credentials file. Problem: '
+            .format(CREDENTIALS_PATH)
         )
-    if credentials.invalid:
-        raise Exception('Google Calendar credentials invalid for agenda.')
-    return credentials
-
-
-def get_credentials_store():
-    return file.Storage(str(CREDENTIALS_PATH))
+        if not CREDENTIALS_PATH.exists():
+            raise Exception(err + 'File does not exist.')
+        try:
+            credentials = pickle.loads(CREDENTIALS_PATH.read_bytes())
+        except Exception as e:
+            raise Exception(err + 'Error un-pickling.') from e
+        if not credentials:
+            raise Exception(err + 'No data un-pickled.')
+        if not credentials.valid and not credentials.expired:
+            raise Exception(err + 'Credentials invalid but not expired.')
+        if not credentials.valid and not credentials.refresh_token:
+            raise Exception(err + 'Credentials expired but no refresh token.')
+        if not credentials.valid:
+            logger.info('Refreshing Google credentials.')
+            credentials.refresh(Request())
+        CREDENTIALS_PATH.write_bytes(pickle.dumps(credentials))
+        return credentials
 
 
 def no_filter(_event):
@@ -123,8 +133,7 @@ def get_calendar_data(list_args, filter_func=no_filter):
         The function should return True to include, False to exclude.
     """
     credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('calendar', 'v3', http=http)
+    service = discovery.build('calendar', 'v3', credentials=credentials)
     calendar_list = service.calendarList().list().execute()
     events = []
     for calendar_list_entry in calendar_list['items']:
@@ -181,10 +190,10 @@ def get_countdown_data():
 
 def get_user_permission():
     """Run through the OAuth flow to get credentials."""
-    store = get_credentials_store()
-    flow = client.flow_from_clientsecrets(str(CLIENT_SECRET_PATH), SCOPES)
-    flow.user_agent = APPLICATION_NAME
-    tools.run_flow(flow, store)
+    flow = InstalledAppFlow.from_client_secrets_file(
+        str(CLIENT_SECRET_PATH), SCOPES)
+    credentials = flow.run_local_server(port=0)
+    CREDENTIALS_PATH.write_bytes(pickle.dumps(credentials))
 
 
 def now_tz():
