@@ -11,7 +11,8 @@
             console.log("countdown item count: " + data.items.length)
             for (var i = 0; i < data.items.length; i++) {
                 var item = data.items[i]
-                var start = moment(item.start.date)
+                var start = moment('dateTime' in item.start ?
+                    item.start.dateTime : item.start.date)
                 var fromNow = start.fromNow()
                 var fromNowDays = ''
                 if (fromNow.indexOf('days') === -1) { 
