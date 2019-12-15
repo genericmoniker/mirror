@@ -8,7 +8,7 @@ WARNING: Work-in-progress; meets my needs but isn't fully generalized.
 Raspberry Pi Setup
 ------------------
 
-Using Raspbian Stretch.
+Using Raspbian Buster.
 
 Install the unclutter package for hiding the mouse cursor.
 
@@ -25,12 +25,12 @@ Add a line to the end of the file:
 
 The value indicates the orientation:
 
-| Value  | Orientation |
-|---|---------------|
-| 0 | Normal |
-| 1 | 90 degrees |
-| 2 | 180 degrees |
-| 3 | 270 degrees |
+| Value | Orientation |
+| ----- | ----------- |
+| 0     | Normal      |
+| 1     | 90 degrees  |
+| 2     | 180 degrees |
+| 3     | 270 degrees |
 
 Clone this repo to `~/mirror`.
 
@@ -41,11 +41,11 @@ Copy the mirror-server systemd service unit file and enable it:
 
 Make a backup of your autostart file (just in case):
 
-    cp ~/.config/lxsession/LXDE-pi/autostart ~/.config/lxsession/LXDE-pi/autostart.bak
+    sudo cp /etc/xdg/lxsession/LXDE-pi/autostart /etc/xdg/lxsession/LXDE-pi/autostart/autostart.bak
 
 Copy the `autostart` file from the project:
 
-    cp ~/mirror/system/autostart ~/.config/lxsession/LXDE-pi/autostart
+    sudo cp ~/mirror/system/autostart /etc/xdg/lxsession/LXDE-pi/autostart
 
 If you want, use the `scroff.sh` and `scron.sh` scripts in a cron job to
 schedule when the screen will be off/on. Those need to be run by root. To edit
@@ -64,7 +64,7 @@ You'll also need to create an `instance` directory, and configure
 services as described below.
 
 
-Python 3.5 Setup
+Python 3.7 Setup
 ----------------
 
 ```bash
@@ -172,7 +172,11 @@ If the browser doesn't show the right data when starting the Pi, it's likely
 that the Python application had an exception while starting. You can check that
 by ssh into the Pi and running:
 
-    sudo systemctl status mirror-server
+    systemctl status mirror-server
+
+Or, to see more logs:
+
+    journalctl -u mirror-server
 
 If you want to run the application stand-alone:
 
