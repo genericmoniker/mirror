@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-# Turn the screen off (requires root)
-/opt/vc/bin/tvservice -o
+# Turn the screen off 
+vcgencmd display_power 0
