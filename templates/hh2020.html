@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Hear Him{% endblock %}
+
+{% block head %}
+<style type="text/css">
+    #logo {
+        font-style: italic;
+        font-weight: bold;
+        font-family: Georgia, 'Times New Roman', Times, serif;
+    }
+    #day {
+        font-variant: small-caps;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+    #title {
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div id="logo">#HearHim</div>
+    <div id="day" class="small">{{ day }}</div>
+    <div id="title">{{ title }}</div>
+    <div id="description">{{ description }}</div>
+
+{% endblock %}

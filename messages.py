@@ -30,8 +30,8 @@ def init_cache(app, scheduler):
 def get_message_data(app: Flask):
     messages = []
     now = datetime.datetime.now()
-    if now.month == 12:
-        messages.append(_get_ltw2018_message(app, now))
+    if now.month == 4 and now.day < 13:
+        messages.append(_get_hh2020_message(app, now))
     messages.append(_get_52stories_message(app, now))
     messages.extend(_get_email_messages(app))
     return messages
@@ -56,6 +56,13 @@ def _ltw_week(dt):
     if dt.day <= 22:
         return 3
     return 4
+
+
+def _get_hh2020_message(app: Flask, now):
+    data = _load_data(app, 'hh2020', 'data.json')
+    day_number = now.day - 6
+    context = data[day_number]
+    return Message('hh2020.html', context)
 
 
 def _get_ltw2018_message(app: Flask, now):

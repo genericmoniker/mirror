@@ -8,7 +8,7 @@ imapclient==2.0.0
 peewee==3.10.0
 personalcapital==1.0.1
 raven[flask]==6.0.0
-requests==2.20.1
+requests==2.21.0
 tzlocal==1.2.2
 #-e git+https://github.com/sarumont/py-trello.git@1325e31#egg=py-trello
 
