@@ -12,7 +12,8 @@ def fetch_messages(app: Flask):
     Only messages from the past 7 days that have "Mirror" in the subject are
     fetched.
 
-    :return: list of dict with {'sender': <sender>, 'body': <body>}.
+    :return: list of dict with:
+        {'sender': <sender>, 'body': <body>, 'body_lines': [<lines>]}.
     """
     if not app.config.get('IMAP_HOST'):
         return []
@@ -45,7 +46,7 @@ def fetch_messages(app: Flask):
             else:
                 message = parts[0]
         body = message.get_payload(decode=True).decode()
-        result.append(dict(sender=sender, body=body))
+        result.append(dict(sender=sender, body=body, body_lines=body.splitlines()))
     return result
 
 

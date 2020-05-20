@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-    <p>{{ body }}</p>
+    <p>{% for line in body_lines %} {{ line }} <br/> {% endfor %}
     <p class="small" style="vertical-align: middle; color: #e1e1e1">
         <span class="far fa-envelope"></span>
         <span style="padding-left: 5px">{{ sender }}</span>
