@@ -6,6 +6,7 @@ from flask import request
 from raven.contrib.flask import Sentry
 
 import agenda
+import connectivity
 import database
 import messages
 import weather
@@ -48,6 +49,11 @@ def alive():
     return 'OK'
 
 
+@app.route('/connectivity')
+def get_connectivity():
+    return jsonify(connectivity.get_connectivity())
+
+
 @app.route('/weather')
 def current_weather():
     return jsonify(weather.get_weather())
@@ -84,6 +90,7 @@ def startup():
     database.init()
     scheduler = BackgroundScheduler()
     agenda.init_cache(app.config, scheduler)
+    connectivity.init_cache(app.config, scheduler)
     messages.init_cache(app, scheduler)
     weather.init_cache(app.config, scheduler)
     worth.init(scheduler)
