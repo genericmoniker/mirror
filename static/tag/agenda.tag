@@ -40,7 +40,7 @@
             }
             if (data.items.length == 0) {
                 items.push({
-                    start: "Nothing more today",
+                    start: "No more jobs!",
                     summary: ""
                 })
             }
