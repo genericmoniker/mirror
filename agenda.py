@@ -6,9 +6,12 @@ https://developers.google.com/resources/api-libraries/documentation/calendar/v3/
 import datetime
 import logging
 import pickle
+import re
 import threading
 from functools import partial
 from pathlib import Path
+
+from flask import current_app
 
 import tzlocal
 from googleapiclient import discovery
@@ -115,7 +118,14 @@ def coming_up_filter(event):
         return False
     # For multi-day events, skip them if they've already started.
     start = parse_date_tz(event['start']['date'])
-    return start > start_of_day_tz()
+    if start <= start_of_day_tz():
+        return False
+    # Check any custom filters from the config.
+    pattern = current_app.config.get('COMING_UP_FILTER')
+    if pattern and re.match(pattern, event['summary']):
+        return False
+
+    return True
 
 
 def get_agenda_data(range_func, filter_func=no_filter):

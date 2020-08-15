@@ -1,7 +1,7 @@
 mirror
 ======
 
-Smart/Magic Mirror 
+Smart/Magic Mirror
 
 WARNING: Work-in-progress; meets my needs but isn't fully generalized.
 
@@ -101,13 +101,13 @@ FORECAST_LOCATION = '<lat>,<long>'
 
 If you use [Personal Capital](https://www.personalcapital.com/), you can set up
 the mirror to show a simplified graph of "net worth". This is just the total of
-cash accounts minus the total of credit accounts, to give a quick spending 
+cash accounts minus the total of credit accounts, to give a quick spending
 metric. The value is shown rounded to the nearest $1000, and doesn't actually
 show a dollar sign anywhere.
 
 To set it up, run:
 ```bash
-~/.envs/mirror/bin/python3 mirrorapp.py --setup 
+~/.envs/mirror/bin/python3 mirrorapp.py --setup
 ```
 It will prompt you for your username and password, and will go through the
 two-factor process (send an SMS to your registered phone number).
@@ -116,18 +116,27 @@ Your credentials are stored in a well-obfuscated form in `instance/mirror.db`.
 
 ### Agenda ###
 
-Follow [steps a through f here](https://goo.gl/5ao8u2) to get a client 
-id json file, but save it as "google_client_id.json" in the `instance` 
+Follow [steps a through f here](https://goo.gl/5ao8u2) to get a client
+id json file, but save it as "google_client_id.json" in the `instance`
 directory.
 
 Then run agenda.py, which will launch your default browser so that you
-can authorize the mirror application for read-only access to your 
+can authorize the mirror application for read-only access to your
 Google Calendars. This will save google_token.pickle into the
 `instance` directory, which will allow the mirror access. You can do this
-on a desktop machine and copy google_token.pickle to your Pi if 
+on a desktop machine and copy google_token.pickle to your Pi if
 that's easier.
 
 The agenda shows events for today, and "all-day" events for the next few days.
+You can filter out some upcoming events with a regular expression in
+`instance/config.py`:
+
+```py
+COMING_UP_FILTER = '[AB] DAY'
+```
+
+Events whose summary matches the regular expression are *excluded*.
+
 If you want to have events farther out show up, you can put "mirror-countdown"
 in them somewhere (probably the description makes the most sense).
 
@@ -152,7 +161,7 @@ password.
 (Currently disabled)
 
 Tasks are pulled from Trello cards. There are several items to set in
-instance/config.py. First are [API keys](https://trello.com/app-key), 
+instance/config.py. First are [API keys](https://trello.com/app-key),
 while the last couple are used to choose which Boards/Lists are
 displayed.
 
