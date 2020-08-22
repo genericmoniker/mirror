@@ -17,7 +17,7 @@ from log import setup_logging
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config')
 app.config.from_pyfile('config.py')
-setup_logging(app.config.get('LOG_FILE_PATH'))
+setup_logging()
 if 'SENTRY_CONFIG' in app.config.keys():
     sentry = Sentry(app)
 

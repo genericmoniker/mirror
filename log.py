@@ -1,33 +1,21 @@
 import logging
-from logging.handlers import RotatingFileHandler
-
 import os
 import sys
 
-logger = logging.getLogger()
+
+def setup_logging():
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(_get_log_formatter())
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)
+    root_logger.addHandler(handler)
 
 
-def setup_logging(filename):
-    fmt = '%(asctime)s [%(thread)d] %(levelname)1.1s %(message)s'
-    formatter = logging.Formatter(fmt)
-    if filename:
-        setup_file(filename, formatter)
-    setup_stream(formatter)
-
-
-def setup_file(filename, formatter):
-    log_dir = os.path.dirname(filename)
-    os.makedirs(log_dir, exist_ok=True)
-    max_file_size = 2 ** 20  # one mebibyte
-    file_handler = RotatingFileHandler(
-        filename, maxBytes=max_file_size, backupCount=5
-    )
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-
-
-def setup_stream(formatter):
-    strm_handler = logging.StreamHandler(sys.stdout)
-    strm_handler.setFormatter(formatter)
-    logger.addHandler(strm_handler)
-    logger.setLevel(logging.INFO)
+def _get_log_formatter():
+    # If running under systemd, use a simple format since the journal
+    # adds its own metadata (including, for example, the date/time).
+    if os.getppid() == 1:
+        fmt = '%(message)s'
+    else:
+        fmt = '%(asctime)s [%(thread)d] %(levelname)1.1s %(message)s'
+    return logging.Formatter(fmt)
