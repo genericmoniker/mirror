@@ -6,3 +6,4 @@ creating the plugin.
 """
 from .configure import configure_plugin
 from .sample import create_plugin
+from .sample import get_scripts

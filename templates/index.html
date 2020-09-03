@@ -14,6 +14,7 @@
 <connectivity></connectivity>
 <div id="content">
     <div class="left">
+        <sample></sample>
         <weather></weather>
         <br>
         <worth></worth>
@@ -30,7 +31,14 @@
     <div id="message">
     </div>
 </div>
-<!-- Riot Tags -->
+
+<!-- Riot Tags and other plugin scripts. -->
+{% for plugin_name, scripts in plugin_scripts.items() %}
+    {% for filename, type in scripts %}
+<script data-src="{{ url_for(plugin_name + '.static', filename=filename) }}" type="{{type}}"></script>
+    {% endfor %}
+{% endfor %}
+
 <script data-src="{{ url_for('static', filename='tag/weather.tag') }}" type="riot/tag"></script>
 <script data-src="{{ url_for('static', filename='tag/clock.tag') }}" type="riot/tag"></script>
 <script data-src="{{ url_for('static', filename='tag/countdown.tag') }}" type="riot/tag"></script>

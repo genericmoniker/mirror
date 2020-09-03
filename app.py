@@ -19,9 +19,11 @@ def create_app():
 
     app = Flask(__name__, instance_relative_config=True)
 
+    plugin_scripts = {}
+
     @app.route("/")
-    def _root():
-        return render_template("index.html")
+    def _index():
+        return render_template("index.html", plugin_scripts=plugin_scripts)
 
     @app.route("/alive")
     def _alive():
@@ -32,16 +34,17 @@ def create_app():
         return jsonify({})
 
     start()
-    _load_plugins(app)
+    _load_plugins(app, plugin_scripts)
 
     return app
 
 
-def _load_plugins(app: Flask) -> None:
+def _load_plugins(app: Flask, plugin_scripts: list) -> None:
     plugins = discover_plugins()
     for name, module in plugins.items():
         try:
             blueprint = module.create_plugin(PluginContext(name))
             app.register_blueprint(blueprint, url_prefix='/' + name)
+            plugin_scripts[name] = module.get_scripts()
         except Exception:
             _logger.exception("Failed to load plugin '%s'", name)

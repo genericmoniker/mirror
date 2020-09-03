@@ -33,6 +33,17 @@ def create_plugin(context) -> Blueprint:
     return bp
 
 
+def get_scripts() -> list:
+    """Get a list of scripts this plugin uses.
+
+    Usually a plugin provides at least one Riot.js tag as a script.
+
+    The scripts are a tuple of (filename, type). The filename is relative to the
+    bluprint "static" folder.
+    """
+    return [("sample.tag", "riot/tag")]
+
+
 def refresh_data(db):
     """Refresh the plugin's data.
 
