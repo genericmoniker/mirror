@@ -1,6 +1,6 @@
 import logging
 
-from flask import Flask, jsonify, render_template
+from flask import Flask, render_template
 
 from log import setup_logging
 from plugin_context import PluginContext, start
@@ -28,10 +28,6 @@ def create_app():
     @app.route("/alive")
     def _alive():
         return "OK"
-
-    @app.route("/discovery")
-    def _discovery():
-        return jsonify({})
 
     start()
     _load_plugins(app, plugin_scripts)

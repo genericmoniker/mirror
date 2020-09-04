@@ -11,12 +11,6 @@ Plugins use Riot.js tags for the client-side implementation.
     </style>
 
     <script>
-        discovery() {
-            $.getJSON("/discovery", function(json) {
-                this.url = json["sample"]  // This is the root -- multiple tags could use the same root URL.
-            }.bind(this))
-        }
-
         tick() {
             $.getJSON(this.url, function(json) {
                 this.update(json)
@@ -26,7 +20,11 @@ Plugins use Riot.js tags for the client-side implementation.
         var timer = setInterval(this.tick, moment.duration(1, 'minutes').asMilliseconds())
 
         this.on('mount', function() {
-            this.discovery()
+
+            // Plugin server-side resources are mounted
+            // at the path matching the plugin name:
+            this.url = '/sample/'
+
             this.tick()
         })
 
