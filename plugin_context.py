@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from functools import partial
 import json
 from pathlib import Path
@@ -76,10 +76,36 @@ class PluginContext:
         return str(HERE / "instance" / "mirror.db")
 
     def _encrypted_json_encoder(self, obj: object):
-        return self._fernet.encrypt(json.dumps(obj).encode())
+        return self._fernet.encrypt(json.dumps(obj, cls=ExtendedEncoder).encode())
 
     def _encrypted_json_decoder(self, data: bytes) -> object:
-        return json.loads(self._fernet.decrypt(data))
+        return json.loads(self._fernet.decrypt(data), cls=ExtendedDecoder)
+
+
+class ExtendedEncoder(json.JSONEncoder):
+    """JSON encoder that handles additional object types."""
+
+    def default(self, obj):
+        if hasattr(obj, "isoformat"):
+            return {"_dt_": obj.isoformat()}
+
+        return json.JSONEncoder.default(self, obj)
+
+
+class ExtendedDecoder(json.JSONDecoder):
+    """JSON decoder that handles additional object types."""
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs, object_hook=self._object_hook)
+
+    @staticmethod
+    def _object_hook(obj):
+        if "_dt_" in obj:
+            try:
+                return datetime.fromisoformat(obj["_dt_"])
+            except ValueError:
+                pass
+        return obj
 
 
 class Cache(dict):

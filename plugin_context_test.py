@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 import threading
 from unittest import mock
 
@@ -30,11 +30,13 @@ def start_and_stop():
 def test_db_round_trip():
     context = PluginContext("test_plugin")
 
-    # Some JSON serializable data:
     test_data = [
+        # Some JSON serializable data:
         ("str", "Some text 🦸‍♀️"),
         ("list", [1, 2, 3, 4, 5, True, False]),
         ("dict", {"one": 1, "two": 2, "three": 3, "hero": "🦸‍♂️"}),
+        # And special handling for datetime:
+        ("now", datetime.now()),
     ]
     for key, item in test_data:
         context.db[key] = item
