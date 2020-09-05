@@ -1,3 +1,6 @@
+"""
+Entrypoint for configuring a mirror and any discovered plugins.
+"""
 from plugin_context import PluginContext
 from plugin_discovery import discover_plugins
 

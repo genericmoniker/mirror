@@ -1,44 +1,33 @@
-"""Data from Google Calendar.
+"""Retrieve data from Google Calendar.
 
-Google API reference:
+Google API references:
+https://developers.google.com/calendar/v3/errors?hl=en
 https://developers.google.com/resources/api-libraries/documentation/calendar/v3/python/latest/
 """
 
 import logging
-import threading
 
-from google.auth.credentials import Credentials
+from google.auth.exceptions import RefreshError
+from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient import discovery
+from googleapiclient.errors import HttpError
 
-SCOPES = "https://www.googleapis.com/auth/calendar.readonly"
+SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 
 
 _logger = logging.getLogger(__name__)
-_credentials_lock = threading.Lock()
 
 
-def obtain_user_permission(client_creds) -> Credentials:
+def obtain_user_permission(client_creds) -> dict:
+    """Run the authorization flow to grant permission to access a user's calendar.
+
+    :return: mapping of user credentials that can be used when calling
+        `get_calendar_data`.
+    """
+    # TODO: What happens if the user declines?
     flow = InstalledAppFlow.from_client_config(client_creds, SCOPES)
-    return flow.run_local_server(port=0)
-
-
-
-def credentials_to_dict(credentials: Credentials) -> dict:
-    return dict(
-        token=credentials.token,
-        refresh_token=credentials.refresh_token,
-        id_token=credentials.id_token,
-        token_uri=credentials.token_uri,
-        client_id=credentials.client_id,
-        client_secret=credentials.client_secret,
-        scopes=credentials.scopes,
-    )
-
-
-def credentials_from_dict(d: dict) -> Credentials:
-    return Credentials(**d)
-
+    return flow.run_local_server(port=0).__getstate__()
 
 
 def no_filter(_event):
@@ -46,40 +35,84 @@ def no_filter(_event):
     return True
 
 
-def get_calendar_data(list_args, filter_func=no_filter):
+def get_calendar_events(user_creds, list_args, filter_func=no_filter):
     """List events from all calendars according to the parameters given.
 
+    The supplied credentials dict may be updated if tokens are refreshed.
+
+    :param user_creds: User credentials from `obtain_user_permission`.
     :param list_args: Arguments to pass to the calendar API's event list
         function.
     :param filter_func: Callable that can filter out individual events.
         The function should return True to include, False to exclude.
+    :raise CredentialsError: if the credentials have not been set up,
+        or if they have expired.
     """
-    credentials = get_credentials()
+    credentials = _credentials_from_dict(user_creds)
     service = discovery.build(
-        "calendar", "v3", credentials=credentials, cache=DiscoveryCache()
+        "calendar",
+        "v3",
+        credentials=credentials,
+        cache=_DiscoveryCache(),
+        num_retries=3,
     )
-    calendar_list = service.calendarList().list().execute()
-    events = []
-    for calendar_list_entry in calendar_list["items"]:
-        calendar_id = calendar_list_entry["id"]
-        try:
-            events_result = (
-                service.events()
-                .list(calendarId=calendar_id, singleEvents=True, **list_args)
-                .execute()
+    try:
+        calendar_list = (
+            service.calendarList().list().execute()  # pylint: disable=no-member
+        )
+        events = []
+        for calendar_list_entry in calendar_list["items"]:
+            _add_calendar_events(
+                service, list_args, calendar_list_entry, events, filter_func
             )
-        except HttpError as ex:
-            logger.error(
-                'Error getting events from "%s". %s',
-                calendar_list_entry["summary"],
-                ex,
-            )
-        else:
-            events += [e for e in events_result.get("items", []) if filter_func(e)]
-    return dict(items=sorted(events, key=event_sort_key_function))
+        return dict(items=sorted(events, key=_event_sort_key_function))
+    except RefreshError as e:
+        raise CredentialsError from e
+    finally:
+        # The client library automatically refreshes if it can, so update the creds.
+        user_creds.update(credentials.__getstate__())
 
 
-class DiscoveryCache:
+class CredentialsError(Exception):
+    """Credentials are invalid (e.g. empty or expired)."""
+
+
+def _credentials_from_dict(creds_dict: dict) -> Credentials:
+    return Credentials(
+        token=creds_dict.get("_token"),
+        refresh_token=creds_dict.get("_refresh_token"),
+        id_token=creds_dict.get("_id_token"),
+        token_uri=creds_dict.get("_token_uri"),
+        client_id=creds_dict.get("_client_id"),
+        client_secret=creds_dict.get("_client_secret"),
+        scopes=creds_dict.get("_scopes"),
+        quota_project_id=creds_dict.get("_quota_project_id"),
+    )
+
+
+def _add_calendar_events(service, list_args, calendar, events, filter_func):
+    calendar_id = calendar["id"]
+    try:
+        events_result = (
+            service.events()
+            .list(calendarId=calendar_id, singleEvents=True, **list_args)
+            .execute()
+        )
+    except HttpError as ex:
+        _logger.error(
+            'Error getting events from "%s". %s', calendar["summary"], ex,
+        )
+    else:
+        events += [e for e in events_result.get("items", []) if filter_func(e)]
+
+
+def _event_sort_key_function(event):
+    start = event.get("start", {})
+    # start may be specified by either 'date' or 'dateTime'
+    return start.get("date", start.get("dateTime", ""))
+
+
+class _DiscoveryCache:
     """Cache for Google service discovery.
 
     See https://github.com/googleapis/google-api-python-client/issues/325
@@ -93,36 +126,3 @@ class DiscoveryCache:
 
     def set(self, url, content):
         self._cache[url] = content
-
-
-def get_credentials():
-    with CREDENTIALS_LOCK:
-        err = (
-            "Error loading Google credentials from {}. "
-            "Run agenda.py to generate a new credentials file. Problem: ".format(
-                CREDENTIALS_PATH
-            )
-        )
-        if not CREDENTIALS_PATH.exists():
-            raise Exception(err + "File does not exist.")
-        try:
-            credentials = pickle.loads(CREDENTIALS_PATH.read_bytes())
-        except Exception as e:
-            raise Exception(err + "Error un-pickling.") from e
-        if not credentials:
-            raise Exception(err + "No data un-pickled.")
-        if not credentials.valid and not credentials.expired:
-            raise Exception(err + "Credentials invalid but not expired.")
-        if not credentials.valid and not credentials.refresh_token:
-            raise Exception(err + "Credentials expired but no refresh token.")
-        if not credentials.valid:
-            logger.info("Refreshing Google credentials.")
-            credentials.refresh(Request())
-        CREDENTIALS_PATH.write_bytes(pickle.dumps(credentials))
-        return credentials
-
-
-def event_sort_key_function(event):
-    start = event.get("start", {})
-    # start may be specified by either 'date' or 'dateTime'
-    return start.get("date", start.get("dateTime", ""))
