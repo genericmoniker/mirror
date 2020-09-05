@@ -1,12 +1,11 @@
+import json
 from datetime import datetime, timedelta
 from functools import partial
-import json
 from pathlib import Path
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from cryptography.fernet import Fernet
 from sqlitedict import SqliteDict
-
 
 HERE = Path(__file__).parent
 

@@ -11,13 +11,12 @@ import threading
 from functools import partial
 from pathlib import Path
 
-from flask import current_app
-
 import tzlocal
+from flask import current_app
+from google.auth.transport.requests import Request
+from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
 
 from cache import Cache
 

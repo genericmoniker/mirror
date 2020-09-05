@@ -1,9 +1,9 @@
-from datetime import datetime, timedelta
 import threading
+from datetime import datetime, timedelta
 from unittest import mock
 
-from cryptography.fernet import Fernet
 import pytest
+from cryptography.fernet import Fernet
 
 from plugin_context import PluginContext, start, stop
 

@@ -24,17 +24,17 @@ def init_cache(config, scheduler):
     global cache
     cache = Cache(
         scheduler,
-        'Refresh Weather',
+        "Refresh Weather",
         REFRESH_MINUTES,
-        partial(get_weather_data, build_url(config))
+        partial(get_weather_data, build_url(config)),
     )
 
 
 def build_url(config):
-    return 'https://api.darksky.net/forecast/{key}/{loc}'.format(
-        key=config.get('FORECAST_API_KEY'),
-        loc=config.get('FORECAST_LOCATION'),
-        exclude='minutely,hourly',
+    return "https://api.darksky.net/forecast/{key}/{loc}".format(
+        key=config.get("FORECAST_API_KEY"),
+        loc=config.get("FORECAST_LOCATION"),
+        exclude="minutely,hourly",
     )
 
 
@@ -47,5 +47,5 @@ def get_weather():
 
     :return: dict of weather data.
     """
-    assert cache, 'init_cache must be called first!'
+    assert cache, "init_cache must be called first!"
     return cache.get()

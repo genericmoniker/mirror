@@ -16,22 +16,19 @@ def init_cache(config, scheduler):
     """
     global cache
     cache = Cache(
-        scheduler,
-        'Refresh Internet Connectivity',
-        REFRESH_MINUTES,
-        check_connectivity
+        scheduler, "Refresh Internet Connectivity", REFRESH_MINUTES, check_connectivity
     )
 
 
 def check_connectivity():
     try:
-        response = requests.get('https://api.ipify.org?format=json', timeout=10)
+        response = requests.get("https://api.ipify.org?format=json", timeout=10)
         response.raise_for_status()
         data = response.json()
-        data.update({'connected': True, 'error': None})
+        data.update({"connected": True, "error": None})
         return data
     except RequestException as e:
-        return {'connected': False, 'error': str(e)}
+        return {"connected": False, "error": str(e)}
 
 
 def get_connectivity():
@@ -39,5 +36,5 @@ def get_connectivity():
 
     :return: dict of connectivity data.
     """
-    assert cache, 'init_cache must be called first!'
+    assert cache, "init_cache must be called first!"
     return cache.get()

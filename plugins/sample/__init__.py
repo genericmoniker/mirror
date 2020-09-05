@@ -5,5 +5,4 @@ the code into modules, we can instead just import the entrypoints for configurin
 creating the plugin.
 """
 from .configure import configure_plugin
-from .sample import create_plugin
-from .sample import get_scripts
+from .sample import create_plugin, get_scripts

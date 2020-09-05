@@ -1,8 +1,8 @@
-from apscheduler.schedulers.background import BackgroundScheduler
-from flask import Flask, jsonify, render_template
+import sys
 from pathlib import Path
 
-from flask import request
+from apscheduler.schedulers.background import BackgroundScheduler
+from flask import Flask, jsonify, render_template, request
 from raven.contrib.flask import Sentry
 
 import agenda
@@ -11,76 +11,75 @@ import database
 import messages
 import weather
 import worth
-import sys
 from log import setup_logging
 
 app = Flask(__name__, instance_relative_config=True)
-app.config.from_object('config')
-app.config.from_pyfile('config.py')
+app.config.from_object("config")
+app.config.from_pyfile("config.py")
 setup_logging()
-if 'SENTRY_CONFIG' in app.config.keys():
+if "SENTRY_CONFIG" in app.config.keys():
     sentry = Sentry(app)
 
 
-@app.route('/')
+@app.route("/")
 def root():
-    return render_template('index.html')
+    return render_template("index.html")
 
 
-@app.route('/rotate_count')
+@app.route("/rotate_count")
 def rotate_page_count():
     path = Path(app.root_path, app.template_folder)
-    pages = list(path.glob('rotate_*.html'))
-    return jsonify({'count': len(pages)})
+    pages = list(path.glob("rotate_*.html"))
+    return jsonify({"count": len(pages)})
 
 
-@app.route('/rotate')
+@app.route("/rotate")
 def rotate_page():
-    counter = int(request.args.get('counter'))
+    counter = int(request.args.get("counter"))
     path = Path(app.root_path, app.template_folder)
-    pages = list(path.glob('rotate_*.html'))
+    pages = list(path.glob("rotate_*.html"))
     template = pages[counter % len(pages)]
     relative = str(template.relative_to(path))
     return render_template(relative)
 
 
-@app.route('/alive')
+@app.route("/alive")
 def alive():
-    return 'OK'
+    return "OK"
 
 
-@app.route('/connectivity')
+@app.route("/connectivity")
 def get_connectivity():
     return jsonify(connectivity.get_connectivity())
 
 
-@app.route('/weather')
+@app.route("/weather")
 def current_weather():
     return jsonify(weather.get_weather())
 
 
-@app.route('/worth')
+@app.route("/worth")
 def current_worth():
-    limit = int(request.args.get('limit', 30))
+    limit = int(request.args.get("limit", 30))
     return jsonify(worth.get_worth(limit))
 
 
-@app.route('/agenda')
+@app.route("/agenda")
 def upcoming_agenda():
     return jsonify(agenda.get_agenda())
 
 
-@app.route('/coming-up')
+@app.route("/coming-up")
 def upcoming_all_day_events():
     return jsonify(agenda.get_coming_up())
 
 
-@app.route('/countdown')
+@app.route("/countdown")
 def countdown_events():
     return jsonify(agenda.get_countdown())
 
 
-@app.route('/message')
+@app.route("/message")
 def message():
     return messages.get_message()
 
@@ -106,8 +105,8 @@ def setup_application():
         database.db.close()
 
 
-if __name__ == '__main__':
-    if len(sys.argv) > 1 and sys.argv[1] == '--setup':
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "--setup":
         setup_application()
     else:
         app.run(debug=False)

@@ -4,13 +4,13 @@
 # Google API Console (client credentials)
 # https://console.developers.google.com/
 
-from pathlib import Path
 import json
+from pathlib import Path
 
 from .google_calendar import obtain_user_permission
 
-CLIENT_CREDENTIALS = 'client-creds'
-USER_CREDENTIALS = 'user-creds'
+CLIENT_CREDENTIALS = "client-creds"
+USER_CREDENTIALS = "user-creds"
 
 
 def configure_plugin(db):
@@ -39,6 +39,6 @@ def _configure_client_credentials(db):
 def _configure_user_credentials(db, client_creds):
     user_creds = db.get(USER_CREDENTIALS)
     if not user_creds:
-        print('Launching browser to obtain user permission...')
+        print("Launching browser to obtain user permission...")
         user_creds = obtain_user_permission(client_creds)
         db[USER_CREDENTIALS] = user_creds

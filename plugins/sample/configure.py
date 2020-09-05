@@ -5,6 +5,7 @@ It can store configuration data in the supplied database for later retrieval in 
 Flask blueprint for the plugin.
 """
 
+
 def configure_plugin(db):
     name = input("What is your name?")
-    db["recipient"] = name or 'world'
+    db["recipient"] = name or "world"

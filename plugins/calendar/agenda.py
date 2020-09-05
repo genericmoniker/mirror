@@ -1,6 +1,5 @@
-from datetime import timedelta
-
 import logging
+from datetime import timedelta
 
 from .datetimeutils import end_of_day_tz, now_tz
 from .google_calendar import CredentialsError, get_calendar_events

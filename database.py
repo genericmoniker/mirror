@@ -1,20 +1,18 @@
-from cryptography.fernet import Fernet
-from peewee import SqliteDatabase, Model, CharField, DateField, IntegerField
-
+import datetime
 from pathlib import Path
 
-import datetime
+from cryptography.fernet import Fernet
+from peewee import CharField, DateField, IntegerField, Model, SqliteDatabase
 
 HERE = Path(__file__).parent
-DB_PATH = HERE / 'instance' / 'mirror.db'
-KEY_PATH = HERE / 'instance' / 'mirror.key'
+DB_PATH = HERE / "instance" / "mirror.db"
+KEY_PATH = HERE / "instance" / "mirror.key"
 
 db = SqliteDatabase(None)
 key = None
 
 
 class EncryptedCharField(CharField):
-
     def db_value(self, value):
         value_bytes = self._fernet.encrypt(value.encode())
         return super().db_value(value_bytes.decode())
@@ -25,13 +23,14 @@ class EncryptedCharField(CharField):
 
     @property
     def _fernet(self):
-        if not hasattr(self, '_fernet_'):
+        if not hasattr(self, "_fernet_"):
             self._fernet_ = Fernet(KEY_PATH.read_bytes())
         return self._fernet_
 
 
 class Secret(Model):
     """A key, value pair, where the value is obfuscated."""
+
     key = CharField(unique=True)
     value = EncryptedCharField()
 
@@ -49,6 +48,7 @@ def set_secret(key, value):
 
 class NetWorth(Model):
     """A net worth record."""
+
     date = DateField()
     value = IntegerField()  # value in whole dollars
 

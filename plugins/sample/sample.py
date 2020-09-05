@@ -8,7 +8,6 @@ from random import choice
 
 from flask import Blueprint, jsonify
 
-
 CACHE_KEY = "sample data"
 REFRESH_INTERVAL = timedelta(minutes=5)
 

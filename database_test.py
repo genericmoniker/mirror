@@ -1,16 +1,16 @@
+from datetime import date
+
+import pytest
+from peewee import Model
+
 from database import (
-    db,
-    init,
     EncryptedCharField,
     NetWorth,
     add_net_worth_value,
+    db,
     get_net_worth_values,
+    init,
 )
-
-from peewee import Model
-import pytest
-
-from datetime import date
 
 
 class EncryptedModel(Model):
@@ -22,7 +22,7 @@ class EncryptedModel(Model):
 
 @pytest.fixture(autouse=True)
 def db_init():
-    db.init(':memory:')
+    db.init(":memory:")
     db.connect()
     db.create_tables([EncryptedModel, NetWorth])
     yield
@@ -30,7 +30,7 @@ def db_init():
 
 
 def test_encryption_round_trip():
-    text = '↕ Hello ↕'
+    text = "↕ Hello ↕"
     m = EncryptedModel(field=text)
     m.save()
     m = EncryptedModel.get()
