@@ -6,8 +6,8 @@
 
 # turn off screen blanking and energy saving
 @xset s off
-@xset -dpms
 @xset s noblank
+@xset -dpms
 
 # hide the mouse cursor
 @unclutter -idle 0
