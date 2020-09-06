@@ -1,9 +1,8 @@
-from datetime import timedelta
-
 from flask import Blueprint, jsonify
 
 from . import agenda
 from . import comingup
+from . import countdown
 
 
 def create_plugin(context) -> Blueprint:
@@ -12,6 +11,9 @@ def create_plugin(context) -> Blueprint:
     )
     context.cache.add_refresh(
         comingup.CACHE_KEY, comingup.REFRESH_INTERVAL, comingup.refresh_data
+    )
+    context.cache.add_refresh(
+        countdown.CACHE_KEY, countdown.REFRESH_INTERVAL, countdown.refresh_data
     )
 
     bp = Blueprint("calendar", __name__, static_folder="static")
@@ -23,6 +25,10 @@ def create_plugin(context) -> Blueprint:
     @bp.route("/comingup")
     def _get_comingup_data():
         return jsonify(context.cache[comingup.CACHE_KEY])
+
+    @bp.route("/countdown")
+    def _get_countdown_data():
+        return jsonify(context.cache[countdown.CACHE_KEY])
 
     return bp
 

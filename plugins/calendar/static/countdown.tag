@@ -15,7 +15,7 @@
                     item.start.dateTime : item.start.date)
                 var fromNow = start.fromNow()
                 var fromNowDays = ''
-                if (fromNow.indexOf('days') === -1) { 
+                if (fromNow.indexOf('days') === -1) {
                     fromNowDays = '(' + start.diff(moment(), 'days') + ' days)'
                 }
                 if (fromNow.indexOf("hour") != -1) {
@@ -34,7 +34,7 @@
         }
 
         tick() {
-            $.getJSON("/countdown", function(json) {
+            $.getJSON("/calendar/countdown", function(json) {
                 this.updateCountdown(json)
             }.bind(this))
         }

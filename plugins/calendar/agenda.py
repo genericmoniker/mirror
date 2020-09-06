@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 
 
 def refresh_data(db):
-    return common.refresh_data(db, get_agenda_event_range)
+    return common.refresh_data(db, common.range_to_list_args(get_agenda_event_range))
 
 
 def get_agenda_event_range():

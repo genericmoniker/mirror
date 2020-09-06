@@ -170,13 +170,6 @@ def event_sort_key_function(event):
     return start.get("date", start.get("dateTime", ""))
 
 
-def get_countdown_data():
-    start = (end_of_day_tz() + datetime.timedelta(days=7)).isoformat()
-    query = "mirror-countdown"
-    list_args = {"timeMin": start, "q": query}
-    return get_calendar_data(list_args)
-
-
 def get_user_permission():
     """Run through the OAuth flow to get credentials."""
     flow = InstalledAppFlow.from_client_secrets_file(str(CLIENT_SECRET_PATH), SCOPES)

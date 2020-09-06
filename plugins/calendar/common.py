@@ -9,11 +9,14 @@ USER_CREDENTIALS = "user-creds"
 COMING_UP_FILTER = "coming-up-filter"
 
 
-def refresh_data(db, event_range_func, filter_func=None):
+def range_to_list_args(event_range_func):
+    start, stop = event_range_func()
+    return {"timeMin": start, "timeMax": stop}
+
+
+def refresh_data(db, list_args, filter_func=None):
     try:
         user_creds = db.get(USER_CREDENTIALS)
-        start, stop = event_range_func()
-        list_args = {"timeMin": start, "timeMax": stop}
         events = get_calendar_events(user_creds, list_args, filter_func)
 
         # Save potentially refreshed creds.
