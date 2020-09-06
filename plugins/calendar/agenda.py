@@ -1,8 +1,8 @@
 import logging
 from datetime import timedelta
 
+from . import common
 from .datetimeutils import end_of_day_tz, now_tz
-from .google_calendar import CredentialsError, get_calendar_events
 
 CACHE_KEY = "agenda data"
 REFRESH_INTERVAL = timedelta(minutes=5)
@@ -11,19 +11,7 @@ _logger = logging.getLogger(__name__)
 
 
 def refresh_data(db):
-    try:
-        user_creds = db.get("user-creds")
-        start, stop = get_agenda_event_range()
-        list_args = {"timeMin": start, "timeMax": stop}
-        events = get_calendar_events(user_creds, list_args)
-
-        # Save potentially refreshed creds.
-        db["user-creds"] = user_creds
-
-        return events
-
-    except CredentialsError as e:
-        _logger.error("Please run `python configure.py --plugin=calendar` (%s)", e)
+    return common.refresh_data(db, get_agenda_event_range)
 
 
 def get_agenda_event_range():

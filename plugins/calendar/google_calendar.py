@@ -35,7 +35,7 @@ def no_filter(_event):
     return True
 
 
-def get_calendar_events(user_creds, list_args, filter_func=no_filter):
+def get_calendar_events(user_creds, list_args, filter_func=None):
     """List events from all calendars according to the parameters given.
 
     The supplied credentials dict may be updated if tokens are refreshed.
@@ -48,6 +48,7 @@ def get_calendar_events(user_creds, list_args, filter_func=no_filter):
     :raise CredentialsError: if the credentials have not been set up,
         or if they have expired.
     """
+    filter_func = filter_func or no_filter
     credentials = _credentials_from_dict(user_creds)
     service = discovery.build(
         "calendar",

@@ -7,10 +7,8 @@
 import json
 from pathlib import Path
 
+from .common import CLIENT_CREDENTIALS, USER_CREDENTIALS
 from .google_calendar import obtain_user_permission
-
-CLIENT_CREDENTIALS = "client-creds"
-USER_CREDENTIALS = "user-creds"
 
 
 def configure_plugin(db):

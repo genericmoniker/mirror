@@ -38,7 +38,7 @@
         }
 
         tick() {
-            $.getJSON("/coming-up", function(json) {
+            $.getJSON("/calendar/comingup", function(json) {
                 this.updateComingUp(json)
             }.bind(this))
         }

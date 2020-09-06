@@ -109,22 +109,6 @@ def no_filter(_event):
     return True
 
 
-def coming_up_filter(event):
-    # All day events only have a date, not a dateTime.
-    if "dateTime" in event["start"]:
-        return False
-    # For multi-day events, skip them if they've already started.
-    start = parse_date_tz(event["start"]["date"])
-    if start <= start_of_day_tz():
-        return False
-    # Check any custom filters from the config.
-    pattern = current_app.config.get("COMING_UP_FILTER")
-    if pattern and re.match(pattern, event["summary"]):
-        return False
-
-    return True
-
-
 def get_agenda_data(range_func, filter_func=no_filter):
     start, stop = range_func()
     list_args = {"timeMin": start, "timeMax": stop}
@@ -178,14 +162,6 @@ def get_calendar_data(list_args, filter_func=no_filter):
         else:
             events += [e for e in events_result.get("items", []) if filter_func(e)]
     return dict(items=sorted(events, key=event_sort_key_function))
-
-
-def get_coming_up_event_range():
-    """Get times from tomorrow until a week from today."""
-    start = start_of_day_tz() + datetime.timedelta(days=1)
-    stop = end_of_day_tz() + datetime.timedelta(days=6)
-    logger.info("coming up range: %s - %s", start.isoformat(), stop.isoformat())
-    return start.isoformat(), stop.isoformat()
 
 
 def event_sort_key_function(event):

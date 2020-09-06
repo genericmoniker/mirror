@@ -36,6 +36,7 @@ def create_app():
 
 def _load_plugins(app: Flask, plugin_scripts: list) -> None:
     plugins = discover_plugins()
+    loaded_plugins = [name for name in plugins.keys()]
     for name, module in plugins.items():
         try:
             blueprint = module.create_plugin(PluginContext(name))
@@ -43,3 +44,5 @@ def _load_plugins(app: Flask, plugin_scripts: list) -> None:
             plugin_scripts[name] = module.get_scripts()
         except Exception:
             _logger.exception("Failed to load plugin '%s'", name)
+            loaded_plugins.remove(name)
+    _logger.info("Loaded plugins: %s", ", ".join(loaded_plugins))
