@@ -1,7 +1,7 @@
-from functools import partial
 import logging
-from datetime import timedelta
 import re
+from datetime import timedelta
+from functools import partial
 
 from . import common
 from .datetimeutils import end_of_day_tz, parse_date_tz, start_of_day_tz
@@ -14,6 +14,7 @@ _logger = logging.getLogger(__name__)
 
 def refresh_data(db):
     filter_pattern = db.get(common.COMING_UP_FILTER)
+    _logger.info("filter pattern: %s", filter_pattern)
     filter_func = partial(coming_up_filter, filter_pattern)
     list_args = common.range_to_list_args(get_coming_up_event_range)
     return common.refresh_data(db, list_args, filter_func)

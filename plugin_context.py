@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import datetime, timedelta
 from functools import partial
 from pathlib import Path
@@ -9,7 +10,7 @@ from sqlitedict import SqliteDict
 
 HERE = Path(__file__).parent
 
-
+_logger = logging.getLogger(__name__)
 _scheduler = None
 
 
@@ -67,8 +68,10 @@ class PluginContext:
             key = Fernet.generate_key()
             key_path.write_bytes(key)
             PluginContext._key = key
+            _logger.info('New database key created at %s', key_path.absolute())
         else:
             PluginContext._key = key_path.read_bytes()
+            _logger.info('Existing database key used at %s', key_path.absolute())
 
     @staticmethod
     def _get_db_filename():

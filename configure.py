@@ -9,6 +9,8 @@ def main():
     # TODO: Get from the command line (or configure everything if none specified):
     name = "calendar"
 
+    # TODO: Set up file logging (since we're using stdout).
+
     plugins = discover_plugins()
     module = plugins[name]
     module.configure_plugin(PluginContext(name).db)

@@ -1,8 +1,6 @@
 from flask import Blueprint, jsonify
 
-from . import agenda
-from . import comingup
-from . import countdown
+from . import agenda, comingup, countdown
 
 
 def create_plugin(context) -> Blueprint:

@@ -1,4 +1,5 @@
 import logging
+
 from .google_calendar import CredentialsError, get_calendar_events
 
 _logger = logging.getLogger(__name__)
