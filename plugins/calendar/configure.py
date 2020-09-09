@@ -57,4 +57,4 @@ def _configure_coming_up_filter(db):
     filter_regex = db.get(COMING_UP_FILTER)
     response = input(f"Coming up regex filter [{filter_regex}]: ").strip()
     if response:
-        db[COMING_UP_FILTER] = response  # TODO: Something not working as expected here?
+        db[COMING_UP_FILTER] = response

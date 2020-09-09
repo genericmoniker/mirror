@@ -128,7 +128,7 @@
         }
 
         tick() {
-            $.getJSON("/weather", function(json) {
+            $.getJSON("/weather/", function(json) {
                 this.updateCurrentConditions(json.currently)
                 this.updateForecast(json.daily)
                 this.updateAlert(json.alerts)
