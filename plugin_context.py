@@ -59,6 +59,10 @@ class PluginContext:
         # cache
         self.cache = Cache(_scheduler, self.db)
 
+    def close(self):
+        """Close the context and flush the database if needed."""
+        self.db.close()
+
     @staticmethod
     def _init_key():
         if PluginContext._key:
@@ -68,10 +72,10 @@ class PluginContext:
             key = Fernet.generate_key()
             key_path.write_bytes(key)
             PluginContext._key = key
-            _logger.info('New database key created at %s', key_path.absolute())
+            _logger.info("New database key created at %s", key_path.absolute())
         else:
             PluginContext._key = key_path.read_bytes()
-            _logger.info('Existing database key used at %s', key_path.absolute())
+            _logger.info("Existing database key used at %s", key_path.absolute())
 
     @staticmethod
     def _get_db_filename():
