@@ -5,8 +5,9 @@ TODO: Darksky was acquired by Apple and the API will only work through the end o
 https://darksky.net/dev/
 """
 from datetime import timedelta
-from flask import Blueprint, jsonify
+
 import requests
+from flask import Blueprint, jsonify
 
 # database keys:
 API_KEY = "api-key"

@@ -1,15 +1,15 @@
 import sys
 from pathlib import Path
 
+import connectivity
+import weather
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, jsonify, render_template, request
 from raven.contrib.flask import Sentry
 
 import agenda
-import connectivity
 import database
 import messages
-import weather
 import worth
 from log import setup_logging
 
