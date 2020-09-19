@@ -1,12 +1,10 @@
-mirror
-======
+# mirror
 
 Smart/Magic Mirror
 
 WARNING: Work-in-progress; meets my needs but isn't fully generalized.
 
-Raspberry Pi Setup
-------------------
+## Raspberry Pi Setup
 
 Using Raspbian Buster.
 
@@ -63,9 +61,7 @@ https://www.raspberrypi.org/documentation/linux/usage/cron.md
 You'll also need to create an `instance` directory, and configure
 services as described below.
 
-
-Python 3.7 Setup
-----------------
+## Python 3.7 Setup
 
 ```bash
 sudo apt-get update
@@ -77,70 +73,51 @@ pip install wheel
 pip install -r requirements.txt
 ```
 
+## Mirror Configuration
+
+To do any configuration that plugins might need, run:
+
+```
+python configure.py
+```
+
+That will prompt you for any settings, storing them well-obfuscated in
+`instance/mirror.db`.
+
+Some configuration requires using a web browser, so you'll either need to have
+a keyboard attached to the device, or you can do configuration on another
+machine (like a desktop PC) and copy `instance/mirror.db` and
+`instance/mirror.key` to the device.
+
 For configuring other services, you'll need to create `instance/config.py` in
 the mirror directory, with contents described below.
 
-### Sentry Logging ###
+## Plugins
 
-You can get a free "hobbyist" account at https://sentry.io. This will let you
-get alerts if something goes wrong in the application.
+### Agenda
 
-Then add a SENTRY_CONFIG dictionary to `instance/config.py` like that shown in
-the [documentation](https://docs.sentry.io/clients/python/integrations/flask/).
+Data from your Google Calendar.
 
-### Weather ###
+You'll first need to set up access to the calendar API. You can do that from
+[this page](https://goo.gl/5ao8u2) and clicking on "Enable the Google Calendar
+API".
 
-Add these values to `instance/config.py`:
+Follow the prompts to get a client id json file. You'll need some values from
+that when running configure.py.
 
-```py
-FORECAST_API_KEY = '<your forecast.io api key here>'
-FORECAST_LOCATION = '<lat>,<long>'
-```
+Running configure.py will also launch your default browser so that you can
+authorize the mirror application that you just set up for read-only access to
+your Google Calendars.
 
-### Worth ###
+The agenda shows events for today, and "all-day" events for the next week.
+You can filter out some upcoming events with a regular expression. Events whose
+summary matches the regular expression are *excluded*.
 
-If you use [Personal Capital](https://www.personalcapital.com/), you can set up
-the mirror to show a simplified graph of "net worth". This is just the total of
-cash accounts minus the total of credit accounts, to give a quick spending
-metric. The value is shown rounded to the nearest $1000, and doesn't actually
-show a dollar sign anywhere.
+If you want to have calendar events farther out show up, you can put
+"mirror-countdown" in them somewhere (probably the description makes the most
+sense).
 
-To set it up, run:
-```bash
-~/.envs/mirror/bin/python3 mirrorapp.py --setup
-```
-It will prompt you for your username and password, and will go through the
-two-factor process (send an SMS to your registered phone number).
-
-Your credentials are stored in a well-obfuscated form in `instance/mirror.db`.
-
-### Agenda ###
-
-Follow [steps a through f here](https://goo.gl/5ao8u2) to get a client
-id json file, but save it as "google_client_id.json" in the `instance`
-directory.
-
-Then run agenda.py, which will launch your default browser so that you
-can authorize the mirror application for read-only access to your
-Google Calendars. This will save google_token.pickle into the
-`instance` directory, which will allow the mirror access. You can do this
-on a desktop machine and copy google_token.pickle to your Pi if
-that's easier.
-
-The agenda shows events for today, and "all-day" events for the next few days.
-You can filter out some upcoming events with a regular expression in
-`instance/config.py`:
-
-```py
-COMING_UP_FILTER = '[AB] DAY'
-```
-
-Events whose summary matches the regular expression are *excluded*.
-
-If you want to have events farther out show up, you can put "mirror-countdown"
-in them somewhere (probably the description makes the most sense).
-
-### Emails ###
+### Emails
 
 You can send an email with "Mirror" in the subject (case-insensitive) and have
 that appear on the mirror for a week, rotated with other bottom-half messages.
@@ -156,7 +133,24 @@ If you want to use a Gmail account, you'll need to enable IMAP in the settings.
 Also, it might work best to use two-factor authentication and create an app
 password.
 
-### Tasks ###
+### Weather
+
+Current weather and forecasts using [Dark Sky](https://darksky.net).
+
+### Worth
+
+If you use [Personal Capital](https://www.personalcapital.com/), you can set up
+the mirror to show a simplified graph of "net worth". This is just the total of
+cash accounts minus the total of credit accounts, to give a quick spending
+metric. The value is shown rounded to the nearest $1000, and doesn't actually
+show a dollar sign anywhere.
+
+Configuration will prompt you for your username and password, and will go
+through the two-factor process (send an SMS to your registered phone number).
+
+Your credentials are stored in a well-obfuscated form in `instance/mirror.db`.
+
+### Tasks
 
 (Currently disabled)
 
@@ -174,8 +168,16 @@ TRELLO_BOARD_RE = '<board selection regular expression>'
 TRELLO_LIST_RE = '<list selection regular expression>'
 ```
 
-Troubleshooting
----------------
+## Sentry Logging
+
+You can get a free "hobbyist" account at https://sentry.io. This will let you
+get alerts if something goes wrong in the application.
+
+Then add a SENTRY_CONFIG dictionary to `instance/config.py` like that shown in
+the [documentation](https://docs.sentry.io/clients/python/integrations/flask/).
+
+
+## Troubleshooting
 
 If the browser doesn't show the right data when starting the Pi, it's likely
 that the Python application had an exception while starting. You can check that

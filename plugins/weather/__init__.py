@@ -23,7 +23,7 @@ REFRESH_INTERVAL = timedelta(minutes=2)
 def configure_plugin(db):
     print("Weather Plugin Set Up")
     db[API_KEY] = input("Dark Sky API key: ").strip()
-    db[LOCATION] = input("Weather location: ").strip()
+    db[LOCATION] = input("Weather location (lat,lon): ").strip()
     # TODO: General config setting implementation?
 
 
