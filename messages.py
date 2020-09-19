@@ -1,6 +1,5 @@
 import datetime
 import json
-import math
 from collections import namedtuple
 from functools import partial
 from pathlib import Path
@@ -9,6 +8,7 @@ from flask import Flask, render_template, request
 
 import mail
 from cache import Cache
+from plugin_context import _scheduler
 
 MESSAGE_REFRESH_MINUTES = 5
 
@@ -17,10 +17,10 @@ Message = namedtuple("Message", "template, context")
 cache = None
 
 
-def init_cache(app, scheduler):
+def init_cache(app):
     global cache
     cache = Cache(
-        scheduler,
+        _scheduler,
         "Refresh Messages",
         MESSAGE_REFRESH_MINUTES,
         partial(get_message_data, app),

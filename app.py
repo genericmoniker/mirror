@@ -31,6 +31,22 @@ def create_app():
     start()
     _load_plugins(app, plugin_scripts)
 
+    # TODO - Convert message stuff to plugins
+    # ----------------------------------------------------------------------------------
+    app.config.from_pyfile("config.py")
+
+    import messages
+
+    @app.before_first_request
+    def _startup():
+        messages.init_cache(app)
+
+    @app.route("/message")
+    def _message():
+        return messages.get_message()
+
+    # ----------------------------------------------------------------------------------
+
     return app
 
 
