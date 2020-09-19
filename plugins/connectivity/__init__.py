@@ -1,7 +1,8 @@
 """Internet connectivity monitoring plugin."""
 from datetime import timedelta
-from flask import Blueprint, jsonify
+
 import requests
+from flask import Blueprint, jsonify
 from requests.exceptions import RequestException
 
 CACHE_KEY = "connectivity data"

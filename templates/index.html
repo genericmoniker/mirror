@@ -31,23 +31,30 @@
     </div>
 </div>
 
-<!-- Riot Tags and other plugin scripts. -->
+<!-- Riot tags and other plugin scripts. -->
 {% for plugin_name, scripts in plugin_scripts.items() %}
     {% for filename, type in scripts %}
+        {% if type == 'riot/tag' %} <!-- Pretty clunky. I think Riot 4 solves this data-src vs. src? -->
 <script data-src="{{ url_for(plugin_name + '.static', filename=filename) }}" type="{{type}}"></script>
+        {% else %}
+<script src="{{ url_for(plugin_name + '.static', filename=filename) }}" type="{{type}}"></script>
+        {% endif %}
     {% endfor %}
 {% endfor %}
 
 <script data-src="{{ url_for('static', filename='tag/clock.tag') }}" type="riot/tag"></script>
-<script data-src="{{ url_for('static', filename='tag/worth.tag') }}" type="riot/tag"></script>
 
+<!-- Common scripts available to all plugins. -->
 <script src="{{ url_for('static', filename='js/riot+compiler.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/jquery-2.2.0.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/luxon.min.js') }}"></script>
+
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
 <script>
     riot.mount('*')
 </script>
+
 </body>
 </html>
