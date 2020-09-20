@@ -5,7 +5,6 @@ google-api-python-client==1.10.0
 google-auth-httplib2==0.0.4
 google-auth-oauthlib==0.4.1
 imapclient==2.1.0
-peewee==3.13.3
 personalcapital==1.0.1
 raven[flask]==6.10.0
 requests==2.24.0
