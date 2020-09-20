@@ -1,33 +1,29 @@
-<coming-up>
-
+<countdown>
     <div class="small">
         <div each={items} class="item">
-            {summary} {fromNow}
+            {summary} {fromNow} {fromNowDays}
         </div>
     </div>
 
-    <style>
-        .item {
-            padding: 5px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            width: auto;
-        }
-    </style>
     <script>
-        updateComingUp(data) {
+        updateCountdown(data) {
             var items = []
-            console.log("coming up item count: " + data.items.length)
+            console.log("countdown item count: " + data.items.length)
             for (var i = 0; i < data.items.length; i++) {
                 var item = data.items[i]
-                var start = moment(item.start.date)
+                var start = moment('dateTime' in item.start ?
+                    item.start.dateTime : item.start.date)
                 var fromNow = start.fromNow()
+                var fromNowDays = ''
+                if (fromNow.indexOf('days') === -1) {
+                    fromNowDays = '(' + start.diff(moment(), 'days') + ' days)'
+                }
                 if (fromNow.indexOf("hour") != -1) {
                     fromNow = "tomorrow"
                 }
                 items.push({
                     fromNow: fromNow,
+                    fromNowDays: fromNowDays,
                     summary: item.summary
                 })
             }
@@ -38,8 +34,8 @@
         }
 
         tick() {
-            $.getJSON("/coming-up", function(json) {
-                this.updateComingUp(json)
+            $.getJSON("/calendar/countdown", function(json) {
+                this.updateCountdown(json)
             }.bind(this))
         }
 
@@ -53,4 +49,4 @@
             clearInterval(timer)
         })
     </script>
-</coming-up>
+</countdown>

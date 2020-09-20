@@ -3,6 +3,7 @@ from threading import RLock
 
 class Cache:
     """Data cache with automatic periodic update."""
+
     def __init__(self, scheduler, name, refresh_min, refresh):
         """Create a new instance.
 
@@ -14,11 +15,7 @@ class Cache:
         self._data = None
         self._lock = RLock()
         self._do_refresh = refresh
-        scheduler.add_job(
-            self.refresh,
-            'interval',
-            name=name,
-            minutes=refresh_min)
+        scheduler.add_job(self.refresh, "interval", name=name, minutes=refresh_min)
 
     def get(self):
         """Get the current cached data."""

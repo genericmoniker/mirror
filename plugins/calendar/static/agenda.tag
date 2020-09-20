@@ -51,7 +51,7 @@
         }
 
         tick() {
-            $.getJSON("/agenda", function(json) {
+            $.getJSON("/calendar/agenda", function(json) {
                 this.updateAgenda(json)
             }.bind(this))
         }

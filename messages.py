@@ -1,27 +1,27 @@
 import datetime
 import json
-import math
 from collections import namedtuple
 from functools import partial
-
-from flask import render_template, Flask, request
 from pathlib import Path
+
+from flask import Flask, render_template, request
 
 import mail
 from cache import Cache
+from plugin_context import _scheduler
 
 MESSAGE_REFRESH_MINUTES = 5
 
-Message = namedtuple('Message', 'template, context')
+Message = namedtuple("Message", "template, context")
 
 cache = None
 
 
-def init_cache(app, scheduler):
+def init_cache(app):
     global cache
     cache = Cache(
-        scheduler,
-        'Refresh Messages',
+        _scheduler,
+        "Refresh Messages",
         MESSAGE_REFRESH_MINUTES,
         partial(get_message_data, app),
     )
@@ -38,9 +38,9 @@ def get_message_data(app: Flask):
 
 
 def get_message():
-    assert cache, 'init_cache must be called first!'
+    assert cache, "init_cache must be called first!"
     messages = cache.get()
-    request_message_number = int(request.args.get('n', 0))
+    request_message_number = int(request.args.get("n", 0))
     message_number = request_message_number % len(messages)
     message = messages[message_number]
     # It might be nice if we put the rendered template in the cache, but the
@@ -59,34 +59,34 @@ def _ltw_week(dt):
 
 
 def _get_hh2020_message(app: Flask, now):
-    data = _load_data(app, 'hh2020', 'data.json')
+    data = _load_data(app, "hh2020", "data.json")
     day_number = now.day - 6
     context = data[day_number]
-    return Message('hh2020.html', context)
+    return Message("hh2020.html", context)
 
 
 def _get_ltw2018_message(app: Flask, now):
-    data = _load_data(app, 'ltw2018', 'data.json')
+    data = _load_data(app, "ltw2018", "data.json")
     week_number = _ltw_week(now)
     context = data[week_number - 1]
-    return Message('ltw2018.html', context)
+    return Message("ltw2018.html", context)
 
 
 def _get_52stories_message(app: Flask, now: datetime):
-    data = _load_data(app, '52stories', 'data.json')
+    data = _load_data(app, "52stories", "data.json")
     week_number = now.isocalendar()[1]
     context = data[week_number - 1]
-    return Message('52stories.html', context)
+    return Message("52stories.html", context)
 
 
 def _get_email_messages(app: Flask):
     messages = mail.fetch_messages(app)
-    return [Message('email.html', m) for m in messages]
+    return [Message("email.html", m) for m in messages]
 
 
 def _load_data(app: Flask, *path_segments):
     data_file = Path(app.static_folder, *path_segments)
-    with data_file.open('r', encoding='utf-8') as f:
+    with data_file.open("r", encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -94,12 +94,12 @@ def light_the_world_data(now):
     title, content = (
         # Dec 1
         (
-            'Jesus Lifted Others’ Burdens and So Can You',
-            '<center>WORLDWIDE DAY OF SERVICE</center>'
+            "Jesus Lifted Others’ Burdens and So Can You",
+            "<center>WORLDWIDE DAY OF SERVICE</center>",
         ),
         # Dec 2
         (
-            'Jesus Honored His Parents and So Can You',
+            "Jesus Honored His Parents and So Can You",
             """
             <ul>
                 <li>Call (not text) your parents.</li>
@@ -109,11 +109,11 @@ def light_the_world_data(now):
                 share their story. For help, try
                     FamilySearch.org.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 3
         (
-            'Jesus Helped Others to See and So Can You',
+            "Jesus Helped Others to See and So Can You",
             """
             <ul>
                 <li>Find an eyeglasses collection box and donate an old
@@ -123,11 +123,11 @@ def light_the_world_data(now):
                 <li>Promote a vision charity on social media. You could even
                 use the eyeglasses emoji.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 4
         (
-            'Jesus Worshipped His Father and So Can You',
+            "Jesus Worshipped His Father and So Can You",
             """
             <ul>
                 <li>Attend a church service in your area—you’re always invited
@@ -138,11 +138,11 @@ def light_the_world_data(now):
                 <li>Help clean up or maintain a
                 church building.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 5
         (
-            'Jesus Healed the Sick and So Can You',
+            "Jesus Healed the Sick and So Can You",
             """
             <ul>
                 <li>Sign up to be an organ donor.</li>
@@ -152,11 +152,11 @@ def light_the_world_data(now):
                 loved ones who are sick or
                 suffering.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 6
         (
-            'Jesus Read the Scriptures and So Can You',
+            "Jesus Read the Scriptures and So Can You",
             """
             <ul>
                 <li>Set your alarm 15 minutes early
@@ -167,11 +167,11 @@ def light_the_world_data(now):
                 <li>Text a scripture to someone
                 who may need a boost.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 7
         (
-            'Jesus Fed the Hungry and So Can You',
+            "Jesus Fed the Hungry and So Can You",
             """
             <ul>
                 <li>Donate non-perishable items
@@ -181,11 +181,11 @@ def light_the_world_data(now):
                 <li>Learn about satisfying spiritual
                 hunger (start with John 6:35).</li>
             </ul>
-            """
+            """,
         ),
         # Dec 8
         (
-            'Jesus Prayed for Others and So Can You',
+            "Jesus Prayed for Others and So Can You",
             """
             <ul>
                 <li>Think about a friend that’s going
@@ -197,11 +197,11 @@ def light_the_world_data(now):
                 prayed with your family? How
                 about right now?</li>
             </ul>
-            """
+            """,
         ),
         # Dec 9
         (
-            'Jesus Visited the Lonely and So Can You',
+            "Jesus Visited the Lonely and So Can You",
             """
             <ul>
                 <li>Visit a nursing home. Studies
@@ -215,11 +215,11 @@ def light_the_world_data(now):
                 them to attend a church service
                 with you on Christmas Day.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 10
         (
-            'Jesus Helped People Walk and So Can You',
+            "Jesus Helped People Walk and So Can You",
             """
             <ul>
                 <li>Donate your old crutches,
@@ -231,11 +231,11 @@ def light_the_world_data(now):
                 <li>Offer to help an elderly person
                 run errands.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 11
         (
-            'Jesus Ministered to Children and So Can You',
+            "Jesus Ministered to Children and So Can You",
             """
             <ul>
                 <li>Ask your children what they
@@ -248,11 +248,11 @@ def light_the_world_data(now):
                 <li>Make plans to take each of your
                 children on a 1-on-1 activity.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 12
         (
-            'Jesus Taught Others and So Can You',
+            "Jesus Taught Others and So Can You",
             """
             <ul>
                 <li>Share your favorite teaching or
@@ -264,11 +264,11 @@ def light_the_world_data(now):
                 learn a new skill that can
                 benefit others.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 13
         (
-            'Jesus Showed Humility and So Can You',
+            "Jesus Showed Humility and So Can You",
             """
             <ul>
                 <li>Share an experience with loved
@@ -281,11 +281,11 @@ def light_the_world_data(now):
                 about someone. Share it with a
                 loved one.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 14
         (
-            'Jesus Taught Us to Clothe the Naked and So Can You',
+            "Jesus Taught Us to Clothe the Naked and So Can You",
             """
             <ul>
                 <li>Collect winter clothing (old or
@@ -298,11 +298,11 @@ def light_the_world_data(now):
                 clothes? Donate some old ones
                 to a charity or thrift store.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 15
         (
-            'Jesus Worshipped through Song and So Can You',
+            "Jesus Worshipped through Song and So Can You",
             """
             <ul>
                 <li>Invite a friend to attend a
@@ -315,11 +315,11 @@ def light_the_world_data(now):
                 <li>Listen to Christmas hymns for
                 an entire day.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 16
         (
-            'Jesus Showed Compassion and So Can You',
+            "Jesus Showed Compassion and So Can You",
             """
             <ul>
                 <li>Participate in a local sub-forSanta
@@ -330,11 +330,11 @@ def light_the_world_data(now):
                 <li>Pray for an opportunity today
                 to show someone compassion.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 17
         (
-            'Jesus Cared for His Mother and So Can You',
+            "Jesus Cared for His Mother and So Can You",
             """
             <ul>
                 <li>Call your mother right now.</li>
@@ -344,11 +344,11 @@ def light_the_world_data(now):
                 <li>Identify a motherly figure in
                 your life and take her flowers.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 18
         (
-            'Jesus Honored the Sabbath and So Can You',
+            "Jesus Honored the Sabbath and So Can You",
             """
             <ul>
                 <li>Turn off your phone for a few
@@ -357,11 +357,11 @@ def light_the_world_data(now):
                 your area.</li>
                 <li>Visit a family member.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 19
         (
-            'Jesus Calmed the Storm and So Can You',
+            "Jesus Calmed the Storm and So Can You",
             """
             <ul>
                 <li>Learn ways you can help
@@ -374,11 +374,11 @@ def light_the_world_data(now):
                 the gift of a 72-hour kit for
                 emergencies.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 20
         (
-            'Jesus Saw Potential in Others and So Can You',
+            "Jesus Saw Potential in Others and So Can You",
             """
             <ul>
                 <li>Be a mentor/tutor to someone. </li>
@@ -389,11 +389,11 @@ def light_the_world_data(now):
                 event (athletic, cultural, etc.)
                 to support someone you know.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 21
         (
-            'Jesus Forgave Others aand So Can You',
+            "Jesus Forgave Others aand So Can You",
             """
             <ul>
                 <li>Is there a family member you
@@ -404,11 +404,11 @@ def light_the_world_data(now):
                 <li>Be kind instead of right for an
                 entire day.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 22
         (
-            'Jesus Showed Gratitude and So Can You',
+            "Jesus Showed Gratitude and So Can You",
             """
             <ul>
                 <li>Give a simple gift to your mail
@@ -421,11 +421,11 @@ def light_the_world_data(now):
                 someone who has positively
                 impacted your life.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 23
         (
-            'Jesus was a Peacemaker and So Can You',
+            "Jesus was a Peacemaker and So Can You",
             """
             <ul>
                 <li>Do you owe anyone an
@@ -437,11 +437,11 @@ def light_the_world_data(now):
                 <li>Say nice things behind people’s
                 backs today.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 24
         (
-            'Jesus Cared for His Loved Ones and So Can You',
+            "Jesus Cared for His Loved Ones and So Can You",
             """
             <ul>
                 <li>Plan a special Christmas Eve
@@ -453,11 +453,11 @@ def light_the_world_data(now):
                 your friends’ birthdays into
                 your mobile device.</li>
             </ul>
-            """
+            """,
         ),
         # Dec 25
         (
-            'Jesus’s Disciples Followed Him and So Can We',
+            "Jesus’s Disciples Followed Him and So Can We",
             """
             <ul>
                 <li>Turn some of the 25 Days ideas
@@ -471,7 +471,7 @@ def light_the_world_data(now):
                 one day to selfless service for
                 those you love.</li>
             </ul>
-            """
+            """,
         ),
     )[now.day - 1]
 

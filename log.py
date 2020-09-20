@@ -15,7 +15,10 @@ def _get_log_formatter():
     # If running under systemd, use a simple format since the journal
     # adds its own metadata (including, for example, the date/time).
     if os.getppid() == 1:
-        fmt = '%(levelname)7s %(message)s'
+        fmt = "%(levelname)7s %(message)s"
     else:
-        fmt = '%(asctime)s [%(thread)d] %(levelname)1.1s %(message)s'
+        fmt = (
+            "%(asctime)s [%(process)d] [%(thread)d] %(levelname)1.1s "
+            "%(name)s - %(message)s"
+        )
     return logging.Formatter(fmt)

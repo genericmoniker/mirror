@@ -1,18 +1,22 @@
-apscheduler==3.3.1
-cryptography==2.5
-flask==1.1.1
-google-api-python-client==1.7.11
-google-auth-httplib2==0.0.3
-google-auth-oauthlib==0.4.0
-imapclient==2.0.0
-peewee==3.10.0
+apscheduler==3.6.3
+cryptography==3.0
+flask==1.1.2
+google-api-python-client==1.10.0
+google-auth-httplib2==0.0.4
+google-auth-oauthlib==0.4.1
+imapclient==2.1.0
+peewee==3.13.3
 personalcapital==1.0.1
-raven[flask]==6.0.0
-requests==2.21.0
-tzlocal==1.2.2
+raven[flask]==6.10.0
+requests==2.24.0
+sqlitedict==1.6.0
+tzlocal==2.1
 #-e git+https://github.com/sarumont/py-trello.git@1325e31#egg=py-trello
 
 # Development requirements:
-pip-tools==4.1.0
-pytest
+black
+pre-commit
+pip-tools==5.3.1
+pyfakefs==4.1.0
+pytest==6.0.1
 pylint

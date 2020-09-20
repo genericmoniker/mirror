@@ -16,10 +16,10 @@ cache = SimpleCache()
 
 def get_task_lists(config):
     """Get the current task lists."""
-    data = cache.get('tasks')
+    data = cache.get("tasks")
     if data is None:
         data = get_task_lists_data(config)
-        cache.set('tasks', data, CACHE_TIMEOUT)
+        cache.set("tasks", data, CACHE_TIMEOUT)
     return data
 
 
@@ -29,10 +29,10 @@ def create_client(config):
     Uses auth properties from instance/config.py.
     """
     return TrelloClient(
-        api_key=config.get('TRELLO_API_KEY'),
-        api_secret=config.get('TRELLO_API_SECRET'),
-        token=config.get('TRELLO_TOKEN'),
-        token_secret=config.get('TRELLO_TOKEN_SECRET'),
+        api_key=config.get("TRELLO_API_KEY"),
+        api_secret=config.get("TRELLO_API_SECRET"),
+        token=config.get("TRELLO_TOKEN"),
+        token_secret=config.get("TRELLO_TOKEN_SECRET"),
     )
 
 
@@ -44,8 +44,8 @@ def get_task_lists_data(config):
     """
     client = create_client(config)
     task_lists = dict(items=[])
-    board_re = re.compile(config.get('TRELLO_BOARD_RE').encode('UTF-8'))
-    list_re = re.compile(config.get('TRELLO_LIST_RE').encode('UTF-8'))
+    board_re = re.compile(config.get("TRELLO_BOARD_RE").encode("UTF-8"))
+    list_re = re.compile(config.get("TRELLO_LIST_RE").encode("UTF-8"))
     boards = client.list_boards()
     now = datetime.utcnow().replace(tzinfo=pytz.utc)
     # noinspection PyTypeChecker
@@ -54,14 +54,14 @@ def get_task_lists_data(config):
             cards = board.get_cards()
             for list_ in board.get_lists(None):
                 if list_re.search(list_.name):
-                    task_lists['items'].append(list_dict(list_, cards, now))
+                    task_lists["items"].append(list_dict(list_, cards, now))
     return task_lists
 
 
 def list_dict(list_, cards, now):
     return dict(
         name=list_.name,
-        tasks=[task_from_card(c, now) for c in cards if c.list_id == list_.id]
+        tasks=[task_from_card(c, now) for c in cards if c.list_id == list_.id],
     )
 
 

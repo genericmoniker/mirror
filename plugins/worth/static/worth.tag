@@ -10,37 +10,36 @@
     </style>
 
     <script>
-        // Get an array of the day of the month for the last n days.
-        lastDates(n) {
-            var dates = [];
-            for (var i=n-1; i >= 0; i--) {
-                var date = moment().startOf("day").subtract(i, "days");
-                dates.push(date.date());
-            }
-            console.log(dates);
-            return dates;
+        // Get an array of the day of the month for the given full dates.
+        getDates(fullDates) {
+            return fullDates.map(
+                function(d) {
+                    return luxon.DateTime.fromISO(d).day
+                }
+            )
         }
 
         // Get an array of n zeros.
         zerosArray(n) {
             return Array.apply(null, Array(n))
-                .map(Number.prototype.valueOf, 0);
-        }
-
-        // Scale fixed point value (cents) to thousands of dollars.
-        scaleData(data) {
-            return data.map(function(x) { return x / 100000; });
+                .map(Number.prototype.valueOf, 0)
         }
 
         updateChart(data) {
             if (data.length == 0) {
                 return;  // nothing to show
             }
-            data = this.scaleData(data);
-            var ctx = this.refs.chart.getContext('2d');
-            var points = data.length;
-            var labels = this.lastDates(points);
-            var zeros = this.zerosArray(points);
+
+            Chart.defaults.global.defaultFontFamily = "Roboto";
+            Chart.defaults.global.defaultFontColor = "white";
+            Chart.defaults.global.defaultFontSize = 30;
+
+            var values = Object.values(data)
+            console.log("worth values: " + values)
+            var labels = this.getDates(Object.keys(data))
+            console.log("worth labels: " + labels)
+            var zeros = this.zerosArray(values.length)
+            var ctx = this.refs.chart.getContext('2d')
             var chart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -49,7 +48,7 @@
                         {
                             fill: false,
                             borderColor: 'rgb(255, 255, 255)',
-                            data: data,
+                            data: values,
                         },
                         // This is just to draw the x-axis:
                         {
@@ -64,7 +63,7 @@
                     legend: {display: false},
                     tooltips: {enabled: false},
                     responsive: true,
-                    maintainAspectRatio: false,                    
+                    maintainAspectRatio: false,
                     scales: {
                         yAxes: [{
                             ticks: {
@@ -78,11 +77,11 @@
                         }]
                     }
                 }
-            });            
+            })
         }
 
         tick() {
-            $.getJSON("/worth?limit=10", function(json) {
+            $.getJSON("/worth/", function(json) {
                 this.updateChart(json.values)
             }.bind(this))
         }

@@ -28,7 +28,7 @@
         }
 
         tick() {
-            $.getJSON("/connectivity", function(json) {
+            $.getJSON("/connectivity/", function(json) {
                 this.updateConnectivity(json)
             }.bind(this))
         }
