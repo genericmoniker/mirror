@@ -1,5 +1,5 @@
 apscheduler==3.6.3
-cryptography==3.0
+cryptography==3.2
 flask==1.1.2
 google-api-python-client==1.10.0
 google-auth-httplib2==0.0.4
