@@ -1,11 +1,15 @@
 import importlib
 import pkgutil
 
-import plugins
+import mirror.plugins
 
 
 def discover_plugins():
-    namespace_package = plugins
+    """Discover mirror plugins using the approach described here:
+
+    https://packaging.python.org/guides/creating-and-discovering-plugins/#using-namespace-packages
+    """
+    namespace_package = mirror.plugins
 
     namespace_modules = pkgutil.iter_modules(
         namespace_package.__path__, namespace_package.__name__ + "."

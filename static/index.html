@@ -1,0 +1,29 @@
+<html>
+<head>
+   <meta charset="UTF-8">
+   <title>Mirror</title>
+</head>
+<body>
+    <p>Events:</p>
+    <ul></ul>
+
+<script>
+    var eventSource = new EventSource('/events');
+    var eventList = document.querySelector('ul');
+
+    eventSource.onopen = function() {
+        console.log('Connected to event stream.');
+    };
+
+    eventSource.onerror = function() {
+        console.log('Event stream failed.')
+    };
+
+    eventSource.addEventListener('connectivity:refresh', function(event) {
+        var el = document.createElement('li');
+        el.textContent = 'message:' + event.data;
+        eventList.append(el);
+    });
+</script>
+</body>
+</html>
