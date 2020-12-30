@@ -1,11 +1,13 @@
 import asyncio
 import json
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
 from pathlib import Path
-from sqlitedict import SqliteDict
+
 from cryptography.fernet import Fernet
-from mirror.event_bus import Event, post
+from sqlitedict import SqliteDict
+
+from mirror.event_bus import Event
 
 _logger = logging.getLogger(__name__)
 
@@ -17,8 +19,9 @@ class PluginContext:
     themselves.
     """
 
-    def __init__(self, plugin_name) -> None:
+    def __init__(self, plugin_name, event_bus) -> None:
         self.plugin_name = plugin_name
+        self._event_bus = event_bus
         self.db = PluginDatabase(plugin_name)
 
     def create_periodic_task(self, coro, interval: timedelta) -> None:
@@ -42,10 +45,17 @@ class PluginContext:
         The plugin name is automatically used to namespace all events as they appear on
         the client side. For example:
 
-        `myplugin:myeventname`
+        `myplugin.myeventname`
+
+        Some metadata keys are also automatically added to the event data:
+
+        _source: The name of the plugin
+        _time: When the event was raised
         """
-        full_name = f"{self.plugin_name}:{name}"
-        await post(Event(name=full_name, data=data))
+        full_name = f"{self.plugin_name}.{name}"
+        data["_source"] = self.plugin_name
+        data["_time"] = datetime.now().isoformat()
+        await self._event_bus.post(Event(name=full_name, data=data))
 
     async def _periodic_wrapper(self, coro, interval: timedelta):
         while True:
@@ -60,14 +70,15 @@ class PluginDatabase(SqliteDict):
     code without blocking I/O (since the underlying SqliteDict queues database
     operations to be handled on a separate thread).
     """
-    _data_dir = Path(__file__).parent.parent.parent / 'instance'
+
+    _data_dir = Path(__file__).parent.parent.parent / "instance"
     _key = None
 
     def __init__(self, plugin_name, filename=None):
         self._init_key()
         self._fernet = Fernet(self._key)
         super().__init__(
-            filename=filename or self._data_dir / 'mirror.db',
+            filename=filename or self._data_dir / "mirror.db",
             tablename=plugin_name,
             autocommit=True,
             encode=self._encrypted_json_encoder,
@@ -78,7 +89,7 @@ class PluginDatabase(SqliteDict):
     def _init_key():
         if PluginDatabase._key:
             return
-        key_path = PluginDatabase._data_dir / 'mirror.key'
+        key_path = PluginDatabase._data_dir / "mirror.key"
         if not key_path.exists():
             key_path.parent.mkdir(parents=True, exist_ok=True)
             key = Fernet.generate_key()
@@ -110,7 +121,7 @@ class _ExtendedDecoder(json.JSONDecoder):
     """JSON decoder that handles additional object types."""
 
     def __init__(self, *args, **kwargs) -> None:
-        kwargs['object_hook'] = self._object_hook
+        kwargs["object_hook"] = self._object_hook
         super().__init__(*args, **kwargs)
 
     @staticmethod

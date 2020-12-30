@@ -1,6 +1,6 @@
 import logging
 
-from .google_calendar import CredentialsError, get_calendar_events
+from .google_calendar import CredentialsError, get_events
 
 _logger = logging.getLogger(__name__)
 
@@ -15,15 +15,16 @@ def range_to_list_args(event_range_func):
     return {"timeMin": start, "timeMax": stop}
 
 
-def refresh_data(db, list_args, filter_func=None):
+async def refresh_data(db, list_args, filter_func=None):
     try:
         user_creds = db.get(USER_CREDENTIALS)
-        events = get_calendar_events(user_creds, list_args, filter_func)
+        client_creds = db.get(CLIENT_CREDENTIALS)
+        events = await get_events(user_creds, client_creds, list_args, filter_func)
 
-        # Save potentially refreshed creds.
+        # Save potentially refreshed user creds.
         db[USER_CREDENTIALS] = user_creds
 
         return events
 
-    except CredentialsError as e:
-        _logger.error("Please run `python configure.py --plugin=calendar` (%s)", e)
+    except CredentialsError as ex:
+        _logger.error("Please run `python configure.py --plugin=calendar` (%s)", ex)

@@ -16,9 +16,13 @@ def fetch_messages(app: Flask):
     """
     if not app.config.get("IMAP_HOST"):
         return []
-    client = IMAPClient(app.config.get("IMAP_HOST"), app.config.get("IMAP_PORT"),)
+    client = IMAPClient(
+        app.config.get("IMAP_HOST"),
+        app.config.get("IMAP_PORT"),
+    )
     client.login(
-        app.config.get("IMAP_USERNAME"), app.config.get("IMAP_PASSWORD"),
+        app.config.get("IMAP_USERNAME"),
+        app.config.get("IMAP_PASSWORD"),
     )
     client.select_folder("INBOX")
     since = (datetime.now() - timedelta(days=7)).date()

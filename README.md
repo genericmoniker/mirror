@@ -94,7 +94,7 @@ the mirror directory, with contents described below.
 
 ## Plugins
 
-### Agenda
+### Calendar
 
 Data from your Google Calendar.
 
@@ -102,8 +102,8 @@ You'll first need to set up access to the calendar API. You can do that from
 [this page](https://goo.gl/5ao8u2) and clicking on "Enable the Google Calendar
 API".
 
-Follow the prompts to get a client id json file. You'll need some values from
-that when running configure.py.
+Follow the prompts to get a client id json file. You'll need that when running
+configure.py.
 
 Running configure.py will also launch your default browser so that you can
 authorize the mirror application that you just set up for read-only access to

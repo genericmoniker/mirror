@@ -11,6 +11,12 @@
     var eventSource = new EventSource('/events');
     var eventList = document.querySelector('ul');
 
+    function eventHandler(event) {
+        var el = document.createElement('li');
+        el.textContent = 'message:' + event.data;
+        eventList.append(el);
+    }
+
     eventSource.onopen = function() {
         console.log('Connected to event stream.');
     };
@@ -19,11 +25,10 @@
         console.log('Event stream failed.')
     };
 
-    eventSource.addEventListener('connectivity:refresh', function(event) {
-        var el = document.createElement('li');
-        el.textContent = 'message:' + event.data;
-        eventList.append(el);
-    });
+    eventSource.addEventListener('connectivity.refresh', eventHandler);
+    eventSource.addEventListener('calendar.refresh_agenda', eventHandler);
+    eventSource.addEventListener('calendar.refresh_coming_up', eventHandler);
+    eventSource.addEventListener('calendar.refresh_countdown', eventHandler);
 </script>
 </body>
 </html>

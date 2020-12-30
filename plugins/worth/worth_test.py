@@ -41,7 +41,13 @@ def test_new_values_are_added_to_existing_ones():
         "worth.worth._fetch_accounts_data",
         return_value=_pc_response(cash=500000, credit=30000),
     ):
-        db = {PC_CASHFLOW: {"2020-09-10": 100, "2020-09-11": 200, "2020-09-13": 300,}}
+        db = {
+            PC_CASHFLOW: {
+                "2020-09-10": 100,
+                "2020-09-11": 200,
+                "2020-09-13": 300,
+            }
+        }
         result = update_worth(db=db, limit=10)
 
     values = result.get("values")
@@ -72,7 +78,11 @@ def test_new_values_replace_existing_values_for_the_same_day():
         "worth.worth._fetch_accounts_data",
         return_value=_pc_response(cash=5000, credit=7000),
     ):
-        db = {PC_CASHFLOW: {_today_iso(): 100,}}
+        db = {
+            PC_CASHFLOW: {
+                _today_iso(): 100,
+            }
+        }
         result = update_worth(db=db, limit=10)
 
     values = result.get("values")
@@ -85,7 +95,13 @@ def test_limit_retrieves_the_most_recent_values():
         return_value=_pc_response(cash=10000, credit=3000),
     ):
         # Even if the original data is out-of-order.
-        db = {PC_CASHFLOW: {"2020-09-10": 500, "2020-09-13": 300, "2020-09-11": 200,}}
+        db = {
+            PC_CASHFLOW: {
+                "2020-09-10": 500,
+                "2020-09-13": 300,
+                "2020-09-11": 200,
+            }
+        }
         result = update_worth(db=db, limit=2)
 
     values = result.get("values")

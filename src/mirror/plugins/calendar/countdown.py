@@ -1,16 +1,23 @@
+import asyncio
 import logging
 from datetime import timedelta
 
 from . import common
-from .datetimeutils import end_of_day_tz
+from .datetime_utils import end_of_day_tz
 
-CACHE_KEY = "countdown data"
 REFRESH_INTERVAL = timedelta(minutes=20)
 
 _logger = logging.getLogger(__name__)
 
 
-def refresh_data(db):
+async def refresh(context):
+    while True:
+        data = await _refresh_data(context.db)
+        await context.post_event("refresh_countdown", data)
+        await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
+
+
+async def _refresh_data(db):
     """Get events tagged in the calendar for long-term countdowns.
 
     This includes future events with "mirror-countdown" in them.

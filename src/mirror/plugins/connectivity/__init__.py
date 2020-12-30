@@ -1,21 +1,36 @@
+import asyncio
 from datetime import timedelta
-import aiohttp
-from aiohttp.client_exceptions import ClientError
 
-REFRESH_INTERVAL = timedelta(minutes=1)
+import httpx
+
+REFRESH_INTERVAL = timedelta(seconds=20)
+
+
+_state = {}
 
 
 def start_plugin(context):
-    context.create_periodic_task(refresh, REFRESH_INTERVAL)
+    task = asyncio.create_task(refresh(context), name="connectivity.refresh")
+    _state["task"] = task
+
+
+# TODO: implement calls to stop_plugin in main.py
+def stop_plugin(context):
+    task = _state.get("task")
+    if task:
+        task.cancel()
 
 
 async def refresh(context):
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://api.ipify.org?format=json") as response:
+    while True:
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get("https://api.ipify.org?format=json")
                 response.raise_for_status()
-                data = await response.json()
+                data = response.json()
                 data.update({"connected": True, "error": None})
-    except ClientError as ex:
-        data = {"connected": False, "error": str(ex)}
-    await context.post_event("refresh", data)
+        except httpx.RequestError as ex:
+            data = {"connected": False, "error": str(ex)}
+        # TODO: Cache the last data and only post an event if it changed.
+        await context.post_event("refresh", data)
+        await asyncio.sleep(REFRESH_INTERVAL.total_seconds())

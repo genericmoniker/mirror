@@ -1,7 +1,6 @@
 import logging
 
 from flask import Flask, render_template
-
 from log import setup_logging
 from plugin_context import PluginContext, start
 from plugin_discovery import discover_plugins

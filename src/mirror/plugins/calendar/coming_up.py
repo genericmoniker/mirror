@@ -1,26 +1,33 @@
+import asyncio
 import logging
 import re
 from datetime import timedelta
 from functools import partial
 
 from . import common
-from .datetimeutils import end_of_day_tz, parse_date_tz, start_of_day_tz
+from .datetime_utils import end_of_day_tz, parse_date_tz, start_of_day_tz
 
-CACHE_KEY = "coming up data"
 REFRESH_INTERVAL = timedelta(minutes=10)
 
 _logger = logging.getLogger(__name__)
 
 
-def refresh_data(db):
+async def refresh(context):
+    while True:
+        data = await _refresh_data(context.db)
+        await context.post_event("refresh_coming_up", data)
+        await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
+
+
+async def _refresh_data(db):
     filter_pattern = db.get(common.COMING_UP_FILTER)
     _logger.info("filter pattern: %s", filter_pattern)
-    filter_func = partial(coming_up_filter, filter_pattern)
-    list_args = common.range_to_list_args(get_coming_up_event_range)
-    return common.refresh_data(db, list_args, filter_func)
+    filter_func = partial(_coming_up_filter, filter_pattern)
+    list_args = common.range_to_list_args(_get_coming_up_event_range)
+    return await common.refresh_data(db, list_args, filter_func)
 
 
-def get_coming_up_event_range():
+def _get_coming_up_event_range():
     """Get times from tomorrow until a week from today."""
     start = start_of_day_tz() + timedelta(days=1)
     stop = end_of_day_tz() + timedelta(days=6)
@@ -28,7 +35,7 @@ def get_coming_up_event_range():
     return start.isoformat(), stop.isoformat()
 
 
-def coming_up_filter(pattern, event):
+def _coming_up_filter(pattern, event):
     # All day events only have a date, not a dateTime.
     if "dateTime" in event["start"]:
         return False

@@ -36,8 +36,9 @@ def _configure_client_credentials(db):
             break  # Keep the existing credentials.
         path = Path(response)
         try:
-            client_creds = json.loads(path.read_bytes())
+            client_creds = json.loads(path.read_bytes())['installed']
             db[CLIENT_CREDENTIALS] = client_creds
+            db[USER_CREDENTIALS] = {}
             success = True
         except Exception as e:
             print(e)

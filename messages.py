@@ -5,10 +5,10 @@ from functools import partial
 from pathlib import Path
 
 from flask import Flask, render_template, request
+from plugin_context import _scheduler
 
 import mail
 from cache import Cache
-from plugin_context import _scheduler
 
 MESSAGE_REFRESH_MINUTES = 5
 

@@ -12,9 +12,12 @@ uvicorn = "^0.12.2"
 gunicorn = "^20.0.4"
 sse-starlette = "^0.6.1"
 aiofiles = "^0.6.0"
-aiohttp = "^3.7.3"
 sqlitedict = "^1.7.0"
 cryptography = "^3.3.1"
+tzlocal = "^2.1"
+httpx = "^0.16.1"
+aiogoogle = "^1.0.1"
+google-auth-oauthlib = "^0.4.2"
 
 [tool.poetry.dev-dependencies]
 black = {version = "*", allow-prereleases = true}
@@ -25,7 +28,8 @@ pylint = "*"
 pytest = "*"
 
 [tool.poetry.scripts]
-"magic-mirror" = "mirror.main:main"
+"mirror" = "mirror.main:main"
+"mirror-config" = "mirror.main_config:main"
 
 [tool.black]
 exclude = '''
