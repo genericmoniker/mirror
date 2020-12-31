@@ -27,4 +27,4 @@ async def refresh_data(db, list_args, filter_func=None):
         return events
 
     except CredentialsError as ex:
-        _logger.error("Please run `python configure.py --plugin=calendar` (%s)", ex)
+        _logger.error("Please run `mirror-config --plugins=calendar` (%s)", ex)

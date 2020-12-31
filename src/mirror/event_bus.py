@@ -4,11 +4,6 @@ from asyncio import Queue
 from dataclasses import dataclass
 from typing import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
-_logger = logging.getLogger(__name__)
-
-# Event bus backing storage:
-_queue = None
-
 _TERMINATE_SENTINEL = "__exit__"
 
 

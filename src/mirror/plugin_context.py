@@ -24,18 +24,6 @@ class PluginContext:
         self._event_bus = event_bus
         self.db = PluginDatabase(plugin_name)
 
-    def create_periodic_task(self, coro, interval: timedelta) -> None:
-        """Wrap a coroutine in a task and schedule it every `interval`.
-
-        :param coro: Coroutine to wrap.
-        :param interval: Interval between executions.
-
-        The task is scheduled to be run immediately, and rescheduled for the `interval`
-        after the task completes.
-        """
-        task = asyncio.create_task(self._periodic_wrapper(coro, interval))
-        task.set_name(f"{self.plugin_name}:{coro.__name__}")
-
     async def post_event(self, name: str, data: dict) -> None:
         """Post an event that is available to client-side JavaScript.
 
@@ -56,11 +44,6 @@ class PluginContext:
         data["_source"] = self.plugin_name
         data["_time"] = datetime.now().isoformat()
         await self._event_bus.post(Event(name=full_name, data=data))
-
-    async def _periodic_wrapper(self, coro, interval: timedelta):
-        while True:
-            await coro(self)
-            await asyncio.sleep(interval.total_seconds())
 
 
 class PluginDatabase(SqliteDict):  # pylint: disable=too-many-ancestors

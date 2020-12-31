@@ -48,6 +48,10 @@ def _configure_client_credentials(db):
 
 def _configure_user_credentials(db, client_creds):
     user_creds = db.get(USER_CREDENTIALS)
+    if user_creds:
+        response = input("Reset user permission? [y/N] ")
+        if response in ("y", "Y", "yes", "YES"):
+            user_creds = None
     if not user_creds:
         print("Launching browser to obtain user permission...")
         user_creds = obtain_user_permission(client_creds)

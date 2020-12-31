@@ -20,6 +20,8 @@ _logger = logging.getLogger(__name__)
 def obtain_user_permission(client_creds) -> dict:
     """Run the authorization flow to grant permission to access a user's calendar.
 
+    If the user doesn't authorize the application, this will just block...
+
     :return: user credentials that can be used when calling `get_events`.
     """
     # We're using Google's synchronous OAuth library here instead of aiogoogle since:
@@ -30,7 +32,6 @@ def obtain_user_permission(client_creds) -> dict:
     # The creds dicts are mostly compatible between both libraries, but require some
     #    conversion.
     #
-    # TODO: What happens if the user declines?
 
     # Convert client creds from aiogoogle format:
     client_creds = {"installed": client_creds}
@@ -115,6 +116,7 @@ async def _get_calendar_events(aiogoogle, service, list_args, calendar, filter_f
             calendar["summary"],
             ex,
         )
+        return []
     else:
         return [e for e in events_result.get("items", []) if filter_func(e)]
 
