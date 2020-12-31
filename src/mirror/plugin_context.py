@@ -63,7 +63,7 @@ class PluginContext:
             await asyncio.sleep(interval.total_seconds())
 
 
-class PluginDatabase(SqliteDict):
+class PluginDatabase(SqliteDict):  # pylint: disable=too-many-ancestors
     """Database for persistent plug-in data.
 
     The database exposes a dict-like interface, and can be used in either async or sync

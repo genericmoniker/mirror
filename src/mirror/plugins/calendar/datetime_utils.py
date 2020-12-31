@@ -27,5 +27,5 @@ def parse_date_tz(date):
     If you want parsing of times and time zones, try the dateutil package.
     """
     parsed = datetime.datetime.strptime(date, "%Y-%m-%d")
-    tz = tzlocal.get_localzone()
-    return tz.localize(parsed)
+    time_zone = tzlocal.get_localzone()
+    return time_zone.localize(parsed)

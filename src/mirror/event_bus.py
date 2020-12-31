@@ -1,8 +1,8 @@
 import json
 import logging
-from asyncio import CancelledError, Queue
+from asyncio import Queue
 from dataclasses import dataclass
-from typing import *
+from typing import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 _logger = logging.getLogger(__name__)
 

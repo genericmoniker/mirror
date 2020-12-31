@@ -68,7 +68,7 @@ async def get_events(user_creds, client_creds, list_args, filter_func=None):
     """
     filter_func = filter_func or no_filter
     if "access_token" not in user_creds:
-        raise CredentialsError
+        raise CredentialsError("No access token in user credentials.")
 
     async with Aiogoogle(user_creds=user_creds, client_creds=client_creds) as aiogoogle:
         # TODO: Cache service discovery?
@@ -82,18 +82,17 @@ async def get_events(user_creds, client_creds, list_args, filter_func=None):
 
             events = []
             for calendar_list_entry in calendar_list["items"]:
-                await _add_calendar_events(
+                events += await _get_calendar_events(
                     aiogoogle,
                     service,
                     list_args,
                     calendar_list_entry,
-                    events,
                     filter_func,
                 )
             return dict(items=sorted(events, key=_event_sort_key_function))
         except HTTPError as ex:
             if "invalid_grant" in str(ex):
-                raise CredentialsError from ex
+                raise CredentialsError("User credentials rejected.") from ex
             raise
 
 
@@ -101,15 +100,13 @@ class CredentialsError(Exception):
     """Credentials are invalid (e.g. empty or expired)."""
 
 
-async def _add_calendar_events(
-    aiogoogle, service, list_args, calendar, events, filter_func
-):
+async def _get_calendar_events(aiogoogle, service, list_args, calendar, filter_func):
     calendar_id = calendar["id"]
     try:
         events_result = await aiogoogle.as_user(
             service.events.list(calendarId=calendar_id, singleEvents=True, **list_args)
         )
-    except Exception as ex:
+    except HTTPError as ex:
         # TODO: Some calendars (e.g. "Holidays in United States") get 404 errors here.
         #  Is that because there aren't any events (holidays) in the range, or because
         #  something else is wrong?
@@ -119,7 +116,7 @@ async def _add_calendar_events(
             ex,
         )
     else:
-        events += [e for e in events_result.get("items", []) if filter_func(e)]
+        return [e for e in events_result.get("items", []) if filter_func(e)]
 
 
 def _event_sort_key_function(event):

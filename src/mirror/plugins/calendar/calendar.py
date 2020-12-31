@@ -1,5 +1,5 @@
 from asyncio import create_task
-from typing import *
+from typing import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 from . import agenda, coming_up, countdown
 

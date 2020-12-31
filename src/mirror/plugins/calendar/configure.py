@@ -40,8 +40,8 @@ def _configure_client_credentials(db):
             db[CLIENT_CREDENTIALS] = client_creds
             db[USER_CREDENTIALS] = {}
             success = True
-        except Exception as e:
-            print(e)
+        except Exception as ex:
+            print(ex)
 
     return client_creds
 
