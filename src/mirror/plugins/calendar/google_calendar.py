@@ -9,7 +9,6 @@ import logging
 
 from aiogoogle import Aiogoogle, HTTPError
 from aiogoogle.auth import UserCreds
-
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
@@ -34,7 +33,7 @@ def obtain_user_permission(client_creds) -> dict:
     # TODO: What happens if the user declines?
 
     # Convert client creds from aiogoogle format:
-    client_creds = {'installed': client_creds}
+    client_creds = {"installed": client_creds}
 
     flow = InstalledAppFlow.from_client_config(client_creds, SCOPES)
     creds = flow.run_local_server(port=0).__getstate__()

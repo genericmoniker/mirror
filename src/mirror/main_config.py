@@ -1,4 +1,5 @@
 import argparse
+
 from mirror.plugin_context import PluginDatabase
 from mirror.plugin_discovery import discover_plugins
 
@@ -15,7 +16,7 @@ def main():
 
     for name in plugins_to_configure:
         module = plugins[name]
-        if not hasattr(module, 'configure_plugin'):
+        if not hasattr(module, "configure_plugin"):
             continue
         db = PluginDatabase(name)
         try:

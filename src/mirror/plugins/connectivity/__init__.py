@@ -10,7 +10,7 @@ _state = {}
 
 
 def start_plugin(context):
-    task = asyncio.create_task(refresh(context), name="connectivity.refresh")
+    task = asyncio.create_task(_refresh(context), name="connectivity.refresh")
     _state["task"] = task
 
 
@@ -21,7 +21,7 @@ def stop_plugin(context):
         task.cancel()
 
 
-async def refresh(context):
+async def _refresh(context):
     while True:
         try:
             async with httpx.AsyncClient() as client:
