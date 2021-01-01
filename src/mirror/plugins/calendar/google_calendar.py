@@ -1,8 +1,14 @@
 """Retrieve data from Google Calendar.
 
-Google API references:
+Google API references
+=====================
+
 https://developers.google.com/calendar/v3/errors?hl=en
+
 https://developers.google.com/resources/api-libraries/documentation/calendar/v3/python/latest/
+
+Refresh tokens:
+https://developers.google.com/identity/protocols/oauth2#expiration
 """
 
 import logging
@@ -45,6 +51,7 @@ def obtain_user_permission(client_creds) -> dict:
         refresh_token=creds["_refresh_token"],
         expires_at=creds["expiry"].isoformat(),
         token_uri=creds["_token_uri"],
+        token_type="Bearer",
     )
 
 
@@ -77,9 +84,8 @@ async def get_events(user_creds, client_creds, list_args, filter_func=None):
         try:
             calendar_list = await aiogoogle.as_user(service.calendarList.list())
 
-            # The client library automatically refreshes when fetching data if it can,
-            # so update the creds.
-            user_creds.update(aiogoogle.user_creds)
+            # The client library refreshes the token if needed, so update the creds.
+            _update_user_creds(user_creds, aiogoogle.user_creds)
 
             events = []
             for calendar_list_entry in calendar_list["items"]:
@@ -125,3 +131,13 @@ def _event_sort_key_function(event):
     start = event.get("start", {})
     # start may be specified by either 'date' or 'dateTime'
     return start.get("date", start.get("dateTime", ""))
+
+
+def _update_user_creds(existing_creds, new_creds):
+    # Don't just `update` the existing creds with the new ones -- that will overwrite
+    # the refresh-related fields with None because the creds received after refreshing
+    # don't include them. It seems odd that `aiogoogle.as_user` effectively wipes out
+    # refresh capability after a refresh is done (may be considered a bug?).
+    existing_creds["access_token"] = new_creds["access_token"]
+    existing_creds["expires_in"] = new_creds["expires_in"]
+    existing_creds["token_type"] = new_creds["token_type"]
