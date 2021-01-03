@@ -1,30 +1,25 @@
 import logging
-from functools import partial
 
 import uvicorn
 from sse_starlette.sse import EventSourceResponse
 from starlette.applications import Starlette
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
+from starlette.templating import Jinja2Templates
 
 from mirror.event_bus import EventBus
 from mirror.log import setup_logging
-from mirror.plugin_context import PluginContext
-from mirror.plugin_discovery import discover_plugins
+from mirror.plugin_manager import PluginManager
 
 _logger = logging.getLogger(__name__)
 
 
-async def load_plugins(event_bus):
-    plugins = discover_plugins()
-    loaded_plugins = list(plugins.keys())
-    for name, module in plugins.items():
-        try:
-            module.start_plugin(PluginContext(name, event_bus))
-        except Exception as ex:  # pylint:disable=broad-except
-            _logger.error("Failed to load plugin '%s': %s", name, ex)
-            loaded_plugins.remove(name)
-    _logger.info("Loaded plugins: %s", ", ".join(loaded_plugins))
+async def homepage(request):
+    templates = Jinja2Templates(directory="templates")
+    plugin_scripts = request.app.state.plugins.get_scripts()
+    return templates.TemplateResponse(
+        "index.html", {"request": request, "plugin_scripts": plugin_scripts}
+    )
 
 
 async def stream_events(request):
@@ -35,21 +30,24 @@ async def stream_events(request):
 def create_app():
     setup_logging()
 
-    routes = [
-        Route("/events", endpoint=stream_events),
-        Mount("/", StaticFiles(directory="static", html=True)),
-    ]
-
     event_bus = EventBus()
-    load_plugins_partial = partial(load_plugins, event_bus)
+    plugins = PluginManager(event_bus)
+
+    routes = [
+        Route("/", endpoint=homepage),
+        Route("/events", endpoint=stream_events),
+        Mount("/static", StaticFiles(directory="static", html=True), name="static"),
+        *plugins.get_routes(),
+    ]
 
     application = Starlette(
         debug=True,
         routes=routes,
-        on_startup=[load_plugins_partial],
-        on_shutdown=[event_bus.shutdown],
+        on_startup=[plugins.startup],
+        on_shutdown=[plugins.shutdown, event_bus.shutdown],
     )
     application.state.event_bus = event_bus
+    application.state.plugins = plugins
 
     return application
 

@@ -140,4 +140,5 @@ def _update_user_creds(existing_creds, new_creds):
     # refresh capability after a refresh is done (may be considered a bug?).
     existing_creds["access_token"] = new_creds["access_token"]
     existing_creds["expires_in"] = new_creds["expires_in"]
+    existing_creds["expires_at"] = new_creds["expires_at"]
     existing_creds["token_type"] = new_creds["token_type"]

@@ -6,23 +6,24 @@
 
 
     <script>
-        tick() {
-            var now = moment()
-            this.update({
-                time: now.format("h:mm a"),
-                date: now.format("dddd, MMMM Do YYYY")
-            })
+        export default {
+            tick() {
+                var now = DateTime.local();
+                this.update({
+                    time: now.toLocaleString(DateTime.TIME_SIMPLE),
+                    date: now.toLocaleString(DateTime.DATE_HUGE)
+                })
+            },
+
+            onBeforeMount(props, state) {
+                state.timer = setInterval(this.tick, 1000)
+                this.tick()
+            },
+
+            onUnmounted(props, state) {
+                clearInterval(state.timer)
+            }
         }
-
-        var timer = setInterval(this.tick, 1000)
-
-        this.on('mount', function() {
-            this.tick()
-        })
-
-        this.on('unmount', function() {
-            clearInterval(timer)
-        })
     </script>
 
 </clock>

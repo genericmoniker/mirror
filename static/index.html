@@ -31,5 +31,13 @@
     eventSource.addEventListener('calendar.refresh_countdown', eventHandler);
     eventSource.addEventListener('weather.refresh', eventHandler);
 </script>
+<script src="js/riot+compiler.min.js"></script>
+<script>
+    (async function main() {
+      await riot.compile()
+
+      riot.mount('*')
+    }())
+    </script>
 </body>
 </html>
