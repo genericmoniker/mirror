@@ -11,6 +11,7 @@ Refresh tokens:
 https://developers.google.com/identity/protocols/oauth2#expiration
 """
 
+import asyncio
 import logging
 
 from aiogoogle import Aiogoogle, HTTPError
@@ -82,10 +83,11 @@ async def get_events(user_creds, client_creds, list_args, filter_func=None):
         # TODO: Cache service discovery?
         service = await aiogoogle.discover("calendar", "v3")
         try:
-            calendar_list = await aiogoogle.as_user(service.calendarList.list())
-
-            # The client library refreshes the token if needed, so update the creds.
-            _update_user_creds(user_creds, aiogoogle.user_creds)
+            # Lock so that only one caller needs to refresh the creds, which happens
+            # behind the scenes when we call `as_user`.
+            with asyncio.Lock():
+                calendar_list = await aiogoogle.as_user(service.calendarList.list())
+                _update_user_creds(user_creds, aiogoogle.user_creds)
 
             events = []
             for calendar_list_entry in calendar_list["items"]:
