@@ -1,2 +1,2 @@
 def get_scripts():
-    return [('clock.riot', 'riot')]
+    return [("mirror-clock.riot", "riot")]
