@@ -16,9 +16,17 @@
                 })
             },
 
-            onMounted(props, state) {
-                this.onTick()
-                setInterval(this.onTick, 1000)
+            onBeforeMount(props) {
+                this.state = {
+                    time: '',
+                    date: ''
+                }
+
+                this.timer = setInterval(this.onTick, 1000)
+            },
+
+            onUnmounted() {
+                clearInterval(this.timer)
             }
         }
     </script>
