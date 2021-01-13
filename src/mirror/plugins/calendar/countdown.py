@@ -26,4 +26,4 @@ async def _refresh_data(db):
     query = "mirror-countdown"
     list_args = {"timeMin": start, "q": query}
     _logger.info("countdown start: %s", start)
-    return common.refresh_data(db, list_args)
+    return await common.refresh_data(db, list_args)
