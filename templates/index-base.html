@@ -24,6 +24,7 @@
         {% block bottom %}{% endblock %}
     </div>
 </div>
+<mirror-events class="component"></mirror-events>
 
 <!-- Riot tags and other plugin scripts. -->
 {% for plugin_name, scripts in plugin_scripts.items() %}
@@ -43,6 +44,8 @@
 <script src="{{ url_for('static', path='js/jquery-2.2.0.min.js') }}"></script>
 <script src="{{ url_for('static', path='js/moment.min.js') }}"></script>
 <script src="{{ url_for('static', path='js/luxon.min.js') }}"></script>
+
+<script src="{{ url_for('static', path='js/mirror-events.riot') }}" type='riot'></script>
 
 <script src="{{ url_for('static', path='js/main.js') }}"></script>
 

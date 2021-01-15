@@ -15,7 +15,7 @@ def start_plugin(context):
 
 def get_scripts() -> list:
     return [
-        ("agenda.tag", "riot/tag"),
+        ("mirror-agenda.riot", "riot"),
         ("comingup.tag", "riot/tag"),
         ("countdown.tag", "riot/tag"),
         ("countup.tag", "riot/tag"),

@@ -1,10 +1,23 @@
 <script>
-	export let name;
+	import Clock from './Clock.svelte'
+	import Agenda from './Agenda.svelte'
+	import ComingUp from './ComingUp.svelte'
+	import Countdown from './Countdown.svelte'
+	import Weather from './Weather.svelte'
+
+	import Connectivity from './Connectivity.svelte';
+	import Events from './Events.svelte';
 </script>
 
 <main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
+	<Clock />
+	<Agenda />
+	<ComingUp />
+	<Countdown />
+	<Weather />
+
+	<Connectivity />
+	<Events />
 </main>
 
 <style>

@@ -28,3 +28,5 @@ async def refresh_data(db, list_args, filter_func=None):
 
     except CredentialsError as ex:
         _logger.error("Please run `mirror-config --plugins=calendar` (%s)", ex)
+    except Exception as ex:
+        _logger.exception("Failed to read get events.")

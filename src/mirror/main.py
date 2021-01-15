@@ -24,7 +24,8 @@ async def homepage(request):
 
 async def stream_events(request):
     event_bus = request.app.state.event_bus
-    return EventSourceResponse(event_bus.listen_for_events())
+    headers = {'Access-Control-Allow-Origin': 'http://localhost:5001'}
+    return EventSourceResponse(event_bus.listen_for_events(), headers=headers)
 
 
 def create_app():

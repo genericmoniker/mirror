@@ -1,3 +1,14 @@
+var eventListeners = [];
+
+function addEventListener(eventName, eventHandler) {
+    eventListeners.push({
+        eventName: eventName,
+        eventHandler: eventHandler
+    })
+}
+
+
+
 ROTATE_COUNT = 0;
 ROTATE_INDEX = 0;
 

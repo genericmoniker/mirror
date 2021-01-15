@@ -85,7 +85,8 @@ async def get_events(user_creds, client_creds, list_args, filter_func=None):
         try:
             # Lock so that only one caller needs to refresh the creds, which happens
             # behind the scenes when we call `as_user`.
-            with asyncio.Lock():
+            # TODO: Needs work still
+            async with asyncio.Lock():
                 calendar_list = await aiogoogle.as_user(service.calendarList.list())
                 _update_user_creds(user_creds, aiogoogle.user_creds)
 
