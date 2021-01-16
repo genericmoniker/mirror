@@ -4,6 +4,7 @@
 	import ComingUp from './ComingUp.svelte'
 	import Countdown from './Countdown.svelte'
 	import Weather from './Weather.svelte'
+	import Worth from './Worth.svelte'
 
 	import Connectivity from './Connectivity.svelte';
 	import Events from './Events.svelte';
@@ -15,6 +16,7 @@
 	<ComingUp />
 	<Countdown />
 	<Weather />
+	<Worth />
 
 	<Connectivity />
 	<Events />
