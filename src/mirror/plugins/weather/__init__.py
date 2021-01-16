@@ -29,12 +29,6 @@ def start_plugin(context):
     _state["task"] = task
 
 
-def get_scripts() -> list:
-    return [
-        ("weather.tag", "riot/tag"),
-    ]
-
-
 async def _refresh(context):
     """Get the weather data for the configured coordinates.
 
