@@ -4,6 +4,9 @@ version = "0.0.1"
 description = "A life dashboard application for Raspberry Pi"
 authors = ["Eric Smith <eric@esmithy.net>"]
 license = "MIT"
+packages = [
+    { include = "mirror", from = "backend/src"},
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -42,6 +45,7 @@ exclude = '''
     | \.mypy_cache
     | \.pytest_cache
     | \.venv
+    | \frontend
     | _build
     | build
     | dist

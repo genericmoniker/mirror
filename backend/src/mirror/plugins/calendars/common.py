@@ -19,6 +19,8 @@ async def refresh_data(db, list_args, filter_func=None):
     try:
         user_creds = db.get(USER_CREDENTIALS)
         client_creds = db.get(CLIENT_CREDENTIALS)
+        if user_creds is None or client_creds is None:
+            raise CredentialsError
         events = await get_events(user_creds, client_creds, list_args, filter_func)
 
         # Save potentially refreshed user creds.
@@ -27,6 +29,6 @@ async def refresh_data(db, list_args, filter_func=None):
         return events
 
     except CredentialsError as ex:
-        _logger.error("Please run `mirror-config --plugins=calendar` (%s)", ex)
+        _logger.error("Please run `mirror-config --plugins=calendars` (%s)", ex)
     except Exception as ex:
         _logger.exception("Failed to read get events.")
