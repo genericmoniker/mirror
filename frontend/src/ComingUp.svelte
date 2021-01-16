@@ -4,7 +4,7 @@
 
     let items = [];
 
-    subscribe("calendar.refresh_coming_up", (e) => {
+    subscribe("calendars.refresh_coming_up", (e) => {
         items = [];
         let rawItems = JSON.parse(e.data).items;
         for (let i = 0; i < rawItems.length; i++) {

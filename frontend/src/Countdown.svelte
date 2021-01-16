@@ -4,7 +4,7 @@
 
     let items = [];
 
-    subscribe("calendar.refresh_countdown", (e) => {
+    subscribe("calendars.refresh_countdown", (e) => {
         items = [];
         let rawItems = JSON.parse(e.data).items;
         console.log("Countdown item count: " + rawItems.length);
