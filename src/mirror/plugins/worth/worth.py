@@ -1,4 +1,6 @@
+import asyncio
 import logging
+import functools
 from datetime import datetime
 
 from personalcapital import PersonalCapital
@@ -10,7 +12,7 @@ _logger = logging.getLogger(__name__)
 MAX_VALUES = 30
 
 
-def update_worth(db, limit):
+async def update_worth(db, limit):
     """Update the worth, returning at most limit days of history.
 
     :param db: database set up with PC credentials.
@@ -18,7 +20,7 @@ def update_worth(db, limit):
     :raise RequireTwoFactorException: if the user needs to re-authenticate.
     :raise DataError: if the account data could not be retrieved.
     """
-    data = _fetch_accounts_data(db)
+    data = await _fetch_accounts_data(db)
 
     value = _calculate_cashflow_worth(data)
     value = round(value / 1000)  # Store $ in whole thousands.
@@ -52,6 +54,16 @@ def _calculate_cashflow_worth(data):
     return net
 
 
+def run_in_executor(func):
+    @functools.wraps(func)
+    def inner(*args, **kwargs):
+        loop = asyncio.get_running_loop()
+        return loop.run_in_executor(None, lambda: func(*args, **kwargs))
+
+    return inner
+
+
+@run_in_executor
 def _fetch_accounts_data(db):
     username = db.get(PC_USERNAME)
     password = db.get(PC_PASSWORD)

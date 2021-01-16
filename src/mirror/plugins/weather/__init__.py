@@ -2,6 +2,7 @@
 
 https://openweathermap.org/api/one-call-api
 """
+import logging
 from asyncio import create_task, sleep
 from datetime import timedelta
 
@@ -14,6 +15,7 @@ LOCATION = "location"
 # Open Weather Map allows lots of calls (60/min) for free, but this seems sufficient.
 REFRESH_INTERVAL = timedelta(minutes=2)
 
+_loggger = logging.getLogger(__name__)
 _state = {}
 
 
@@ -49,11 +51,11 @@ async def _refresh(context):
             async with httpx.AsyncClient() as client:
                 url = "https://api.openweathermap.org/data/2.5/onecall"
                 response = await client.get(url, params=params)
-                response.raise_for_status()
-                data = response.json()
-        except httpx.RequestError as ex:
-            data = {"connected": False, "error": str(ex)}
+            response.raise_for_status()
+            data = response.json()
+            await context.post_event("refresh", data)
+        except httpx.RequestError:
+            _loggger.exception("Error getting weather data.")
         # TODO: Cache the last data and only post an event if it changed. Or rather, do
         # that in the event bus.
-        await context.post_event("refresh", data)
         await sleep(REFRESH_INTERVAL.total_seconds())

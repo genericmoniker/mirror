@@ -18,6 +18,7 @@ tzlocal = "^2.1"
 httpx = "^0.16.1"
 aiogoogle = "^1.0.1"
 google-auth-oauthlib = "^0.4.2"
+personalcapital = "^1.0.1"
 
 [tool.poetry.dev-dependencies]
 black = {version = "*", allow-prereleases = true}

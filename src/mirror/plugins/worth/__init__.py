@@ -1,0 +1,28 @@
+"""Net worth data of some number of financial accounts via Personal Capital."""
+from asyncio import create_task, sleep
+from datetime import timedelta
+import logging
+
+from .configure import configure_plugin
+from .worth import update_worth
+
+REFRESH_INTERVAL = timedelta(hours=12)
+
+_logger = logging.getLogger(__name__)
+_state = {}
+
+
+def start_plugin(context):
+    task = create_task(_refresh(context), name="worth.refresh")
+    _state["task"] = task
+
+
+async def _refresh(context):
+    """Get the net worth data."""
+    while True:
+        try:
+            data = await update_worth(context.db, limit=10)
+            await context.post_event("refresh", data)
+        except Exception:
+            _logger.exception("Error updating worth data.")
+        await sleep(REFRESH_INTERVAL.total_seconds())
