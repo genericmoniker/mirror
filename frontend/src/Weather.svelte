@@ -61,12 +61,12 @@
     }
 </style>
 
-<div class="large"><i class="large {icon}" /> <span>{temp}</span>°</div>
+<div class="large"><i class="large {icon}" /> <span>{Math.round(temp)}</span>°</div>
 <div><span id="summary">{summary}</span></div>
 <table class="small">
     <!-- 5 columns wide -->
     <tr>
-        <td colspan="5">Feels like {feels}°</td>
+        <td colspan="5">Feels like {Math.round(feels)}°</td>
     </tr>
     <tr>
         <td colspan="5">
