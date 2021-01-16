@@ -22,7 +22,7 @@
         wind = data.current.wind_speed;
         sunrise = time(data.current.sunrise);
         sunset = time(data.current.sunset);
-        daily = data.daily.slice(1, 6);
+        daily = data.daily.slice(0, 5);
         alerts = ('alerts' in data) ? data.alerts : [];
     });
 
@@ -87,9 +87,9 @@
         <td colspan="4">&nbsp;</td>
     </tr>
 
-    {#each daily as day}
+    {#each daily as day, i}
     <tr>
-        <td>{dayOfWeek(day.dt)}</td>
+        <td>{(i === 0) ? 'Today' : dayOfWeek(day.dt)}</td>
         <td><i class={iconClass('', day.weather[0].id)}></i></td>
         <td>↑ <b>{Math.round(day.temp.max)}</b></td>
         <td>↓ {Math.round(day.temp.min)}</td>
