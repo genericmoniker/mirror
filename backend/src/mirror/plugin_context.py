@@ -54,7 +54,7 @@ class PluginDatabase(SqliteDict):  # pylint: disable=too-many-ancestors
     operations to be handled on a separate thread).
     """
 
-    _data_dir = Path(__file__).parent.parent.parent / "instance"
+    _data_dir = Path(__file__).parent.parent.parent.parent / "instance"
     _key = None
 
     def __init__(self, plugin_name, filename=None):

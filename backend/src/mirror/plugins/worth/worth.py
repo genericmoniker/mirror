@@ -1,6 +1,6 @@
 import asyncio
-import logging
 import functools
+import logging
 from datetime import datetime
 
 from personalcapital import PersonalCapital

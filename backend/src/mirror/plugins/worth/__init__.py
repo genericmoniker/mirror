@@ -1,7 +1,7 @@
 """Net worth data of some number of financial accounts via Personal Capital."""
+import logging
 from asyncio import create_task, sleep
 from datetime import timedelta
-import logging
 
 from .configure import configure_plugin
 from .worth import update_worth

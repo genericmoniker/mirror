@@ -25,7 +25,9 @@ def create_app():
 
     event_bus = EventBus()
     plugins = PluginManager(event_bus)
-    static_dir = Path(__file__).resolve().parent.parent.parent / "frontend/public"
+    static_dir = (
+        Path(__file__).resolve().parent.parent.parent.parent / "frontend/public"
+    )
 
     routes = [
         Route("/events", endpoint=stream_events),
