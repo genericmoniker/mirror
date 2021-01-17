@@ -12,8 +12,12 @@ _logger = logging.getLogger(__name__)
 
 async def refresh(context):
     while True:
-        data = await _refresh_data(context.db)
-        await context.post_event("refresh_agenda", data)
+        try:
+            data = await _refresh_data(context.db)
+            await context.post_event("refresh_agenda", data)
+        except Exception:  # pylint:disable=broad-except
+            _logger.exception("Error getting agenda events.")
+
         await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
 
 
