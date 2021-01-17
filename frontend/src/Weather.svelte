@@ -93,7 +93,7 @@
         <td><i class={iconClass('', day.weather[0].id)}></i></td>
         <td>↑ <b>{Math.round(day.temp.max)}</b></td>
         <td>↓ {Math.round(day.temp.min)}</td>
-        <td><i class='wi wi-umbrella'></i> {day.pop * 100}<sup class='tiny'>%</sup></td>
+        <td><i class='wi wi-umbrella'></i> {Math.round(day.pop * 100)}<sup class='tiny'>%</sup></td>
     </tr>
     {/each}
 
