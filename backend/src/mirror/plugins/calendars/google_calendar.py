@@ -12,7 +12,6 @@ https://developers.google.com/identity/protocols/oauth2#expiration
 """
 
 import logging
-import urllib
 
 from aiogoogle import Aiogoogle, HTTPError
 from aiogoogle.auth import UserCreds
@@ -107,11 +106,7 @@ class CredentialsError(Exception):
 
 
 async def _get_calendar_events(aiogoogle, service, list_args, calendar, filter_func):
-    # It seems like aiogoogle ought to do this escaping, but it doesn't, resulting in
-    # 404 errors if the ID has non-URL-safe chars, like
-    # "en.usa#holiday@group.v.calendar.google.com".
-    # https://github.com/omarryhan/aiogoogle/issues/47
-    calendar_id = urllib.parse.quote_plus(calendar["id"])
+    calendar_id = calendar["id"]
     try:
         events_result = await aiogoogle.as_user(
             service.events.list(calendarId=calendar_id, singleEvents=True, **list_args)

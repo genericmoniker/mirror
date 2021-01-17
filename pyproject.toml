@@ -19,7 +19,7 @@ sqlitedict = "^1.7.0"
 cryptography = "^3.3.1"
 tzlocal = "^2.1"
 httpx = "^0.16.1"
-aiogoogle = "^1.1.4"
+aiogoogle = "^1.1.5"
 google-auth-oauthlib = "^0.4.2"
 personalcapital = "^1.0.1"
 

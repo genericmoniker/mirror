@@ -8,7 +8,7 @@ python-versions = "*"
 
 [[package]]
 name = "aiogoogle"
-version = "1.1.4"
+version = "1.1.5"
 description = "Async Google API client"
 category = "main"
 optional = false
@@ -779,7 +779,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "6d0830edd34ed157fddbf8b06af325aaa3653a17f4342e4eb22bebac7c04d465"
+content-hash = "682c8ad3e1f4ecf911224819d04a3a3e151271c81f2a933812a07e5fdab1537f"
 
 [metadata.files]
 aiofiles = [
@@ -787,8 +787,8 @@ aiofiles = [
     {file = "aiofiles-0.6.0.tar.gz", hash = "sha256:e0281b157d3d5d59d803e3f4557dcc9a3dff28a4dd4829a9ff478adae50ca092"},
 ]
 aiogoogle = [
-    {file = "aiogoogle-1.1.4-py3-none-any.whl", hash = "sha256:abe8ddd8d826501d72337983bc607c4502cff3d291d6bd5d5df3020b73d8cf6f"},
-    {file = "aiogoogle-1.1.4.tar.gz", hash = "sha256:27e532a88c89d8e2fd56eff25382badb4d68d1afc849919701a074a32b7041e6"},
+    {file = "aiogoogle-1.1.5-py3-none-any.whl", hash = "sha256:3903cdf6b70c2002cbb9f319ccb12ae1c6e6c81e670847bc09ccb32299e6b079"},
+    {file = "aiogoogle-1.1.5.tar.gz", hash = "sha256:d1e754a051127ee8d5c34b673076216cb2ee1280c31e51bcdb6c50f92b55f8d7"},
 ]
 aiohttp = [
     {file = "aiohttp-3.7.3-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:328b552513d4f95b0a2eea4c8573e112866107227661834652a8984766aa7656"},
