@@ -31,6 +31,5 @@ async def _refresh(context):
                 data.update({"connected": True, "error": None})
         except httpx.RequestError as ex:
             data = {"connected": False, "error": str(ex)}
-        # TODO: Cache the last data and only post an event if it changed.
         await context.post_event("refresh", data)
         await asyncio.sleep(REFRESH_INTERVAL.total_seconds())

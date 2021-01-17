@@ -5,7 +5,6 @@
     let error = '';
 
     subscribe('connectivity.refresh', (e) => {
-        console.log('Connectivity refresh: ' + e.data);
         let data = JSON.parse(e.data);
         connected = data.connected;
     });

@@ -15,7 +15,7 @@ LOCATION = "location"
 # Open Weather Map allows lots of calls (60/min) for free, but this seems sufficient.
 REFRESH_INTERVAL = timedelta(minutes=2)
 
-_loggger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 _state = {}
 
 
@@ -55,7 +55,5 @@ async def _refresh(context):
             data = response.json()
             await context.post_event("refresh", data)
         except httpx.RequestError:
-            _loggger.exception("Error getting weather data.")
-        # TODO: Cache the last data and only post an event if it changed. Or rather, do
-        # that in the event bus.
+            _logger.exception("Error getting weather data.")
         await sleep(REFRESH_INTERVAL.total_seconds())
