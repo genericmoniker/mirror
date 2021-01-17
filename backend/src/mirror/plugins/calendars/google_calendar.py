@@ -11,8 +11,8 @@ Refresh tokens:
 https://developers.google.com/identity/protocols/oauth2#expiration
 """
 
-import asyncio
 import logging
+import urllib
 
 from aiogoogle import Aiogoogle, HTTPError
 from aiogoogle.auth import UserCreds
@@ -80,15 +80,11 @@ async def get_events(user_creds, client_creds, list_args, filter_func=None):
         raise CredentialsError("No access token in user credentials.")
 
     async with Aiogoogle(user_creds=user_creds, client_creds=client_creds) as aiogoogle:
-        # TODO: Cache service discovery?
+        # Is there a way to cache service discovery?
         service = await aiogoogle.discover("calendar", "v3")
         try:
-            # Lock so that only one caller needs to refresh the creds, which happens
-            # behind the scenes when we call `as_user`.
-            # TODO: Needs work still
-            async with asyncio.Lock():
-                calendar_list = await aiogoogle.as_user(service.calendarList.list())
-                _update_user_creds(user_creds, aiogoogle.user_creds)
+            calendar_list = await aiogoogle.as_user(service.calendarList.list())
+            _update_user_creds(user_creds, aiogoogle.user_creds)
 
             events = []
             for calendar_list_entry in calendar_list["items"]:
@@ -111,15 +107,16 @@ class CredentialsError(Exception):
 
 
 async def _get_calendar_events(aiogoogle, service, list_args, calendar, filter_func):
-    calendar_id = calendar["id"]
+    # It seems like aiogoogle ought to do this escaping, but it doesn't, resulting in
+    # 404 errors if the ID has non-URL-safe chars, like
+    # "en.usa#holiday@group.v.calendar.google.com".
+    # https://github.com/omarryhan/aiogoogle/issues/47
+    calendar_id = urllib.parse.quote_plus(calendar["id"])
     try:
         events_result = await aiogoogle.as_user(
             service.events.list(calendarId=calendar_id, singleEvents=True, **list_args)
         )
     except HTTPError as ex:
-        # TODO: Some calendars (e.g. "Holidays in United States") get 404 errors here.
-        #  Is that because there aren't any events (holidays) in the range, or because
-        #  something else is wrong?
         _logger.error(
             'Error getting events from "%s". %s',
             calendar["summary"],
