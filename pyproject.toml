@@ -22,6 +22,7 @@ httpx = "^0.16.1"
 aiogoogle = "^1.1.5"
 google-auth-oauthlib = "^0.4.2"
 personalcapital = "^1.0.1"
+IMAPClient = "^2.2.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "*", allow-prereleases = true}
