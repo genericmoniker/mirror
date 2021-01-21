@@ -14,8 +14,7 @@ def start_plugin(context):
     _state["task"] = task
 
 
-# TODO: implement calls to stop_plugin in main.py
-def stop_plugin(context):
+def stop_plugin(context):  # pylint: disable=unused-argument
     task = _state.get("task")
     if task:
         task.cancel()

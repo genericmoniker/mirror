@@ -1,9 +1,6 @@
 import contextlib
 import logging
 
-from starlette.routing import Mount
-from starlette.staticfiles import StaticFiles
-
 from mirror.plugin_context import PluginContext
 from mirror.plugin_discovery import discover_plugins
 

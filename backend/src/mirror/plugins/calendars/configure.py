@@ -40,7 +40,7 @@ def _configure_client_credentials(db):
             db[CLIENT_CREDENTIALS] = client_creds
             db[USER_CREDENTIALS] = {}
             success = True
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-except
             print(ex)
 
     return client_creds

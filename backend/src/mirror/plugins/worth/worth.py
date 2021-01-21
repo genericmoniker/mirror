@@ -39,11 +39,11 @@ async def update_worth(db, limit):
 
 
 def _limit_values(data, limit):
-    return {k: v for k, v in sorted(data.items())[-limit:]}
+    return dict(sorted(data.items())[-limit:])
 
 
 class DataError(Exception):
-    pass
+    """Raised when there is an error fetching data."""
 
 
 def _calculate_cashflow_worth(data):

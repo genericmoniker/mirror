@@ -140,7 +140,9 @@ disable=print-statement,
         exception-escape,
         comprehension-escape,
         missing-module-docstring,
-        missing-function-docstring
+        missing-function-docstring,
+        too-few-public-methods,
+        fixme
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -244,10 +246,11 @@ function-naming-style=snake_case
 
 # Good variable names which should always be accepted, separated by a comma.
 good-names=db,
+           ex,
            i,
            j,
            k,
-           ex,
+           pc,
            Run,
            _
 

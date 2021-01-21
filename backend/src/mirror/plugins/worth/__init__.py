@@ -23,6 +23,6 @@ async def _refresh(context):
         try:
             data = await update_worth(context.db, limit=10)
             await context.post_event("refresh", data)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             _logger.exception("Error updating worth data.")
         await sleep(REFRESH_INTERVAL.total_seconds())
