@@ -18,6 +18,6 @@
 </script>
 
 <div>
-    <span class="large">{time}</span><br>
-    <span>{date}</span>
+    <span class="huge">{time}</span><br>
+    <span class="large">{date}</span>
 </div>

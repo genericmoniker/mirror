@@ -87,6 +87,6 @@
 
 <style>
     canvas {
-        width: 400px !important;
+        width: 475px !important;
     }
 </style>

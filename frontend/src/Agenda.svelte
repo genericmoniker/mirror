@@ -39,7 +39,7 @@
     }
 </style>
 
-<table class="small">
+<table>
     {#each items as item}
         <tr>
             <td>{item.start}</td>

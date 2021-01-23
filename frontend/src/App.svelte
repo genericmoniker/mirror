@@ -11,37 +11,47 @@
 	import Events from './Events.svelte';
 </script>
 
+<style>
+#left {
+    float: left;
+    width: 48%;
+}
+
+#right {
+    float: right;
+    width: 48%;
+    text-align: right;
+}
+
+#bottom {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 35%;
+}
+</style>
+
 <main>
-	<Clock />
-	<Agenda />
-	<ComingUp />
-	<Countdown />
-	<Weather />
-	<Worth />
-	<Mail />
+	<section id="left">
+		<Weather />
+		<br>
+		<Worth />
+	</section>
+
+	<section id="right">
+		<Clock />
+		<br>
+		<Agenda />
+		<br>
+		<ComingUp />
+		<br>
+		<Countdown />
+	</section>
+
+	<section id="bottom">
+		<Mail />
+	</section>
 
 	<Connectivity />
 	<Events />
 </main>
-
-<style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
-
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
-</style>

@@ -2,13 +2,13 @@
     import { subscribe } from "./Events.svelte";
     import { DateTime } from "luxon";
 
-    let temp = '';
-    let icon = '';
-    let summary = '';
-    let feels = '';
-    let wind = '';
-    let sunrise = '';
-    let sunset = '';
+    let temp = "";
+    let icon = "";
+    let summary = "";
+    let feels = "";
+    let wind = "";
+    let sunrise = "";
+    let sunset = "";
     let daily = [];
     let alerts = [];
 
@@ -16,27 +16,30 @@
         let data = JSON.parse(e.data);
 
         temp = data.current.temp;
-        icon = iconClass(data.current.weather[0].icon, data.current.weather[0].id);
+        icon = iconClass(
+            data.current.weather[0].icon,
+            data.current.weather[0].id
+        );
         summary = data.current.weather[0].description;
         feels = data.current.feels_like;
         wind = data.current.wind_speed;
         sunrise = time(data.current.sunrise);
         sunset = time(data.current.sunset);
         daily = data.daily.slice(0, 5);
-        alerts = ('alerts' in data) ? data.alerts : [];
+        alerts = "alerts" in data ? data.alerts : [];
     });
 
     function iconClass(icon, id) {
         // There are more icons for the weather "id", so we only
         // use the "icon" to figure out night or day.
-        let time = ''; // Neutral in terms of night/day.
+        let time = ""; // Neutral in terms of night/day.
         let lastChar = icon.slice(-1);
-        if (lastChar === 'd') {
-            time = 'day-';
-        } else if (lastChar === 'n') {
-            time = 'night-'
+        if (lastChar === "d") {
+            time = "day-";
+        } else if (lastChar === "n") {
+            time = "night-";
         }
-        return 'wi wi-owm-' + time + id;
+        return "wi wi-owm-" + time + id;
     }
 
     function time(dt) {
@@ -44,38 +47,28 @@
     }
 
     function dayOfWeek(dt) {
-        return DateTime.fromSeconds(dt).toFormat('ccc');
+        return DateTime.fromSeconds(dt).toFormat("ccc");
     }
-
 </script>
 
+<div class="huge">
+    <i class="huge {icon}" /> <span>{Math.round(temp)}</span>°
+</div>
+<div><span id="summary" class="large">{summary}</span></div>
+<br />
 
-<style>
-    #summary {
-        text-transform: capitalize;
-    }
-
-    #weather_alerts {
-        margin-top: 30px;
-        font-weight: bold;
-    }
-</style>
-
-<div class="large"><i class="large {icon}" /> <span>{Math.round(temp)}</span>°</div>
-<div><span id="summary">{summary}</span></div>
-<table class="small">
-    <!-- 5 columns wide -->
+<table>
+    <!-- Include these in the table for uniform horizontal spacing. -->
     <tr>
         <td colspan="5">Feels like {Math.round(feels)}°</td>
     </tr>
     <tr>
         <td colspan="5">
             <i class="wi wi-strong-wind" />
-            {wind}
-            <sup class="tiny">mph</sup>
+            {Math.round(wind)}
+            <sup class="small">mph</sup>
         </td>
     </tr>
-
     <tr>
         <td colspan="5"><i class="wi wi-sunrise" /> {sunrise}</td>
     </tr>
@@ -83,24 +76,39 @@
         <td colspan="5"><i class="wi wi-sunset" /> {sunset}</td>
     </tr>
 
-    <tr>
-        <td colspan="4">&nbsp;</td>
-    </tr>
+    <tr><td colspan="5"></td></tr>
 
     {#each daily as day, i}
-    <tr>
-        <td>{(i === 0) ? 'Today' : dayOfWeek(day.dt)}</td>
-        <td><i class={iconClass('', day.weather[0].id)}></i></td>
-        <td>↑ <b>{Math.round(day.temp.max)}</b></td>
-        <td>↓ {Math.round(day.temp.min)}</td>
-        <td><i class='wi wi-umbrella'></i> {Math.round(day.pop * 100)}<sup class='tiny'>%</sup></td>
-    </tr>
+        <tr>
+            <td>{i === 0 ? "Today" : dayOfWeek(day.dt)}</td>
+            <td><i class={iconClass("", day.weather[0].id)} /></td>
+            <td>↑ <b>{Math.round(day.temp.max)}</b>°</td>
+            <td>↓ {Math.round(day.temp.min)}°</td>
+            <td>
+                <i class="wi wi-umbrella" />
+                {Math.round(day.pop * 100)}<sup class="small">%</sup>
+            </td>
+        </tr>
     {/each}
-
-    <div id="weather_alerts" class="small">
-        {#each alerts as alert}
-        <div>{alert.event}</div>
-        {/each}
-    </div>
-
 </table>
+
+<div id="alerts">
+    {#each alerts as alert}
+        <div>{alert.event}</div>
+    {/each}
+</div>
+
+<style>
+    #summary {
+        text-transform: capitalize;
+    }
+
+    #alerts {
+        margin-top: 40px;
+        font-weight: bold;
+    }
+
+    td {
+        padding-right: 20px;
+    }
+</style>

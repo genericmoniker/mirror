@@ -33,8 +33,6 @@
     }
 </style>
 
-<div class="small">
-    {#each items as item}
-        <div class="item">{item.summary} {item.fromNow}</div>
-    {/each}
-</div>
+{#each items as item}
+    <div class="item">{item.summary} {item.fromNow}</div>
+{/each}

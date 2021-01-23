@@ -11,7 +11,7 @@
 </script>
 
 {#if !connected}
-<div id="conn" class="small">
+<div id="conn">
     <img src="/images/connectivity-network-error.svg" alt="{error}"/>
 </div>
 {/if}

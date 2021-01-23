@@ -40,8 +40,6 @@
     });
 </script>
 
-<div class="small">
-    {#each items as item}
-        <div class="item">{item.summary} {item.fromNow} {item.fromNowDays}</div>
-    {/each}
-</div>
+{#each items as item}
+    <div class="item">{item.summary} {item.fromNow} {item.fromNowDays}</div>
+{/each}
