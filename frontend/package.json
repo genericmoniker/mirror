@@ -1,6 +1,11 @@
 {
-  "name": "svelte-app",
-  "version": "1.0.0",
+  "name": "mirror-app",
+  "version": "3.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/genericmoniker/mirror.git"
+  },
+  "license": "MIT",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",

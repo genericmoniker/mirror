@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mirror"
-version = "0.0.1"
+version = "3.0.0"
 description = "A life dashboard application for Raspberry Pi"
 authors = ["Eric Smith <eric@esmithy.net>"]
 license = "MIT"

@@ -14,12 +14,12 @@
 <style>
 #left {
     float: left;
-    width: 48%;
+    width: 46%;
 }
 
 #right {
     float: right;
-    width: 48%;
+    width: 50%;
     text-align: right;
 }
 
