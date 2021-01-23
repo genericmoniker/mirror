@@ -14,9 +14,11 @@
 </script>
 
 {#if item}
+<div class="large">
 <p>{#each item.body_lines as line} {line} <br/> {/each}</p>
-<p class="small" style="vertical-align: middle; color: #e1e1e1">
-    <Icon data={envelope} />
+</div>
+<p style="vertical-align: middle; color: #e1e1e1">
+    <Icon data={envelope} scale="1.5" />
     <span style="padding-left: 5px">{item.sender}</span>
 </p>
 {/if}
