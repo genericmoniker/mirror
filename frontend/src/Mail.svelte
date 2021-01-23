@@ -1,7 +1,7 @@
 <script>
     import { subscribe } from "./Events.svelte";
     import Icon from 'svelte-awesome';
-    import { envelope } from 'svelte-awesome/icons';
+    import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
 
     export let index = 0;
     let items = [];
@@ -17,8 +17,8 @@
 <div class="large">
 <p>{#each item.body_lines as line} {line} <br/> {/each}</p>
 </div>
-<p style="vertical-align: middle; color: #e1e1e1">
-    <Icon data={envelope} scale="1.5" />
-    <span style="padding-left: 5px">{item.sender}</span>
-</p>
+<div style="display:flex; align-items:center; color: #e1e1e1">
+    <Icon data={faEnvelope} scale="1.7" />
+    <span style="padding-left: 10px">{item.sender}</span>
+</div>
 {/if}
