@@ -1,8 +1,9 @@
 <script>
-	import Clock from './Clock.svelte'
 	import Agenda from './Agenda.svelte'
 	import ComingUp from './ComingUp.svelte'
 	import Countdown from './Countdown.svelte'
+	import Clock from './Clock.svelte'
+	import Mail from './Mail.svelte'
 	import Weather from './Weather.svelte'
 	import Worth from './Worth.svelte'
 
@@ -17,6 +18,7 @@
 	<Countdown />
 	<Weather />
 	<Worth />
+	<Mail />
 
 	<Connectivity />
 	<Events />
