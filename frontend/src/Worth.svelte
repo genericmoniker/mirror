@@ -34,9 +34,9 @@
         Chart.defaults.global.defaultFontSize = 30;
 
         const values = Object.values(data);
-        console.log("worth values: " + values);
+        console.log("Worth values: ",  values);
         const labels = getDates(Object.keys(data));
-        console.log("worth labels: " + labels);
+        console.log("Worth labels: ", labels);
         const zeros = zerosArray(values.length);
         const ctx = canvas.getContext('2d');
         let chart = new Chart(ctx, {
