@@ -1,7 +1,11 @@
 <script context="module">
     let subscribers = [];
+    let connected = false;
 
     export function subscribe(eventName, eventHandler) {
+        if (connected) {
+            throw "Attempt to `subscribe` after already connected to EventSource.";
+        }
         subscribers.push({ eventName: eventName, eventHandler: eventHandler });
     }
 </script>
@@ -11,7 +15,7 @@
 
     function eventHandlerWrapper(handler) {
         return (e) => {
-            console.log(e.type, ":", e.data);
+            console.log("Event", e.type, ":", e.data);
             return handler(e);
         };
     }
@@ -34,5 +38,7 @@
                 eventHandlerWrapper(subscriber.eventHandler)
             );
         }
+
+        connected = true;
     });
 </script>
