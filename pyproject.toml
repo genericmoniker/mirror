@@ -36,6 +36,7 @@ pytest-asyncio = "^0.14.0"
 [tool.poetry.scripts]
 "mirror" = "mirror.main:main"
 "mirror-config" = "mirror.main_config:main"
+"pre-commit-npm" = "pre_commit_npm:main"
 
 [tool.black]
 exclude = '''

@@ -1,14 +1,14 @@
 <script>
-    import { getContext } from "svelte";
-    import { ROTATOR } from "./Rotator.svelte";
+  import { getContext } from "svelte";
+  import { ROTATOR } from "./Rotator.svelte";
 
-    // Name of this panel -- mostly for logging/debugging.
-    export let name = "";
+  // Name of this panel -- mostly for logging/debugging.
+  export let name = "";
 
-    const panel = { name: name };
-    const { registerPanel, currentPanel } = getContext(ROTATOR);
+  const panel = { name: name };
+  const { registerPanel, currentPanel } = getContext(ROTATOR);
 
-    registerPanel(panel);
+  registerPanel(panel);
 </script>
 
 <!--

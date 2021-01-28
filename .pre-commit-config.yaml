@@ -34,3 +34,14 @@ repos:
     entry: poetry run pytest
     types: [python]
     pass_filenames: false
+
+  - id: svelte-prettier
+    name: svelte-prettier
+    language: system
+    entry: poetry run pre-commit-npm frontend run pretty
+    files: frontend.*\.svelte
+
+- repo: meta
+  hooks:
+  - id: check-hooks-apply
+  - id: check-useless-excludes
