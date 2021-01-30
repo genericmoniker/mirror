@@ -17,8 +17,5 @@ def _get_log_formatter():
     if os.getppid() == 1:
         fmt = "%(levelname)7s %(message)s"
     else:
-        fmt = (
-            "%(asctime)s [%(process)d] [%(thread)d] %(levelname)1.1s "
-            "%(name)s - %(message)s"
-        )
+        fmt = "%(asctime)s %(levelname)1.1s %(name)s - %(message)s"
     return logging.Formatter(fmt)

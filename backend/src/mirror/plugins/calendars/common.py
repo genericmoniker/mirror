@@ -32,8 +32,8 @@ async def refresh_data(db, list_args, filter_func=None):
 
         return reshape_events(events)
 
-    except CredentialsError as ex:
-        _logger.error("Please run `mirror-config --plugins=calendars` (%s)", ex)
+    except CredentialsError:
+        _logger.error("Please run `mirror-config --plugins=calendars`")
 
 
 def reshape_events(events):
@@ -42,6 +42,7 @@ def reshape_events(events):
     for event in events["items"]:
 
         # Some people enter calendar events in ALL CAPS, which is annoying 😉.
+        # Convert them to title-case instead.
         summary = event["summary"]
         if summary.isupper():
             summary = summary.title()

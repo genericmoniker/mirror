@@ -1,4 +1,3 @@
-import logging
 from pathlib import Path
 
 import uvicorn
@@ -11,12 +10,13 @@ from mirror.event_bus import EventBus
 from mirror.log import setup_logging
 from mirror.plugin_manager import PluginManager
 
-_logger = logging.getLogger(__name__)
-
 
 async def stream_events(request):
     event_bus = request.app.state.event_bus
+
+    # Allow requests from the frontend dev server (npm run dev):
     headers = {"Access-Control-Allow-Origin": "http://localhost:5001"}
+
     return EventSourceResponse(event_bus.listen_for_events(), headers=headers)
 
 

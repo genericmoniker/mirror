@@ -3,6 +3,8 @@ import logging
 from asyncio import create_task, sleep
 from datetime import timedelta
 
+from personalcapital.personalcapital import RequireTwoFactorException
+
 from .configure import configure_plugin
 from .worth import update_worth
 
@@ -23,6 +25,8 @@ async def _refresh(context):
         try:
             data = await update_worth(context.db, limit=10)
             await context.post_event("refresh", data)
-        except Exception:  # pylint: disable=broad-except
-            _logger.exception("Error updating worth data.")
+        except RequireTwoFactorException:
+            _logger.error("Please run `mirror-config --plugins=worth`")
+        except Exception as ex:  # pylint: disable=broad-except
+            _logger.error("Error updating worth data: %s", ex)
         await sleep(REFRESH_INTERVAL.total_seconds())

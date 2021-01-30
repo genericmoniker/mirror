@@ -27,7 +27,7 @@ class PluginContext:
         """Post an event that is available to client-side JavaScript.
 
         :param name: Name of the event (see notes below).
-        :param data: Data sent with the event.
+        :param data: Data sent with the event. Send {} if there is no data.
 
         The plugin name is automatically used to namespace all events as they appear on
         the client side. For example:
@@ -39,6 +39,9 @@ class PluginContext:
         _source: The name of the plugin
         _time: When the event was raised
         """
+        if data is None:
+            return
+        data = dict(data)  # Copy data to avoid caller side-effects.
         full_name = f"{self.plugin_name}.{name}"
         data["_source"] = self.plugin_name
         data["_time"] = datetime.now().isoformat()
