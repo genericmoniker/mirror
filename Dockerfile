@@ -57,12 +57,13 @@ ENV PATH=$POETRY_HOME/bin:$PATH
 # Best practices:
 # * `COPY` in files only when needed.
 # * Reduce disk usage from `pip` installs.
-COPY pyproject.toml poetry.lock poetry.toml ./
 
 # Backend dependencies
+COPY --chown=appuser pyproject.toml poetry.lock poetry.toml ./
 RUN poetry install --no-root
 
 # Frontend dependencies
+COPY --chown=appuser frontend/package.json frontend/package-lock.json ./frontend/
 WORKDIR /home/appuser/frontend
 RUN npm install
 
