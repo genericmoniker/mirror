@@ -17,4 +17,4 @@ docker run \
     -p 5000:5000 \
     --volume="${HOST_VOLUME}:/home/appuser/instance" \
     -e TZ=America/Denver \
-    "${IMAGE_NAME}:starlette"
+    "${IMAGE_NAME}:main"
