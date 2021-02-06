@@ -1,0 +1,16 @@
+.cache
+.data_samples
+.mypy_cache
+.pytest_cache
+.venv
+.vscode
+instance
+system
+.dockerignore
+.gitignore
+.pre-commit-config.yaml
+docker-build.sh
+docker-run.sh
+Dockerfile
+LICENSE
+README.md

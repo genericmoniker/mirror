@@ -1,11 +1,21 @@
 [Unit]
-Description=Mirror Application Server
+Description=Mirror Server
+Requires=docker.service
+After=docker.service
 
 [Service]
 User=pi
-WorkingDirectory=/home/pi/mirror
-ExecStart=/home/pi/.envs/mirror/bin/flask run
-Restart=on-failure
+Restart=always
+ExecStart=/usr/bin/docker run \
+    -d \
+    --name="mirror" \
+    -p 5000:5000 \
+    --pull="always" \
+    --volume="/home/pi/mirror/instance:/home/appuser/instance" \
+    -e TZ=America/Denver \
+    --rm \
+    "genericmoniker/mirror:master"
+ExecStop=/usr/bin/docker stop --time=5 mirror
 
 [Install]
 WantedBy=multi-user.target

@@ -30,16 +30,19 @@ The value indicates the orientation:
 | 2     | 180 degrees |
 | 3     | 270 degrees |
 
-Clone this repo to `~/mirror`.
+Install docker following the instructions for Raspbian from the
+[documentation](https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script),
+including adding your user to the `docker` group.
 
-Copy the mirror-server systemd service unit file and enable it:
+Copy the mirror-server.service systemd service unit file from this repo and
+enable it:
 
     sudo cp ~/mirror/system/mirror-server.service /etc/systemd/system/
     sudo systemctl enable mirror-server
 
 Make a backup of your autostart file (just in case):
 
-    sudo cp /etc/xdg/lxsession/LXDE-pi/autostart /etc/xdg/lxsession/LXDE-pi/autostart/autostart.bak
+    sudo cp /etc/xdg/lxsession/LXDE-pi/autostart /etc/xdg/lxsession/LXDE-pi/autostart.bak
 
 Copy the `autostart` file from the project:
 
