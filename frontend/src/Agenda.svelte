@@ -24,6 +24,7 @@
 </script>
 
 <table>
+  {#if items.length === 0}<tr><td>No more jobs!</td></tr>{/if}
   {#each items as item}
     <tr>
       <td>{item.start}</td>
