@@ -7,6 +7,8 @@
   let summary = "";
   let feels = "";
   let wind = "";
+  let uvi = 0;
+  let uviMax = 0;
   let sunrise = "";
   let sunset = "";
   let daily = [];
@@ -20,6 +22,8 @@
     summary = data.current.weather[0].description;
     feels = data.current.feels_like;
     wind = data.current.wind_speed;
+    uvi = data.current.uvi;
+    uviMax = data.daily[0].uvi;
     sunrise = time(data.current.sunrise);
     sunset = time(data.current.sunset);
     daily = data.daily.slice(0, 5);
@@ -67,6 +71,19 @@
     </td>
   </tr>
   <tr>
+    <td colspan="5">
+      <div style="display:flex;align-items:center;">
+        <img
+          id="uvi"
+          src="/images/weather-glasses.svg"
+          alt="uv index"
+          width="40px"
+        />
+        &nbsp;{uvi.toFixed(1)}&nbsp; ↑ {uviMax.toFixed(1)}
+      </div>
+    </td>
+  </tr>
+  <tr>
     <td colspan="5"><i class="wi wi-sunrise" /> {sunrise}</td>
   </tr>
   <tr>
@@ -103,6 +120,10 @@
   #alerts {
     margin-top: 40px;
     font-weight: bold;
+  }
+
+  #uvi {
+    filter: invert(100%);
   }
 
   td {
