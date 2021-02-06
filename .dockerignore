@@ -1,5 +1,6 @@
 .cache
 .data_samples
+.github
 .mypy_cache
 .pytest_cache
 .venv
