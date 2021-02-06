@@ -59,20 +59,23 @@ ENV PATH=$POETRY_HOME/bin:$PATH
 # * Reduce disk usage from `pip` installs.
 COPY pyproject.toml poetry.lock poetry.toml ./
 
-# multidict and yarl C extensions don't build for me on linux/arm/v7 (need gcc and py
-# headers maybe?) so disable for now (actually too many other c externsions required)
-# ENV MULTIDICT_NO_EXTENSIONS=1
-# ENV YARL_NO_EXTENSIONS=1
-
+# Backend dependencies
 RUN poetry install --no-root
+
+# Frontend dependencies
+WORKDIR /home/appuser/frontend
+RUN npm install
 
 # Copy in the code.
 #
 # Best practices: Avoid extra chowns.
+WORKDIR /home/appuser
 COPY --chown=appuser . .
+
+# Backend build
 RUN poetry install
 
-# Build the frontend
+# Frontend build
 WORKDIR /home/appuser/frontend
 RUN npm run build
 
