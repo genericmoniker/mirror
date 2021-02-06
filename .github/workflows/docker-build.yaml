@@ -22,4 +22,4 @@ jobs:
         id: buildx
       -
         name: Docker buildx
-        run: docker-build.sh
+        run: ./docker-build.sh
