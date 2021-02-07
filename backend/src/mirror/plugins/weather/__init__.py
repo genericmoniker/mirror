@@ -12,8 +12,11 @@ import httpx
 API_KEY = "api-key"
 LOCATION = "location"
 
-# Open Weather Map allows lots of calls (60/min) for free, but this seems sufficient.
-REFRESH_INTERVAL = timedelta(minutes=2)
+# Open Weather Map allows 1000 calls per day to their "One Call API". Leaving some room
+# for development where we might be making double the number of requests for a while on
+# some particular day, and since it seems plenty real-time we'll go with refreshing
+# every 5 minutes (288 per day).
+REFRESH_INTERVAL = timedelta(minutes=5)
 
 _logger = logging.getLogger(__name__)
 _state = {}
