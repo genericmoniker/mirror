@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mirror</title>
+    <link href="{{ url_for('static', path='css/main.css') }}"
+          rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', path='css/weather-icons.css') }}"
+          rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,700'
+          rel='stylesheet' type='text/css'>
+</head>
+<body>
+<connectivity></connectivity>
+<div id="content">
+    <!-- Actual content is specified in the child template (index.html). -->
+    <div class="left">
+        {% block left %}{% endblock %}
+    </div>
+    <div class="right">
+        {% block right %}{% endblock %}
+    </div>
+    <div class="bottom">
+        {% block bottom %}{% endblock %}
+    </div>
+</div>
+<mirror-events class="component"></mirror-events>
+
+<!-- Riot tags and other plugin scripts. -->
+{% for plugin_name, scripts in plugin_scripts.items() %}
+    {% for filename, type in scripts %}
+        {% if type == 'riot/tag' %} <!-- Pretty clunky. I think Riot 4 solves this data-src vs. src? -->
+<script data-src="{{ url_for(plugin_name, path=filename) }}" type="{{type}}"></script>
+        {% else %}
+<script src="{{ url_for(plugin_name, path=filename) }}" type="{{type}}"></script>
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+
+<script data-src="{{ url_for('static', path='tag/clock.tag') }}" type="riot/tag"></script>
+
+<!-- Common scripts available to all plugins. -->
+<script src="{{ url_for('static', path='js/riot+compiler.min.js') }}"></script>
+<script src="{{ url_for('static', path='js/jquery-2.2.0.min.js') }}"></script>
+<script src="{{ url_for('static', path='js/moment.min.js') }}"></script>
+<script src="{{ url_for('static', path='js/luxon.min.js') }}"></script>
+
+<script src="{{ url_for('static', path='js/mirror-events.riot') }}" type='riot'></script>
+
+<script src="{{ url_for('static', path='js/main.js') }}"></script>
+
+<script>
+    (async function main() {
+      await riot.compile()
+
+      riot.mount('.component')
+    }())
+</script>
+
+</body>
+</html>

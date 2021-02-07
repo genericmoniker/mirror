@@ -1,0 +1,82 @@
+[tool.poetry]
+name = "mirror"
+version = "3.0.0"
+description = "A life dashboard application for Raspberry Pi"
+authors = ["Eric Smith <eric@esmithy.net>"]
+license = "MIT"
+packages = [
+    { include = "mirror", from = "backend/src"},
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+starlette = "^0.14.1"
+uvicorn = "^0.12.2"
+gunicorn = "^20.0.4"
+sse-starlette = "^0.6.1"
+aiofiles = "^0.6.0"
+sqlitedict = "^1.7.0"
+cryptography = "^3.3.1"
+tzlocal = "^2.1"
+httpx = "^0.16.1"
+aiogoogle = "^1.1.5"
+google-auth-oauthlib = "^0.4.2"
+personalcapital = "^1.0.1"
+IMAPClient = "^2.2.0"
+
+[tool.poetry.dev-dependencies]
+black = {version = "*", allow-prereleases = true}
+isort = "*"
+mypy = "*"
+pre-commit = "*"
+pylint = "*"
+pytest = "*"
+pytest-asyncio = "^0.14.0"
+
+[tool.poetry.scripts]
+"mirror" = "mirror.main:main"
+"mirror-config" = "mirror.main_config:main"
+"pre-commit-npm" = "pre_commit_npm:main"
+
+[tool.black]
+exclude = '''
+(
+  /(  # Exclude directories:
+      \.eggs
+    | .+\.egg-info
+    | \.git
+    | \.mypy_cache
+    | \.pytest_cache
+    | \.venv
+    | \frontend
+    | _build
+    | build
+    | dist
+  )/
+)
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.mypy]
+# Coming soon?
+# https://github.com/python/mypy/issues/5205
+
+[tool.pylint.messages_control]
+# Coming soon.
+# https://docs.pylint.org/en/latest/whatsnew/2.5.html
+disable = """
+bad-continuation,attribute-defined-outside-init,W0511,R0902,R0913,W0622,C0116,C0103,
+R0903,W0631,W0212,W0603,R1710,R0201
+"""
+j = '0'
+
+[tool.pytest]
+# Coming someday?
+# https://github.com/pytest-dev/pytest/issues/1556
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

@@ -1,0 +1,34 @@
+{
+  "name": "mirror-app",
+  "version": "3.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/genericmoniker/mirror.git"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "start": "sirv public --port 5001",
+    "pretty": "prettier --write"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^16.0.0",
+    "@rollup/plugin-node-resolve": "^10.0.0",
+    "prettier": "^2.2.1",
+    "prettier-plugin-svelte": "^2.1.1",
+    "rollup": "^2.3.4",
+    "rollup-plugin-css-only": "^3.1.0",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-svelte": "^7.0.0",
+    "rollup-plugin-terser": "^7.0.0",
+    "svelte": "^3.0.0"
+  },
+  "dependencies": {
+    "@fortawesome/free-regular-svg-icons": "^5.15.2",
+    "chart.js": "^2.9.4",
+    "luxon": "^1.25.0",
+    "sirv-cli": "^1.0.0",
+    "svelte-awesome": "^2.3.0"
+  }
+}

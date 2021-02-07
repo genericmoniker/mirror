@@ -1,6 +1,6 @@
 # Project-specific
 instance
-data_samples
+.data_samples
 
 # IDEs
 .idea
@@ -47,6 +47,9 @@ coverage.xml
 *,cover
 .hypothesis/
 .pytest_cache
+
+# Other tools
+.mypy_cache
 
 # Translations
 *.mo
