@@ -7,24 +7,27 @@
   subscribe("connectivity.refresh", (e) => {
     let data = JSON.parse(e.data);
     connected = data.connected;
+    error = data.error;
   });
 </script>
 
 {#if !connected}
   <div id="conn">
+    <span id="error" class="small">{error}</span>
     <img src="/images/connectivity-network-error.svg" alt={error} />
   </div>
 {/if}
 
 <style>
-  div {
+  #conn {
     display: block;
-    height: 75px;
+    height: 70px;
     position: fixed;
     bottom: 0;
     right: 0;
     z-index: 999;
     padding-right: 20px;
+    padding-bottom: 10px;
   }
 
   img {

@@ -3,7 +3,7 @@ from datetime import timedelta
 
 import httpx
 
-REFRESH_INTERVAL = timedelta(seconds=20)
+REFRESH_INTERVAL = timedelta(seconds=60)
 
 
 _state = {}
