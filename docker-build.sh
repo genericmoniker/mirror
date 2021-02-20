@@ -31,14 +31,19 @@ docker pull "${IMAGE_WITH_DEFAULT_BRANCH}" || true
 # * Warm up the build cache, per-branch (not doing ATM).
 # * Don't rely on the `latest` tag.
 # * Record the build's version control revision and branch.
+#
+# Multiplatform build:
+# * linux/amd64 to run on desktop
+# * linux/arm/v7 to run on Raspberry Pi 2
+# * linux/arm64 could be added for new Pis
 docker buildx build \
        -t "${IMAGE_WITH_COMMIT}" \
        -t "${IMAGE_WITH_BRANCH}" \
        --label "git-commit=${GIT_COMMIT}" \
        --label "git-branch=${GIT_BRANCH}" \
-       --platform linux/amd64,linux/arm64,linux/arm/v7 \
+       --platform linux/amd64,linux/arm/v7 \
        --push \
        .
 
        # --cache-from "${IMAGE_WITH_BRANCH}" \
-       # --cache-from "${IMAGE_WITH_DEFAULT_BRANCH}" \
+       # --cache-from "${IMAGE_WITH_DEFAULT_BRANCH}"
