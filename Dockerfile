@@ -17,6 +17,9 @@ ENV POETRY_HOME=/opt/poetry
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - --no-modify-path
 ENV PATH=$POETRY_HOME/bin:$PATH
 
+# Need Rust for Python Cryptography build for linux/arm/v7.
+RUN curl https://sh.rustup.rs -sSf | sh
+
 WORKDIR /build
 
 # Install dependencies.
