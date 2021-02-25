@@ -13,14 +13,19 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
   apt-get install -y --no-install-recommends nodejs
 
 # Install poetry.
-ENV POETRY_HOME=/opt/poetry
+ENV POETRY_VERSION=1.1.4 \
+    POETRY_HOME=/opt/poetry
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - --no-modify-path
 ENV PATH=$POETRY_HOME/bin:$PATH
 
 # Need Rust for Python Cryptography build for linux/arm/v7.
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
-WORKDIR /build
+# We don't create the appuser yet, but we'll still use this as the WORKDIR
+# so that shebangs in any scripts match up when we copy the virtualenv.
+ENV ROOTDIR=/home/appuser
+
+WORKDIR ${ROOTDIR}
 
 # Install dependencies.
 #
@@ -29,22 +34,26 @@ WORKDIR /build
 
 # Backend dependencies
 COPY pyproject.toml poetry.lock poetry.toml ./
-RUN poetry install --no-root
+RUN poetry install --no-root --no-dev
 
 # Frontend dependencies
 COPY frontend/package.json frontend/package-lock.json ./frontend/
-WORKDIR /build/frontend
+WORKDIR ${ROOTDIR}/frontend
 RUN npm install
 
 # Copy in the code.
-WORKDIR /build
+WORKDIR ${ROOTDIR}
 COPY . .
 
-# Backend "PEP 517" build (to copy a wheel to the virtual environment)
-RUN pip install .
+# Install any scripts, for example.
+RUN poetry install --no-dev
+
+# Build a wheel of the application and install it in the virtual environment.
+RUN poetry build -f wheel
+RUN ${ROOTDIR}/.venv/bin/pip install --no-deps --force-reinstall dist/*.whl
 
 # Frontend build
-WORKDIR /build/frontend
+WORKDIR ${ROOTDIR}/frontend
 RUN npm run build
 
 # ============================================================================
@@ -72,15 +81,15 @@ RUN useradd --create-home appuser
 USER appuser
 WORKDIR /home/appuser
 
-# Copy backend virtualenv (location is /build/.venv because of:
+# Copy backend virtualenv -- location is /build/.venv because of:
 # - WORKDIR in the build phase
 # - `in-project = true` in poetry.toml
 # Best practices: Avoid extra chowns.
-COPY --from=build-image --chown=appuser /build/.venv ./.venv
+COPY --from=build-image --chown=appuser /home/appuser/.venv ./.venv
 ENV PATH="/home/appuser/.venv/bin:$PATH"
 
 # Copy frontend.
-COPY --from=build-image --chown=appuser /build/frontend/public ./frontend/public
+COPY --from=build-image --chown=appuser /home/appuser/frontend/public ./frontend/public
 
 # Best practices: Prepare for C crashes.
 ENV PYTHONFAULTHANDLER=1

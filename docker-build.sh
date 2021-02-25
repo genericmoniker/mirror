@@ -33,15 +33,16 @@ docker pull "${IMAGE_WITH_DEFAULT_BRANCH}" || true
 # * Record the build's version control revision and branch.
 #
 # Multiplatform build:
-# * linux/amd64 to run on desktop
 # * linux/arm/v7 to run on Raspberry Pi 2
 # * linux/arm64 could be added for new Pis
+# * linux/amd64 could be added to run on desktop
 docker buildx build \
        -t "${IMAGE_WITH_COMMIT}" \
        -t "${IMAGE_WITH_BRANCH}" \
        --label "git-commit=${GIT_COMMIT}" \
        --label "git-branch=${GIT_BRANCH}" \
-       --platform linux/amd64,linux/arm/v7 \
+       --platform linux/arm/v7 \
+       --progress plain \
        --push \
        .
 

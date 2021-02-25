@@ -78,5 +78,5 @@ j = '0'
 # https://github.com/pytest-dev/pytest/issues/1556
 
 [build-system]
-requires = ["poetry_core>=1.0.0"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

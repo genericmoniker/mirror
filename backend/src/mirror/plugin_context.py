@@ -1,12 +1,12 @@
 import json
 import logging
 from datetime import datetime
-from pathlib import Path
 
 from cryptography.fernet import Fernet
 from sqlitedict import SqliteDict
 
 from mirror.event_bus import Event
+from mirror.paths import ROOTDIR
 
 _logger = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ class PluginDatabase(SqliteDict):  # pylint: disable=too-many-ancestors
     operations to be handled on a separate thread).
     """
 
-    _data_dir = Path(__file__).parent.parent.parent.parent / "instance"
+    _data_dir = ROOTDIR / "instance"
     _key = None
 
     def __init__(self, plugin_name, filename=None):

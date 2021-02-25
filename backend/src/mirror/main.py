@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import uvicorn
 from sse_starlette.sse import EventSourceResponse
 from starlette.applications import Starlette
@@ -8,6 +6,7 @@ from starlette.staticfiles import StaticFiles
 
 from mirror.event_bus import EventBus
 from mirror.log import setup_logging
+from mirror.paths import ROOTDIR
 from mirror.plugin_manager import PluginManager
 
 
@@ -25,9 +24,7 @@ def create_app():
 
     event_bus = EventBus()
     plugins = PluginManager(event_bus)
-    static_dir = (
-        Path(__file__).resolve().parent.parent.parent.parent / "frontend/public"
-    )
+    static_dir = ROOTDIR / "frontend/public"
 
     routes = [
         Route("/events", endpoint=stream_events),
