@@ -198,3 +198,50 @@ If you want to run the application stand-alone:
 cd ~/mirror
 ~/.envs/mirror/bin/python3 mirrorapp.py
 ```
+
+## Development
+
+The mirror application has two main parts:
+
+1. The backend, developed with Python using starlette
+2. The frontend, developed with JavaScript using svelte
+
+### Backend
+
+Install [poetry](https://python-poetry.org/docs/#installation), then:
+
+    poetry install
+
+Run the backend with either:
+
+    poetry run mirror
+
+or
+
+    python3 backend/src/mirror/main.py
+
+The server runs on http://localhost:5000, but you'll need to have built the
+frontend to get a UI.
+
+### Frontend
+
+Run the backend first!
+
+Install [npm](https://www.npmjs.com/get-npm), then cd to the `frontend`
+directory and the frontend with:
+
+    npm run dev
+
+The application will be available on http://localhost:5001, with hot-reload.
+
+You can also:
+
+    npm build
+
+To build the production frontend.
+
+### Pre-commit hook
+
+For tests, linting and other checks before commit:
+
+    poetry run pre-commit install
