@@ -22,3 +22,8 @@ docker run \
 
 echo "> Removing dangling images"
 docker image rm $(docker images -qa -f 'dangling=true') || true
+
+echo "> Refreshing the browser"
+export DISPLAY=:0.0
+export XAUTHORITY=/home/pi/.Xauthority
+xdotool key --window $(xdotool getactivewindow) ctrl+R
