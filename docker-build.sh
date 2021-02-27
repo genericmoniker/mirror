@@ -5,6 +5,7 @@
 set -euo pipefail
 
 IMAGE_NAME="genericmoniker/mirror"
+CACHE_IMAGE_NAME="genericmoniker/mirror-cache"
 
 # Get the Git commit and branch.
 GIT_COMMIT=$(set -e && git rev-parse --short HEAD)
@@ -18,17 +19,12 @@ GIT_DEFAULT_BRANCH=$(basename "${GIT_DEFAULT_BRANCH}")
 IMAGE_WITH_COMMIT="${IMAGE_NAME}:commit-${GIT_COMMIT}"
 IMAGE_WITH_BRANCH="${IMAGE_NAME}:${GIT_BRANCH}"
 IMAGE_WITH_DEFAULT_BRANCH="${IMAGE_NAME}:${GIT_DEFAULT_BRANCH}"
-# Pull previous versions of the image, if any.
-#
-# Best practices:
-# * Warm up the build cache, per-branch.
-docker pull "${IMAGE_WITH_BRANCH}" || true
-docker pull "${IMAGE_WITH_DEFAULT_BRANCH}" || true
+CACHE_IMAGE_WITH_BRANCH="${CACHE_IMAGE_NAME}:${GIT_BRANCH}"
 
 # Build the image, giving it two names.
 #
 # Best practices:
-# * Warm up the build cache, per-branch (not doing ATM).
+# * Warm up the build cache, per-branch.
 # * Don't rely on the `latest` tag.
 # * Record the build's version control revision and branch.
 #
@@ -44,7 +40,6 @@ docker buildx build \
        --platform linux/arm/v7 \
        --progress plain \
        --push \
+       --cache-from=type=registry,ref="${CACHE_IMAGE_WITH_BRANCH}" \
+       --cache-to=type=registry,ref="${CACHE_IMAGE_WITH_BRANCH}",mode=max \
        .
-
-       # --cache-from "${IMAGE_WITH_BRANCH}" \
-       # --cache-from "${IMAGE_WITH_DEFAULT_BRANCH}"

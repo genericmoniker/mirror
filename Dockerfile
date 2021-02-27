@@ -1,3 +1,5 @@
+# syntax = docker/dockerfile:1.2
+
 # Best practice: Choose a stable base image and tag.
 FROM python:3.8-slim-buster AS build-image
 
