@@ -12,7 +12,7 @@ repos:
   - id: black
     name: black
     language: system
-    entry: poetry run black
+    entry: poetry run black --quiet
     types: [python]
 
   - id: pylint
