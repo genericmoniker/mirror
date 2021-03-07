@@ -4,6 +4,8 @@ Smart/Magic Mirror
 
 WARNING: Work-in-progress; meets my needs but isn't fully generalized.
 
+WARNING: This document is not fully up-to-date.
+
 ## Raspberry Pi Setup
 
 Using Raspbian Buster.
@@ -96,6 +98,31 @@ For configuring other services, you'll need to create `instance/config.py` in
 the mirror directory, with contents described below.
 
 ## Plugins
+
+### Activity
+
+Fitbit step count for the data.
+
+1. Go to https://dev.fitbit.com/apps, logging in with your Fitbit account.
+1. Click on "Register a new app"
+1. Fill in the requested data. Most of the values before "OAuth 2.0 Application
+   Type" will be used for the authorization prompt, so the values don't matter
+   much.
+1. For "OAuth 2.0 Application Type" choose "Personal"
+1. For "Callback URL" enter "http://localhost:5000/fitbit"
+1. For "Default Access Type" choose "Read-Only"
+1. After agreeing to terms, click "Register"
+1. When that succeeds, click the "OAuth 2.0 tutorial page" link
+1. For "Flow type" choose "Authorization Code Flow"
+1. For "Select Scopes" check "activity"
+1. There is a link below text saying, "We've generated the authorization URL
+   for you, all you need to do is just click on link below:" Click it.
+1. Your browser will go to the callback URL entered earlier (likely displaying
+   an error), and will have a `code` query parameter like
+   `?code=7b64c4b088b9c841d15bcac15d4aa7433d35af3e#_=`. Copy the
+   `7b64c4b088b9c841d15bcac15d4aa7433d35af3e` part.
+1. Run mirror-config, and enter the prompted values. For Authorization code,
+   enter the value copied from the URL in the previous step.
 
 ### Calendar
 
