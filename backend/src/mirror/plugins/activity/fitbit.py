@@ -70,7 +70,7 @@ async def _refresh_access_token(client, creds: dict) -> None:
     https://dev.fitbit.com/build/reference/web-api/oauth2/#refreshing-tokens
     """
     post_data = {
-        "refresh_token ": creds["refresh_token "],
+        "refresh_token": creds["refresh_token"],
         "grant_type": "refresh_token",
     }
     data = await _do_auth_post(client, creds, post_data)
