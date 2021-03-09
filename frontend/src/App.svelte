@@ -1,4 +1,5 @@
 <script>
+  import Activity from "./Activity.svelte";
   import Agenda from "./Agenda.svelte";
   import ComingUp from "./ComingUp.svelte";
   import Connectivity from "./Connectivity.svelte";
@@ -24,6 +25,8 @@
 <main>
   <section id="left">
     <Weather />
+    <br />
+    <Activity width="450" />
     <br />
     <Worth />
   </section>
