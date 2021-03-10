@@ -11,10 +11,13 @@ It may also have these keys, and they may be updated during function calls:
     - access_token
     - refresh_token
 """
+import logging
 from base64 import b64encode
 from datetime import datetime
 
 import httpx
+
+_logger = logging.getLogger(__name__)
 
 
 class CredentialsError(Exception):
@@ -92,5 +95,7 @@ async def _do_auth_post(client, creds: dict, post_data: dict) -> dict:
     auth_value = b64encode(f"{creds['client_id']}:{creds['client_secret']}".encode())
     headers = {"Authorization": "Basic " + auth_value.decode()}
     response = await client.post(url, headers=headers, data=post_data)
+    if response.is_error:
+        _logger.error(response.content)
     response.raise_for_status()
     return response.json()
