@@ -50,7 +50,7 @@ def _calculate_cashflow_worth(data):
     cash = data["spData"]["cashAccountsTotal"]
     credit = data["spData"]["creditCardAccountsTotal"]
     net = cash - credit
-    _logger.info("cash: %s, credit: %s, net: %s", cash, credit, net)
+    _logger.info("cash: %.2f, credit: %.2f, net: %.2f", cash, credit, net)
     return net
 
 
