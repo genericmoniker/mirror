@@ -1,21 +1,19 @@
-import logging
-import os
-import sys
+from copy import deepcopy
+
+from uvicorn.config import LOGGING_CONFIG
 
 
-def setup_logging():
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(_get_log_formatter())
-    root_logger = logging.getLogger()
-    root_logger.setLevel(logging.INFO)
-    root_logger.addHandler(handler)
+def uvicorn_log_config():
+    config = deepcopy(LOGGING_CONFIG)
+    default_fmt = "%(asctime)s %(levelprefix)s %(name)s -> %(message)s"
+    config["formatters"]["default"]["fmt"] = default_fmt
+    access_fmt = '%(asctime)s %(levelprefix)s %(client_addr)s - "%(request_line)s" %(status_code)s'  # pylint:disable=line-too-long
+    config["formatters"]["access"]["fmt"] = access_fmt
 
-
-def _get_log_formatter():
-    # If running under systemd, use a simple format since the journal
-    # adds its own metadata (including, for example, the date/time).
-    if os.getppid() == 1:
-        fmt = "%(levelname)7s %(message)s"
-    else:
-        fmt = "%(asctime)s %(levelname)1.1s %(name)s - %(message)s"
-    return logging.Formatter(fmt)
+    config["loggers"] = {
+        # Set the root handler so we have the same format for all log messages:
+        "": {"handlers": ["default"], "level": "INFO"},
+        "uvicorn.error": {"level": "INFO"},
+        "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": False},
+    }
+    return config

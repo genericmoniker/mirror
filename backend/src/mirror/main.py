@@ -5,7 +5,7 @@ from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
 from mirror.event_bus import EventBus
-from mirror.log import setup_logging
+from mirror.log import uvicorn_log_config
 from mirror.paths import ROOTDIR
 from mirror.plugin_manager import PluginManager
 
@@ -20,8 +20,6 @@ async def stream_events(request):
 
 
 def create_app():
-    setup_logging()
-
     event_bus = EventBus()
     plugins = PluginManager(event_bus)
     static_dir = ROOTDIR / "frontend/public"
@@ -48,7 +46,7 @@ app = create_app()
 
 
 def main():
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host="0.0.0.0", port=5000, log_config=uvicorn_log_config())
 
 
 if __name__ == "__main__":
