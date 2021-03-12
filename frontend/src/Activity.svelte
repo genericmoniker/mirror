@@ -17,16 +17,13 @@
     let stepsGoal = data.stepsGoal;
     let percent = steps / stepsGoal;
     let barWidth = Math.min(1, percent) * width;
-    drawBar(barWidth);
+    drawProgressBar(barWidth);
   });
 
-  function drawCenterLine() {
+  function drawProgressBar(barWidth) {
     const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawLine(ctx, canvas.width, 1);
-  }
-
-  function drawBar(barWidth) {
-    const ctx = canvas.getContext("2d");
     drawLine(ctx, barWidth, height);
   }
 
@@ -43,8 +40,7 @@
   }
 
   onMount(() => {
-    drawCenterLine();
-    drawBar(100);
+    drawProgressBar(0);
   });
 </script>
 
