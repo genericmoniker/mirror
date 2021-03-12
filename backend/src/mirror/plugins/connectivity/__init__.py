@@ -29,6 +29,7 @@ async def _refresh(context):
                 data = response.json()
                 data.update({"connected": True, "error": None})
         except httpx.RequestError as ex:
-            data = {"connected": False, "error": str(ex)}
+            error_message = str(ex) or repr(ex)
+            data = {"connected": False, "error": error_message}
         await context.post_event("refresh", data)
         await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
