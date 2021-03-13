@@ -34,6 +34,12 @@ def start_plugin(context):
     _state["task"] = task
 
 
+def stop_plugin(context):  # pylint: disable=unused-argument
+    task = _state.get("task")
+    if task:
+        task.cancel()
+
+
 async def _refresh(context):
     """Get the weather data for the configured coordinates.
 

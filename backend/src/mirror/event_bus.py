@@ -1,9 +1,12 @@
 import json
+import logging
 from asyncio import Queue
 from dataclasses import dataclass
 from typing import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 _TERMINATE_SENTINEL = "__exit__"
+
+_logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -39,6 +42,7 @@ class EventBus:
 
     async def shutdown(self) -> None:
         for queue in self._listener_queues:
+            _logger.info("queuing terminate sentinel")
             await queue.put(_TERMINATE_SENTINEL)
 
     async def post(self, event: Event) -> None:
@@ -75,6 +79,7 @@ class EventBus:
             while True:
                 event = await queue.get()
                 if event == _TERMINATE_SENTINEL:
+                    _logger.info("terminating event generator")
                     return
                 yield event.as_sse_dict()
         finally:
