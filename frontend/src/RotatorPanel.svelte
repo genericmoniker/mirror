@@ -8,12 +8,26 @@
   const panel = { name: name };
   const { registerPanel, currentPanel } = getContext(ROTATOR);
 
+  $: visible = $currentPanel === panel;
+
   registerPanel(panel);
 </script>
 
 <!--
 The tab control this is based on used an {#if} block to show/hide the slot
 content, but that doesn't allow child components to initialize at app startup,
-so using hidden instead.
+since they don't exist until added to the DOM.
 -->
-<div hidden={$currentPanel !== panel}><slot /></div>
+<div class:fade={!visible}>
+  <slot />
+</div>
+
+<style>
+  div {
+    transition: 0.5s ease all;
+  }
+
+  .fade {
+    opacity: 0;
+  }
+</style>
