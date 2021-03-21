@@ -14,15 +14,21 @@ https://svelte.dev/repl/8e68120858e5322272dc9136c4bb79cc?version=3.5.1
   export let time = 30;
 
   const panels = [];
-  const currentPanel = writable(null);
-  let index = -1;
+  let panelIndex = -1;
 
+  const currentPanel = writable(null);
+
+  // This increments each time all the panels have been cycled through.
+  const loopIndex = writable(0);
+
+  // Store the registerPanel function and other data for panels to be able to access.
   setContext(ROTATOR, {
     registerPanel: (panel) => {
       panels.push(panel);
     },
 
     currentPanel,
+    loopIndex,
   });
 
   onMount(() => {
@@ -42,14 +48,19 @@ https://svelte.dev/repl/8e68120858e5322272dc9136c4bb79cc?version=3.5.1
     if (panels.length === 0) {
       return;
     }
-    index = index === panels.length - 1 ? 0 : index + 1;
-    let current = panels[index];
+    if (panelIndex === panels.length - 1) {
+      panelIndex = 0;
+      loopIndex.update((n) => n + 1);
+    } else {
+      panelIndex += 1;
+    }
+    let current = panels[panelIndex];
     currentPanel.set(current);
     console.log(
       "Rotator currentPanel:",
       current.name ? current.name : "(unnamed)",
-      "index:",
-      index
+      "panelIndex:",
+      panelIndex
     );
   }
 </script>
