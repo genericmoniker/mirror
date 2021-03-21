@@ -43,7 +43,7 @@
   </section>
 
   <section id="bottom">
-    <Rotator time="10">
+    <Rotator time="30">
       <RotatorPanel name="compliment">
         <Compliment />
       </RotatorPanel>
