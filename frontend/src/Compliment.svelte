@@ -15,7 +15,7 @@
   $: compliment = compliments[$loopIndex % compliments.length];
 </script>
 
-<p class="huge">{compliment}</p>
+<p class="large">{compliment}</p>
 
 <style>
   p {
