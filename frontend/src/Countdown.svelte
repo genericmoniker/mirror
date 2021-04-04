@@ -1,14 +1,33 @@
 <script>
   import { subscribe } from "./Events.svelte";
   import { DateTime } from "luxon";
+  import { onMount } from "svelte";
+
+  const ONE_MINUTE = 60000;
 
   let dataItems = [];
   let displayItems = [];
+  let today = DateTime.local();
 
   subscribe("calendars.refresh_countdown", (e) => {
     let rawItems = JSON.parse(e.data).items;
     updateData(rawItems);
     updateDisplay();
+  });
+
+  onMount(() => {
+    const interval = setInterval(() => {
+      let now = DateTime.local();
+      if (now.toISODate() !== today.toISODate()) {
+        today = now;
+        console.log("Countdown day changed to: " + today.toISODate());
+        updateDisplay();
+      }
+    }, ONE_MINUTE);
+
+    return () => {
+      clearInterval(interval);
+    };
   });
 
   function updateData(items) {
