@@ -11,9 +11,7 @@ CACHE_IMAGE_NAME="genericmoniker/mirror-cache"
 GIT_COMMIT=$(set -e && git rev-parse --short HEAD)
 GIT_BRANCH=$(set -e && git rev-parse --abbrev-ref HEAD)
 
-# Get the default Git branch; default to master if it can't figure it out.
-GIT_DEFAULT_BRANCH=$(git rev-parse --abbrev-ref origin/HEAD || echo origin/master)
-GIT_DEFAULT_BRANCH=$(basename "${GIT_DEFAULT_BRANCH}")
+GIT_DEFAULT_BRANCH="main"
 
 # Set two complete image names:
 IMAGE_WITH_COMMIT="${IMAGE_NAME}:commit-${GIT_COMMIT}"
