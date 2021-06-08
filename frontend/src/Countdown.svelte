@@ -1,4 +1,5 @@
 <script>
+  import { updateData, updateDisplay } from "./Calendar.svelte";
   import { subscribe } from "./Events.svelte";
   import { DateTime } from "luxon";
   import { onMount } from "svelte";
@@ -11,8 +12,8 @@
 
   subscribe("calendars.refresh_countdown", (e) => {
     let rawItems = JSON.parse(e.data).items;
-    updateData(rawItems);
-    updateDisplay();
+    dataItems = updateData(rawItems);
+    displayItems = updateDisplay(dataItems);
   });
 
   onMount(() => {
@@ -29,51 +30,6 @@
       clearInterval(interval);
     };
   });
-
-  function updateData(items) {
-    console.log("Countdown item count: " + items.length);
-    dataItems = [];
-    for (let i = 0; i < items.length; i++) {
-      let item = items[i];
-      let start = DateTime.fromISO(
-        "dateTime" in item.start ? item.start.dateTime : item.start.date
-      );
-      dataItems.push({
-        summary: item.summary,
-        start: start,
-      });
-    }
-  }
-
-  function updateDisplay() {
-    displayItems = [];
-    for (let i = 0; i < dataItems.length; i++) {
-      let item = dataItems[i];
-
-      // toRelative will be something like "in 6 months".
-      let fromNow = item.start.toRelative();
-
-      // If fromNow doesn't include days, add them parenthetically.
-      let fromNowDays = "";
-      if (fromNow.indexOf("days") === -1) {
-        fromNowDays =
-          "(" +
-          item.start.toRelative({ unit: "days" }).replace("in ", "") +
-          ")";
-      }
-
-      // If fromNow is in the hours, just say "tomorrow".
-      if (fromNow.indexOf("hour") != -1) {
-        fromNow = "tomorrow";
-      }
-
-      displayItems.push({
-        fromNow: fromNow,
-        fromNowDays: fromNowDays,
-        summary: item.summary,
-      });
-    }
-  }
 </script>
 
 {#each displayItems as item}
