@@ -22,7 +22,7 @@
       if (now.toISODate() !== today.toISODate()) {
         today = now;
         console.log("Countdown day changed to: " + today.toISODate());
-        updateDisplay();
+        displayItems = updateDisplay(dataItems);
       }
     }, ONE_MINUTE);
 
