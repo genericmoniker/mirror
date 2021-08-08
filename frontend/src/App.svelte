@@ -9,6 +9,7 @@
   import Events from "./Events.svelte";
   import { subscribe } from "./Events.svelte";
   import Mail from "./Mail.svelte";
+  import Menu from "./Menu.svelte";
   import Rotator from "./Rotator.svelte";
   import RotatorPanel from "./RotatorPanel.svelte";
   import Weather from "./Weather.svelte";
@@ -35,6 +36,7 @@
   <section id="right">
     <Clock />
     <br />
+    <Menu />
     <Agenda />
     <br />
     <ComingUp />
