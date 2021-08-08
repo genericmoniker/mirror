@@ -2,7 +2,7 @@
   import Activity from "./Activity.svelte";
   import Agenda from "./Agenda.svelte";
   import ComingUp from "./ComingUp.svelte";
-  import Compliment from "./Compliment.svelte";
+  import Positivity from "./Positivity.svelte";
   import Connectivity from "./Connectivity.svelte";
   import Countdown from "./Countdown.svelte";
   import Clock from "./Clock.svelte";
@@ -44,8 +44,8 @@
 
   <section id="bottom">
     <Rotator time="30">
-      <RotatorPanel name="compliment">
-        <Compliment />
+      <RotatorPanel name="positivity">
+        <Positivity />
       </RotatorPanel>
       {#each mailItems as item, i}
         <RotatorPanel name="mail {i}">
