@@ -82,7 +82,9 @@ async def get_events(user_creds, client_creds, list_args, filter_func=None):
         # Is there a way to cache service discovery?
         service = await aiogoogle.discover("calendar", "v3")
         try:
-            calendar_list = await aiogoogle.as_user(service.calendarList.list())
+            calendar_list = await aiogoogle.as_user(
+                service.calendarList.list(), timeout=30
+            )
             _update_user_creds(user_creds, aiogoogle.user_creds)
 
             events = []
@@ -109,7 +111,8 @@ async def _get_calendar_events(aiogoogle, service, list_args, calendar, filter_f
     calendar_id = calendar["id"]
     try:
         events_result = await aiogoogle.as_user(
-            service.events.list(calendarId=calendar_id, singleEvents=True, **list_args)
+            service.events.list(calendarId=calendar_id, singleEvents=True, **list_args),
+            timeout=30,
         )
     except HTTPError as ex:
         _logger.error(
