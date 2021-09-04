@@ -20,19 +20,24 @@ class PluginManager:
     def startup(self):
         for name, module in self._discovered_plugins.items():
             with plugin_error_logger(name, "start_plugin"):
-                if hasattr(module, "start_plugin"):
-                    module.start_plugin(PluginContext(name, self._event_bus))
+                module.start_plugin(PluginContext(name, self._event_bus))
 
     def shutdown(self):
         for name, module in self._discovered_plugins.items():
             with plugin_error_logger(name, "stop_plugin"):
-                if hasattr(module, "stop_plugin"):
-                    module.stop_plugin(PluginContext(name, self._event_bus))
+                module.stop_plugin(PluginContext(name, self._event_bus))
+
+    def dump_tasks(self):
+        for name, module in self._discovered_plugins.items():
+            with plugin_error_logger(name, "dump_tasks"):
+                module.dump_tasks(PluginContext(name, self._event_bus))
 
 
 @contextlib.contextmanager
 def plugin_error_logger(name, action):
     try:
         yield
+    except AttributeError:
+        pass  # plugin entrypoints are optional
     except Exception as ex:  # pylint:disable=broad-except
         _logger.error("Error from plugin '%s' (%s): %s", name, action, ex)

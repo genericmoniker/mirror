@@ -1,6 +1,7 @@
 import uvicorn
 from sse_starlette.sse import EventSourceResponse
 from starlette.applications import Starlette
+from starlette.responses import Response
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
@@ -19,6 +20,12 @@ async def stream_events(request):
     return EventSourceResponse(event_bus.listen_for_events(), headers=headers)
 
 
+async def diagnostics(request):
+    plugins = request.app.state.plugins
+    plugins.dump_tasks()
+    return Response(status_code=204)
+
+
 def create_app():
     event_bus = EventBus()
     plugins = PluginManager(event_bus)
@@ -26,6 +33,7 @@ def create_app():
 
     routes = [
         Route("/events", endpoint=stream_events),
+        Route("/diag", endpoint=diagnostics),
         Mount("/", StaticFiles(directory=static_dir, html=True), name="static"),
     ]
 
@@ -36,6 +44,7 @@ def create_app():
         on_shutdown=[plugins.shutdown, event_bus.shutdown],
     )
     application.state.event_bus = event_bus
+    application.state.plugins = plugins
 
     return application
 
