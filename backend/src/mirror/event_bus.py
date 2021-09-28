@@ -51,6 +51,7 @@ class EventBus:
         If the event is the same as the last event posted (not including data['_time'])
         then it will not be sent to clients.
         """
+        _logger.debug("Event posted: %s", event)
 
         # Don't send if there's nothing new.
         cached = self._cached_events.get(event.name)

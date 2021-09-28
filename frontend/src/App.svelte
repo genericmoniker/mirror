@@ -13,6 +13,7 @@
   import Rotator from "./Rotator.svelte";
   import RotatorPanel from "./RotatorPanel.svelte";
   import Weather from "./Weather.svelte";
+  import Word from "./Word.svelte";
   import Worth from "./Worth.svelte";
 
   let mailItems = [];
@@ -46,6 +47,9 @@
 
   <section id="bottom">
     <Rotator time="30">
+      <RotatorPanel name="word-ptbr">
+        <Word event="word_ptbr.refresh" />
+      </RotatorPanel>
       <RotatorPanel name="positivity">
         <Positivity />
       </RotatorPanel>
