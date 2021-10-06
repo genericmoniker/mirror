@@ -27,11 +27,6 @@ class PluginManager:
             with plugin_error_logger(name, "stop_plugin"):
                 module.stop_plugin(PluginContext(name, self._event_bus))
 
-    def dump_tasks(self):
-        for name, module in self._discovered_plugins.items():
-            with plugin_error_logger(name, "dump_tasks"):
-                module.dump_tasks(PluginContext(name, self._event_bus))
-
 
 @contextlib.contextmanager
 def plugin_error_logger(name, action):

@@ -1,11 +1,8 @@
-import logging
 from asyncio import create_task
-from io import StringIO
 from typing import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 from . import agenda, coming_up, countdown
 
-_logger = logging.getLogger(__name__)
 _state: Dict[str, Any] = {"tasks": []}
 
 
@@ -20,11 +17,3 @@ def stop_plugin(context):  # pylint: disable=unused-argument
     for task in _state.get("tasks"):
         if task:
             task.cancel()
-
-
-def dump_tasks(context):  # pylint: disable=unused-argument
-    file = StringIO()
-    print("Dumping calendars tasks", file=file)
-    for task in _state.get("tasks"):
-        task.print_stack(file=file)
-    _logger.info(file.getvalue())

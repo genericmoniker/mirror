@@ -5,6 +5,7 @@ from starlette.responses import Response
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
+from mirror.diagnostics import log_task_stacks
 from mirror.event_bus import EventBus
 from mirror.log import uvicorn_log_config
 from mirror.paths import ROOTDIR
@@ -20,9 +21,8 @@ async def stream_events(request):
     return EventSourceResponse(event_bus.listen_for_events(), headers=headers)
 
 
-async def diagnostics(request):
-    plugins = request.app.state.plugins
-    plugins.dump_tasks()
+async def diagnostics(request):  # pylint: disable=unused-argument
+    log_task_stacks()
     return Response(status_code=204)
 
 
@@ -44,7 +44,6 @@ def create_app():
         on_shutdown=[plugins.shutdown, event_bus.shutdown],
     )
     application.state.event_bus = event_bus
-    application.state.plugins = plugins
 
     return application
 
