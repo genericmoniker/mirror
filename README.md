@@ -8,11 +8,16 @@ WARNING: This document is not fully up-to-date.
 
 ## Raspberry Pi Setup
 
-Using Raspbian Buster.
+Using Raspberry Pi OS.
 
-Install the unclutter package for hiding the mouse cursor.
+It will probably be helpful to enable ssh access, which can be done following
+the [Remote Access
+instructions](https://www.raspberrypi.org/documentation/computers/remote-access.html).
 
-    sudo apt-get install unclutter
+Install the unclutter package for hiding the mouse cursor, and the xdotool to
+make it easier to refresh the browser from the command line.
+
+    sudo apt-get install unclutter xdotool
 
 You might want to rotate the display if your monitor is hung vertically. Edit
 /boot/config.txt:
@@ -34,7 +39,8 @@ The value indicates the orientation:
 
 Install docker following the instructions for Raspbian from the
 [documentation](https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script),
-including adding your user to the `docker` group.
+including adding your user to the `docker` group in the [post install
+instructions](https://docs.docker.com/engine/install/linux-postinstall/).
 
 Copy the mirror-server.service systemd service unit file from this repo and
 enable it:
@@ -56,34 +62,22 @@ cron jobs, run:
 
     sudo crontab -e
 
-For example, turn on at 5:50 AM, off at 11 PM, add these lines:
+For example, turn on at 5:45 AM, off at 11 PM, add these lines:
 
-    50 5  * * * /home/pi/mirror/system/scron.sh
+    45 5  * * * /home/pi/mirror/system/scron.sh
     0 23  * * * /home/pi/mirror/system/scroff.sh
 
 https://www.raspberrypi.org/documentation/linux/usage/cron.md
 
-You'll also need to create an `instance` directory, and configure
-services as described below.
-
-## Python 3.7 Setup
-
-```bash
-sudo apt-get update
-sudo apt-get install libffi-dev libssl-dev
-python3 -m venv ~/.envs/mirror
-. ~/.envs/mirror/bin/activate
-cd mirror
-pip install wheel
-pip install -r requirements.txt
-```
+You'll also need to create a `/home/pi/mirror/instance` directory, and
+configure services as described below.
 
 ## Mirror Configuration
 
 To do any configuration that plugins might need, run:
 
 ```
-python configure.py
+~/mirror/system/mirror-config
 ```
 
 That will prompt you for any settings, storing them well-obfuscated in
@@ -93,9 +87,6 @@ Some configuration requires using a web browser, so you'll either need to have
 a keyboard attached to the device, or you can do configuration on another
 machine (like a desktop PC) and copy `instance/mirror.db` and
 `instance/mirror.key` to the device.
-
-For configuring other services, you'll need to create `instance/config.py` in
-the mirror directory, with contents described below.
 
 ## Plugins
 
@@ -165,7 +156,7 @@ password.
 
 ### Weather
 
-Current weather and forecasts using [Dark Sky](https://darksky.net).
+Current weather and forecasts using Open Weather Map.
 
 ### Worth
 
@@ -205,7 +196,6 @@ get alerts if something goes wrong in the application.
 
 Then add a SENTRY_CONFIG dictionary to `instance/config.py` like that shown in
 the [documentation](https://docs.sentry.io/clients/python/integrations/flask/).
-
 
 ## Troubleshooting
 
