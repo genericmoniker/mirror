@@ -34,6 +34,10 @@ since they don't exist until added to the DOM.
 </div>
 
 <style>
+  div {
+    padding-right: 50px;
+  }
+
   .active {
     transition: opacity 2s ease;
     opacity: 1;
