@@ -8,6 +8,7 @@
   import Clock from "./Clock.svelte";
   import Events from "./Events.svelte";
   import { subscribe } from "./Events.svelte";
+  import LightTheWorld from "./LightTheWorld.svelte";
   import Mail from "./Mail.svelte";
   import Menu from "./Menu.svelte";
   import Rotator from "./Rotator.svelte";
@@ -47,6 +48,9 @@
 
   <section id="bottom">
     <Rotator time="30">
+      <RotatorPanel name="light-the-world">
+        <LightTheWorld />
+      </RotatorPanel>
       <RotatorPanel name="word-ptbr">
         <Word event="word_ptbr.refresh" />
       </RotatorPanel>
