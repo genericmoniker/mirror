@@ -47,6 +47,28 @@ class PluginContext:
         data["_time"] = datetime.now().isoformat()
         await self._event_bus.post(Event(name=full_name, data=data))
 
+    _connectivity_score = 0
+
+    def vote_connected(self):
+        """Allows a plugin to vote that the network is connected."""
+        score = min(PluginContext._connectivity_score + 1, 10)
+        PluginContext._connectivity_score = score
+        _logger.info(
+            "%s votes connected; score: %s",
+            self.plugin_name,
+            score,
+        )
+
+    def vote_disconnected(self, cause: Exception):
+        """Allows a plugin to vote that the network is disconnected."""
+        score = max(PluginContext._connectivity_score - 1, -10)
+        _logger.info(
+            "%s votes disconnected because of %s; score: %s",
+            self.plugin_name,
+            cause,
+            score,
+        )
+
 
 class PluginDatabase(SqliteDict):  # pylint: disable=too-many-ancestors
     """Database for persistent plug-in data.

@@ -38,7 +38,12 @@ async def _refresh(context):
                 full_data = response.json()
                 data = _reshape_full_data(full_data)
                 await context.post_event("refresh", data)
-        except httpx.RequestError:
+                context.vote_connected()
+        except httpx.TransportError as ex:
+            # https://www.python-httpx.org/exceptions/
+            context.vote_disconnected(ex)
+            _logger.exception("Network error getting menu.")
+        except Exception:  # pylint: disable=broad-except
             _logger.exception("Error getting menu.")
         await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
 

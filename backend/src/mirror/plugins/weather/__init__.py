@@ -63,6 +63,11 @@ async def _refresh(context):
             response.raise_for_status()
             data = response.json()
             await context.post_event("refresh", data)
-        except httpx.RequestError:
+            context.vote_connected()
+        except httpx.TransportError as ex:
+            # https://www.python-httpx.org/exceptions/
+            context.vote_disconnected(ex)
+            _logger.exception("Network error getting weather data.")
+        except Exception:  # pylint: disable=broad-except
             _logger.exception("Error getting weather data.")
         await sleep(REFRESH_INTERVAL.total_seconds())

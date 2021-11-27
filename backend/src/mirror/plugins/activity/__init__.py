@@ -3,6 +3,8 @@ import logging
 from asyncio import create_task, sleep
 from datetime import datetime, timedelta
 
+from httpx import TransportError
+
 from .fitbit import CredentialsError, get_activity
 
 # A forum post said that devices tend to sync every 15 minutes when in range of a phone.
@@ -50,8 +52,13 @@ async def _refresh(context):
             data["steps"] = activity_data["summary"]["steps"]
             _logger.info("steps goal: %s, steps: %s", data["stepsGoal"], data["steps"])
             await context.post_event("refresh", data)
+            context.vote_connected()
         except CredentialsError:
             _logger.error("Please run `mirror-config --plugins=activity`")
-        except Exception as ex:  # pylint: disable=broad-except
-            _logger.exception("Error updating activity data: %s", ex)
+        except TransportError as ex:
+            # https://www.python-httpx.org/exceptions/
+            context.vote_disconnected(ex)
+            _logger.exception("Network error updating activity data.")
+        except Exception:  # pylint: disable=broad-except
+            _logger.exception("Error updating activity data.")
         await sleep(REFRESH_INTERVAL.total_seconds())

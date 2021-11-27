@@ -12,6 +12,7 @@ import asyncio
 import email
 import functools
 import logging
+import socket
 from datetime import datetime, timedelta
 from getpass import getpass
 
@@ -55,6 +56,11 @@ async def _refresh(context):
             emails = await _fetch_messages(context.db)
             data = {"items": emails}
             await context.post_event("refresh", data)
+            context.vote_connected()
+        except (socket.error, socket.timeout) as ex:
+            # https://imapclient.readthedocs.io/en/2.2.0/api.html#exceptions
+            context.vote_disconnected(ex)
+            _logger.exception("Network error getting emails.")
         except Exception:  # pylint:disable=broad-except
             _logger.exception("Error getting emails.")
         await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
@@ -81,14 +87,8 @@ def _fetch_messages(db):
     """
     if not db.get(IMAP_HOST):
         return []
-    with IMAPClient(
-        host=db.get(IMAP_HOST),
-        port=db.get(IMAP_PORT),
-    ) as client:
-        client.login(
-            db.get(IMAP_USERNAME),
-            db.get(IMAP_PASSWORD),
-        )
+    with IMAPClient(host=db.get(IMAP_HOST), port=db.get(IMAP_PORT)) as client:
+        client.login(db.get(IMAP_USERNAME), db.get(IMAP_PASSWORD))
         client.select_folder("INBOX")
         since = (datetime.now() - timedelta(days=6)).date()
         message_ids = client.search(

@@ -35,6 +35,11 @@ async def _refresh(context):
             response.raise_for_status()
             data = _parse(response.text)
             await context.post_event("refresh", data)
+            context.vote_connected()
+        except httpx.TransportError as ex:
+            # https://www.python-httpx.org/exceptions/
+            context.vote_disconnected(ex)
+            _logger.exception("Network error getting word-of-the-day data.")
         except Exception:  # pylint: disable=broad-except
             _logger.exception("Error getting word-of-the-day data.")
 
