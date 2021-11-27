@@ -1,4 +1,9 @@
-"""Net worth data of some number of financial accounts via Personal Capital."""
+"""Net worth data of some number of financial accounts via Personal Capital.
+
+WARNING: BROKEN AS OF NOV 2021.
+
+See https://github.com/haochi/personalcapital/issues/20
+"""
 import logging
 from asyncio import create_task, sleep
 from datetime import timedelta
