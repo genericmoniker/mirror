@@ -154,6 +154,16 @@ If you want to use a Gmail account, you'll need to enable IMAP in the settings.
 Also, it might work best to use two-factor authentication and create an app
 password.
 
+### Now Playing
+
+Currently playing track from Spotify (requires a Spotify Premium account).
+
+1. Create an app at Spotify's [Developer
+   Dashboard](https://developer.spotify.com/dashboard/) following [these
+   instructions](https://developer.spotify.com/documentation/general/guides/authorization/app-settings/).
+   Use "http://localhost:5050/auth" for the redirect URI.
+2. Run `mirror-config --plugins=now_playing` and follow the prompts.
+
 ### Weather
 
 Current weather and forecasts using Open Weather Map.

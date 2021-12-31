@@ -5,19 +5,20 @@ Spotify authorization guide:
 https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
 """
 
+import json
 import logging
 from asyncio import create_task, sleep
 from datetime import timedelta
+from functools import partial
 
 import httpx
-from httpx_auth import OAuth2AuthorizationCodePKCE
-from httpx_auth.authentication import OAuth2
+from authlib.integrations.httpx_client import AsyncOAuth2Client
 
 API_URL = "https://api.spotify.com/"
-AUTH_URL = "https://accounts.spotify.com/"
+AUTH_URL = "https://accounts.spotify.com/authorize"
+TOKEN_URL = "https://accounts.spotify.com/api/token"
 SCOPE = "user-read-currently-playing"
-REDIRECT_URI_ENDPOINT = "auth"
-REDIRECT_URI_PORT = 5050
+REDIRECT_URI = "http://localhost:5050/auth"
 
 REFRESH_INTERVAL = timedelta(seconds=30)
 
@@ -27,8 +28,6 @@ _state = {}
 
 def start_plugin(context):
     if context.db.get("client_id"):
-        OAuth2.token_cache.tokens = context.db
-
         _state["task"] = create_task(_refresh(context), name="now_playing.refresh")
     else:
         _logger.info("Plugin not configured.")
@@ -40,64 +39,76 @@ def stop_plugin(context):  # pylint: disable=unused-argument
         task.cancel()
 
 
-def configure_plugin(db):
-
-    # httpx_auth thinks logging exceptions AND raising them is a good idea 😠
-    httpx_auth_logger = logging.getLogger("httpx_auth")
-    httpx_auth_logger.setLevel(logging.CRITICAL)
-
+def configure_plugin(config_context):
+    db = config_context.db
+    oauth = config_context.oauth
     print("Now Playing Plugin Set Up")
-    client_id = input("Spotify App Client ID: ").strip()
-    print("Launching your browser to continue authorization (if needed)...")
+    client_id = input("Spotify app client ID: ").strip()
+    client_secret = input("Spotify app client secret: ").strip()
 
-    # This is a little awkward. We'll create an auth object with all the necessary
-    # parameters to talk to Spotify, slip in db as the storage for tokens, and request
-    # a token through the cache in order to save the needed values.
-    auth = _create_auth(client_id)
-    OAuth2.token_cache.tokens = db
+    # FYI - Spotify auth also supports PKCE, which if used doesn't ever require
+    # using the client secret.
+
     try:
-        OAuth2.token_cache.get_token(
-            auth.state, on_missing_token=auth.request_new_token
+        response, state = oauth.authorize(
+            AUTH_URL,
+            client_id,
+            None,
+            SCOPE,
+            REDIRECT_URI,
+            show_dialog=True,
         )
-
-        # Hang on to the client_id, too, so we can create auth when running the plugin.
+        token = oauth.fetch_token(
+            TOKEN_URL, client_id, client_secret, REDIRECT_URI, response, state
+        )
         db["client_id"] = client_id
-
-        print("Successfully authorized")
+        db["client_secret"] = client_secret
+        db["state"] = state
+        db["token"] = json.dumps(token)
+        print("Authorization succeeded")
     except Exception as ex:  # pylint: disable=broad-except
-        print("Failed to authorize: ", ex)
-
-
-def _create_auth(client_id):
-    auth = OAuth2AuthorizationCodePKCE(
-        authorization_url=AUTH_URL + "authorize",
-        token_url=AUTH_URL + "api/token",
-        client_id=client_id,
-        redirect_uri_endpoint=REDIRECT_URI_ENDPOINT,
-        redirect_uri_port=REDIRECT_URI_PORT,
-        success_display_time=5000,
-        scope=SCOPE,
-    )
-    return auth
+        print("Authorization failed:", ex)
 
 
 async def _refresh(context):
-    auth = _create_auth(context.db["client_id"])
     while True:
+        sleep_time = REFRESH_INTERVAL.total_seconds()
         try:
-            async with httpx.AsyncClient(auth=auth) as client:
-                url = API_URL + "v1/me/player/currently-playing"
-                response = await client.get(url)
+            response = await _get_currently_playing(context.db)
             data = _transform_currently_playing_track(response)
             await context.post_event("refresh", data)
             context.vote_connected()
+            sleep_time = _get_next_poll_seconds(data)
         except httpx.TransportError as ex:
             # https://www.python-httpx.org/exceptions/
             context.vote_disconnected(ex)
             _logger.exception("Network error getting now playing data.")
         except Exception:  # pylint: disable=broad-except
-            _logger.exception("Error getting now_playing data.")
-        await sleep(REFRESH_INTERVAL.total_seconds())
+            _logger.exception("Error getting now playing data.")
+        _logger.debug("sleep time: %s", sleep_time)
+        await sleep(sleep_time)
+
+
+async def _get_currently_playing(db):
+    # We use the OAuth client, which is a subclass of httpx.AsyncClient,
+    # to automatically send the authorization header and handle refresh
+    # tokens.
+    token = json.loads(db["token"])
+    update_partial = partial(_update_token, db)
+    async with AsyncOAuth2Client(
+        client_id=db["client_id"],
+        client_secret=db["client_secret"],
+        token=token,
+        token_endpoint=TOKEN_URL,
+        update_token=update_partial,
+    ) as client:
+        url = API_URL + "v1/me/player/currently-playing"
+        return await client.get(url)
+
+
+async def _update_token(db, token, **kwargs):  # pylint: disable=unused-argument
+    # update old token
+    db["token"] = json.dumps(token)
 
 
 def _transform_currently_playing_track(response):
@@ -117,3 +128,16 @@ def _transform_currently_playing_track(response):
         "progress_ms": raw["progress_ms"],
         "is_playing": raw["is_playing"],
     }
+
+
+def _get_next_poll_seconds(data):
+    """Get the number of seconds until the next poll.
+
+    This attempts to catch track changes right away.
+    """
+    if not data or not data["is_playing"]:
+        return REFRESH_INTERVAL.total_seconds()
+    duration_ms = data["duration_ms"]
+    progress_ms = data["progress_ms"]
+    track_finished_seconds = ((duration_ms - progress_ms) / 1000) + 1
+    return min(track_finished_seconds, REFRESH_INTERVAL.total_seconds())

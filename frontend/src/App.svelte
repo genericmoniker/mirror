@@ -11,6 +11,7 @@
   import LightTheWorld from "./LightTheWorld.svelte";
   import Mail from "./Mail.svelte";
   import Menu from "./Menu.svelte";
+  import NowPlaying from "./NowPlaying.svelte";
   import Rotator from "./Rotator.svelte";
   import RotatorPanel from "./RotatorPanel.svelte";
   import Weather from "./Weather.svelte";
@@ -31,6 +32,8 @@
     <Weather />
     <br />
     <Activity width="450" />
+    <br />
+    <NowPlaying />
     <br />
     <Worth />
   </section>
