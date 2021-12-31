@@ -51,9 +51,11 @@
 
   <section id="bottom">
     <Rotator time="30">
+      <!--
       <RotatorPanel name="light-the-world">
         <LightTheWorld />
       </RotatorPanel>
+      -->
       <RotatorPanel name="word-ptbr">
         <Word event="word_ptbr.refresh" />
       </RotatorPanel>
