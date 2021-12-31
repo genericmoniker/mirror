@@ -1,6 +1,6 @@
 import argparse
 
-from mirror.plugin_context import PluginDatabase
+from mirror.plugin_configure_context import PluginConfigureContext
 from mirror.plugin_discovery import discover_plugins
 
 
@@ -18,11 +18,8 @@ def main():
         module = plugins[name]
         if not hasattr(module, "configure_plugin"):
             continue
-        db = PluginDatabase(name)
-        try:
-            module.configure_plugin(db)
-        finally:
-            db.close()
+        with PluginConfigureContext(name) as context:
+            module.configure_plugin(context)
 
 
 if __name__ == "__main__":

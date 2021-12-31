@@ -22,7 +22,8 @@ _logger = logging.getLogger(__name__)
 _state = {}
 
 
-def configure_plugin(db):
+def configure_plugin(config_context):
+    db = config_context.db
     print("Weather Plugin Set Up")
     db[API_KEY] = input("Open Weather Map API key: ").strip()
     db[LOCATION] = input("Weather location (lat,lon): ").strip()

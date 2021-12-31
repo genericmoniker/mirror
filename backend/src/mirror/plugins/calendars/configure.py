@@ -14,7 +14,8 @@ from .common import CLIENT_CREDENTIALS, COMING_UP_FILTER, USER_CREDENTIALS
 from .google_calendar import obtain_user_permission
 
 
-def configure_plugin(db):
+def configure_plugin(config_context):
+    db = config_context.db
     print("Calendar Plugin Set Up")
 
     client_creds = _configure_client_credentials(db)

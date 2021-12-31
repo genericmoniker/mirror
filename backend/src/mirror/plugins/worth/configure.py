@@ -9,7 +9,8 @@ from personalcapital import (
 from .common import PC_PASSWORD, PC_SESSION, PC_USERNAME
 
 
-def configure_plugin(db):
+def configure_plugin(config_context):
+    db = config_context.db
     print("Worth Plugin Set Up")
     username = input("Personal Capital username: ").strip()
     password = getpass("Personal Capital password: ").strip()

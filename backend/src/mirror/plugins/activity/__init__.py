@@ -21,7 +21,8 @@ _logger = logging.getLogger(__name__)
 _state = {}
 
 
-def configure_plugin(db):
+def configure_plugin(config_context):
+    db = config_context.db
     print("Activity Plugin Set Up")
     db[CLIENT_ID] = input("Fitbit client ID (from app registration): ").strip()
     db[CLIENT_SECRET] = input("Fitbit client secret (from app registration): ").strip()

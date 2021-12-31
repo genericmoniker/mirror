@@ -30,7 +30,8 @@ _logger = logging.getLogger(__name__)
 _state = {}
 
 
-def configure_plugin(db):
+def configure_plugin(config_context):
+    db = config_context.db
     print("Mail Plugin Set Up")
 
     db[IMAP_HOST] = input("IMAP email server host: ").strip()
