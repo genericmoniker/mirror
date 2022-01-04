@@ -58,7 +58,7 @@ async def _refresh(context):
     }
     while True:
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=10) as client:
                 url = "https://api.openweathermap.org/data/2.5/onecall"
                 response = await client.get(url, params=params)
             response.raise_for_status()

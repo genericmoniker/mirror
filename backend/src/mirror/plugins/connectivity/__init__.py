@@ -23,7 +23,7 @@ def stop_plugin(context):  # pylint: disable=unused-argument
 async def _refresh(context):
     while True:
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=10) as client:
                 response = await client.get("https://api.ipify.org?format=json")
                 response.raise_for_status()
                 data = response.json()

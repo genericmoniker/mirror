@@ -30,7 +30,7 @@ async def _refresh(context):
     while True:
         try:
             transport = httpx.AsyncHTTPTransport(retries=3)
-            async with httpx.AsyncClient(transport=transport) as client:
+            async with httpx.AsyncClient(transport=transport, timeout=10) as client:
                 response = await client.get(url)
             response.raise_for_status()
             data = _parse(response.text)

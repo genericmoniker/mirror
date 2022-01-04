@@ -34,7 +34,7 @@ async def get_activity(creds: dict, for_date: datetime) -> dict:
 async def _api_request(creds: dict, url_path: str) -> dict:
     if not creds:
         raise CredentialsError
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=10) as client:
         if not creds.get("access_token"):
             await _get_access_token(client, creds)
         url = "https://api.fitbit.com/1/user/-/" + url_path

@@ -101,6 +101,7 @@ async def _get_currently_playing(db):
         token=token,
         token_endpoint=TOKEN_URL,
         update_token=update_partial,
+        timeout=10,
     ) as client:
         url = API_URL + "v1/me/player/currently-playing"
         return await client.get(url)
