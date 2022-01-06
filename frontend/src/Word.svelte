@@ -3,7 +3,13 @@
 
   export let event;
 
-  let data = {};
+  let data = {
+    word: "",
+    part_of_speech: "",
+    translation: "",
+    sentence: "",
+    sentence_translation: "",
+  };
 
   subscribe(event, (e) => {
     data = JSON.parse(e.data);
@@ -11,15 +17,17 @@
   });
 </script>
 
-<div class="center">
-  <p><span class="huge divider">{data.word}</span></p>
-  <p class="large">
-    <span><i>{data.part_of_speech}</i></span> &#8226;
-    <span>{data.translation}</span>
-  </p>
-  <p>{data.sentence}</p>
-  <p>{data.sentence_translation}</p>
-</div>
+{#if data.word !== ""}
+  <div class="center">
+    <p><span class="huge divider">{data.word}</span></p>
+    <p class="large">
+      <span><i>{data.part_of_speech}</i></span> &#8226;
+      <span>{data.translation}</span>
+    </p>
+    <p>{data.sentence}</p>
+    <p>{data.sentence_translation}</p>
+  </div>
+{/if}
 
 <style>
   .center {
