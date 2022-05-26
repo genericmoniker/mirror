@@ -39,13 +39,17 @@ def _get_coming_up_event_range():
 
 
 def _coming_up_filter(pattern, event):
-    # All day events only have a date, not a dateTime.
-    if "dateTime" in event["start"]:
+    # We mainly want all day events. All day events only have a date, not a dateTime.
+    # But include events anyway if they are count-down events.
+    is_all_day = "dateTime" not in event["start"]
+    is_countdown = "mirror-countdown" in event.get("description", "").lower()
+    if not is_all_day and not is_countdown:
         return False
     # For multi-day events, skip them if they've already started.
-    start = parse_date_tz(event["start"]["date"])
-    if start <= start_of_day_tz():
-        return False
+    if is_all_day:
+        start = parse_date_tz(event["start"]["date"])
+        if start <= start_of_day_tz():
+            return False
     # Check any custom filters from the config.
     if pattern and re.match(pattern, event["summary"]):
         return False
