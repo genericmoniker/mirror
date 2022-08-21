@@ -32,6 +32,14 @@
     <Weather />
     <br />
     <Activity width="450" />
+    <!-- FUTURE: Two up
+    <table>
+      <tr>
+        <td><Activity width="225" /></td>
+        <td><Activity width="225" /></td>
+      </tr>
+    </table>
+     -->
     <br />
     <NowPlaying />
     <br />

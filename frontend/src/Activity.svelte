@@ -6,11 +6,12 @@
   import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 
   export let width;
-  let height = 11;
+  export let ring = true; // Otherwise a bar graph.
+  let height = ring ? 150 : 11;
 
   let canvas;
   let stepsStr = "0";
-  let percent = 0;
+  let percent = 0; // 0-1
 
   subscribe("activity.refresh", (e) => {
     let data = JSON.parse(e.data);
@@ -18,13 +19,22 @@
     stepsStr = steps.toLocaleString();
     let stepsGoal = data.stepsGoal;
     percent = steps / stepsGoal;
-    let barWidth = Math.min(1, percent) * width;
-    drawProgressBar(barWidth);
+    drawProgress(percent);
   });
 
-  function drawProgressBar(barWidth) {
+  function drawProgress(percent) {
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (ring) {
+      drawProgressRing(ctx, percent);
+    } else {
+      drawProgressBar(ctx, 0.55);
+    }
+  }
+
+  function drawProgressBar(ctx, percent) {
+    let barWidth = Math.min(1, percent) * width;
+    console.log("===BAR WIDTH:" + barWidth);
     drawLine(ctx, canvas.width, 1);
     drawLine(ctx, barWidth, height);
   }
@@ -41,17 +51,48 @@
     ctx.stroke();
   }
 
+  function drawProgressRing(ctx, percent) {
+    let thinLineWidth = 1;
+    let thickLineWidth = 6;
+    let x = width / 2;
+    let y = height / 2;
+    let radius = height / 2 - thickLineWidth / 2;
+    let rotation = Math.PI / 2; // amount to subtract to start with 0 at north
+    let startAngle = 0 - rotation;
+    let endAngleCircle = 2 * Math.PI - rotation;
+    let endAnglePercent = 2 * Math.PI * percent - rotation;
+    // Thin, full circle:
+    drawArc(ctx, x, y, radius, startAngle, endAngleCircle, thinLineWidth);
+    // Thick, progress:
+    drawArc(ctx, x, y, radius, startAngle, endAnglePercent, thickLineWidth);
+  }
+
+  function drawArc(ctx, x, y, radius, start, end, lineWidth) {
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.arc(x, y, radius, start, end);
+    ctx.stroke();
+  }
+
   onMount(() => {
-    drawProgressBar(0);
+    drawProgress(0);
   });
 </script>
 
-<div id="component">
-  <div id="text" style="width: {width}px">
+<div id="component" class:stacked={ring}>
+  <div class="text" style="width: {width}px; height: {height}px;">
+    <br />
+    <!-- Cheat vertical center! -->
     <Icon id="steps-icon" data={faShoePrints} scale="2" />
-    &nbsp;
+    {#if ring}
+      <br />
+    {:else}
+      &nbsp;
+    {/if}
     {stepsStr}
-    {#if percent >= 1}
+    {#if !ring && percent >= 1}
       &nbsp;
       <span id="goal-icon"
         ><Icon id="goal-icon" data={faCheckCircle} scale="1.6" /></span
@@ -59,15 +100,20 @@
     {/if}
   </div>
   <canvas bind:this={canvas} {width} {height} />
+  <div class="text" style="width: {width}px; height: {height}px;">
+    <!-- TODO: Could put label here. -->
+  </div>
 </div>
 
 <style>
   #component {
-    padding-left: 10px;
+    padding-left: 0px;
   }
-  #text {
+  .text {
     text-align: center;
-    vertical-align: middle;
+  }
+  .stacked div {
+    position: absolute;
   }
   #goal-icon {
     opacity: 1;
