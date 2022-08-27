@@ -7,6 +7,7 @@
 
   export let width;
   export let ring = true; // Otherwise a bar graph.
+  export let person = null;
   let height = ring ? 150 : 11;
 
   let canvas;
@@ -14,7 +15,7 @@
   let percent = 0; // 0-1
 
   subscribe("activity.refresh", (e) => {
-    let data = JSON.parse(e.data);
+    let data = JSON.parse(e.data)[person];
     let steps = data.steps;
     stepsStr = steps.toLocaleString();
     let stepsGoal = data.stepsGoal;
@@ -101,7 +102,7 @@
   </div>
   <canvas bind:this={canvas} {width} {height} />
   <div class="text" style="width: {width}px; height: {height}px;">
-    <!-- TODO: Could put label here. -->
+    {person}
   </div>
 </div>
 

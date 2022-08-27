@@ -100,7 +100,7 @@ Fitbit step count for the data.
    Type" will be used for the authorization prompt, so the values don't matter
    much.
 1. For "OAuth 2.0 Application Type" choose "Personal"
-1. For "Callback URL" enter "http://localhost:5000/fitbit"
+1. For "Redirect URL" enter "http://localhost:5000/fitbit"
 1. For "Default Access Type" choose "Read-Only"
 1. After agreeing to terms, click "Register"
 1. When that succeeds, click the "OAuth 2.0 tutorial page" link
@@ -114,6 +114,9 @@ Fitbit step count for the data.
    `7b64c4b088b9c841d15bcac15d4aa7433d35af3e` part.
 1. Run mirror-config, and enter the prompted values. For Authorization code,
    enter the value copied from the URL in the previous step.
+
+Note: The authorization code can only be used once, so if something goes wrong, you may
+need to generate a new one and re-run configuration to try again.
 
 ### Calendar
 

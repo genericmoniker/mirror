@@ -31,15 +31,13 @@
   <section id="left">
     <Weather />
     <br />
-    <Activity width="450" />
-    <!-- FUTURE: Two up
     <table>
       <tr>
-        <td><Activity width="225" /></td>
-        <td><Activity width="225" /></td>
+        <td><Activity width="225" person="Eric" /></td>
+        <td><Activity width="225" person="Shannon" /></td>
       </tr>
     </table>
-     -->
+    <br />
     <br />
     <NowPlaying />
     <br />
