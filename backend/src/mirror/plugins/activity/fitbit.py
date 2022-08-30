@@ -30,6 +30,22 @@ async def get_activity(creds: dict, for_date: datetime) -> dict:
     url_path = f"activities/date/{date}.json"
     return await _api_request(creds, url_path)
 
+    # Use this instead of _api_request for testing:
+    # return _get_activity_test_data()
+
+
+def _get_activity_test_data():
+    """Get sample data for testing w/o authenticating to the Fitbit API."""
+    import json  # pylint:disable=import-outside-toplevel
+    import random  # pylint:disable=import-outside-toplevel
+    from pathlib import Path  # pylint:disable=import-outside-toplevel
+
+    root_dir = Path(__file__).parent.parent.parent.parent.parent.parent
+    data = (root_dir / ".data_samples/fitbit-activity.json").read_text()
+    data = json.loads(data)
+    data["summary"]["steps"] = random.randint(0, 10_000)
+    return data
+
 
 async def _api_request(creds: dict, url_path: str) -> dict:
     if not creds:

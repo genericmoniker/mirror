@@ -1,3 +1,4 @@
+import copy
 import json
 import logging
 from datetime import datetime
@@ -41,7 +42,7 @@ class PluginContext:
         """
         if data is None:
             return
-        data = dict(data)  # Copy data to avoid caller side-effects.
+        data = copy.deepcopy(data)  # Copy data to avoid caller side-effects.
         full_name = f"{self.plugin_name}.{name}"
         data["_source"] = self.plugin_name
         data["_time"] = datetime.now().isoformat()
