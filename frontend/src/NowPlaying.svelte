@@ -7,9 +7,15 @@
 
   subscribe("now_playing.refresh", (e) => {
     let data = JSON.parse(e.data);
-    name = data.name;
-    artists = data.artists.join(", ");
-    is_playing = data.is_playing;
+    if ("name" in data) {
+      name = data.name;
+      artists = data.artists.join(", ");
+      is_playing = data.is_playing;
+    } else {
+      name = "";
+      artists = "";
+      is_playing = false;
+    }
   });
 </script>
 
