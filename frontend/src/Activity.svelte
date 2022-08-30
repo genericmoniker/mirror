@@ -29,7 +29,7 @@
     if (ring) {
       drawProgressRing(ctx, percent);
     } else {
-      drawProgressBar(ctx, 0.55);
+      drawProgressBar(ctx, percent);
     }
   }
 
