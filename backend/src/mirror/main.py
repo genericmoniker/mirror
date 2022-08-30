@@ -26,12 +26,17 @@ async def diagnostics(request):  # pylint: disable=unused-argument
     return Response(status_code=204)
 
 
+async def ready(request):  # pylint: disable=unused-argument
+    return Response()
+
+
 def create_app():
     event_bus = EventBus()
     plugins = PluginManager(event_bus)
     static_dir = ROOTDIR / "frontend/public"
 
     routes = [
+        Route("/ready", endpoint=ready),
         Route("/events", endpoint=stream_events),
         Route("/diag", endpoint=diagnostics),
         Mount("/", StaticFiles(directory=static_dir, html=True), name="static"),
