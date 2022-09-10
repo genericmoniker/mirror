@@ -7,7 +7,7 @@ https://developer.spotify.com/documentation/general/guides/authorization/code-fl
 
 import json
 import logging
-from asyncio import create_task, sleep
+from asyncio import Task, create_task, sleep
 from datetime import timedelta
 from functools import partial
 
@@ -28,7 +28,9 @@ _state = {}
 
 def start_plugin(context):
     if context.db.get("client_id"):
-        _state["task"] = create_task(_refresh(context), name="now_playing.refresh")
+        task = create_task(_refresh(context), name="now_playing.refresh")
+        task.add_done_callback(_task_done)
+        _state["task"] = task
     else:
         _logger.info("Plugin not configured.")
 
@@ -36,7 +38,12 @@ def start_plugin(context):
 def stop_plugin(context):  # pylint: disable=unused-argument
     task = _state.get("task")
     if task:
+        task.remove_done_callback(_task_done)
         task.cancel()
+
+
+def _task_done(task: Task) -> None:
+    _logger.warning("Now playing task unexpectedly done: %s", task.exception())
 
 
 def configure_plugin(config_context):
