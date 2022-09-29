@@ -47,7 +47,7 @@ def reshape_events(events):
         if summary.isupper():
             summary = summary.title()
 
-        new_event = {"summary": summary, "start": event["start"]}
+        new_event = {"summary": summary, "start": event["start"], "end": event["end"]}
 
         # Only include one event if it is duplicated across calendars. This overlaps
         # conceptually with the `filter_func` on `refresh_data` but considering all
