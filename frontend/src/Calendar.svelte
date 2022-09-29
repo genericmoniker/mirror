@@ -23,6 +23,11 @@
     for (let i = 0; i < dataItems.length; i++) {
       let item = dataItems[i];
 
+      // Skip items in the past.
+      if (item.start < DateTime.local()) {
+        continue;
+      }
+
       // toRelative will be something like "in 6 months".
       let fromNow = item.start.toRelative();
 
