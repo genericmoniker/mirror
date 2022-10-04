@@ -50,6 +50,11 @@ class PluginContext:
 
     _connectivity_score = 0
 
+    @property
+    def is_connected(self):
+        """Whether the network is connected."""
+        return PluginContext._connectivity_score >= 0
+
     def vote_connected(self):
         """Allows a plugin to vote that the network is connected."""
         score = min(PluginContext._connectivity_score + 1, 10)
