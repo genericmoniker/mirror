@@ -68,6 +68,7 @@ class PluginContext:
     def vote_disconnected(self, cause: Exception):
         """Allows a plugin to vote that the network is disconnected."""
         score = max(PluginContext._connectivity_score - 1, -10)
+        PluginContext._connectivity_score = score
         _logger.info(
             "%s votes disconnected because of %s; score: %s",
             self.plugin_name,
