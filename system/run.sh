@@ -33,7 +33,4 @@ export XAUTHORITY=/home/pi/.Xauthority
 xdotool key --window $(xdotool getactivewindow) ctrl+shift+R
 echo
 
-echo "> Running offline check script"
-./check-offline.sh &
-
 echo "> Done"
