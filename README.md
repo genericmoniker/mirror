@@ -238,13 +238,13 @@ The mirror application has two main parts:
 
 ### Backend
 
-Install [poetry](https://python-poetry.org/docs/#installation), then:
+Install [pdm](https://pdm.fming.dev/latest/), then:
 
-    poetry install
+    pdm install --dev
 
 Run the backend with either:
 
-    poetry run mirror
+    pdm run mirror
 
 or
 
@@ -274,4 +274,4 @@ To build the production frontend.
 
 For tests, linting and other checks before commit:
 
-    poetry run pre-commit install
+    pdm run pre-commit install

@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1.2
 
 # Best practice: Choose a stable base image and tag.
-FROM python:3.8-slim-buster AS build-image
+FROM python:3.10-slim-buster AS build-image
 
 # Best practice: Make sure apt-get doesn't run in interactive mode.
 RUN export DEBIAN_FRONTEND=noninteractive && \
@@ -10,15 +10,13 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
 
 # NodeSource repostiory and nodejs
 # Best practice: Make sure apt-get doesn't run in interactive mode.
-RUN curl -sL https://deb.nodesource.com/setup_15.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
 RUN export DEBIAN_FRONTEND=noninteractive && \
   apt-get install -y --no-install-recommends nodejs
 
-# Install poetry.
-ENV POETRY_VERSION=1.1.12 \
-    POETRY_HOME=/opt/poetry
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - --no-modify-path
-ENV PATH=$POETRY_HOME/bin:$PATH
+# Install PDM.
+RUN curl -sSL https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm.py | python3 - --version=2.3.2
+ENV PATH=/root/.local/bin:${PATH}
 
 # Need Rust for Python Cryptography >=3.5 build for linux/arm/v7.
 # I'm having trouble making this work (e.g. "spurious network error" trying to
@@ -39,8 +37,8 @@ WORKDIR ${ROOTDIR}
 # * `COPY` in files only when needed.
 
 # Backend dependencies
-COPY pyproject.toml poetry.lock poetry.toml ./
-RUN poetry install --no-root --no-dev
+COPY pyproject.toml pdm.lock ./
+RUN pdm install --prod --no-lock --no-editable
 
 # Frontend dependencies
 COPY frontend/package.json frontend/package-lock.json ./frontend/
@@ -51,12 +49,8 @@ RUN npm install
 WORKDIR ${ROOTDIR}
 COPY . .
 
-# Install any scripts, for example.
-RUN poetry install --no-dev
-
-# Build a wheel of the application and install it in the virtual environment.
-RUN poetry build -f wheel
-RUN ${ROOTDIR}/.venv/bin/pip install --no-deps --force-reinstall dist/*.whl
+# Install application.
+RUN pdm install --prod --no-lock --no-editable
 
 # Frontend build
 WORKDIR ${ROOTDIR}/frontend
@@ -64,7 +58,7 @@ RUN npm run build
 
 # ============================================================================
 
-FROM python:3.8-slim-buster AS run-image
+FROM python:3.10-slim-buster AS run-image
 
 # Install security updates, and some useful packages.
 #
