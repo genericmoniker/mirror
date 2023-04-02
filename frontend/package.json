@@ -28,7 +28,7 @@
     "@fortawesome/free-regular-svg-icons": "^5.15.3",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "chart.js": "^2.9.4",
-    "luxon": "^1.27.0",
+    "luxon": "^1.28.1",
     "sirv-cli": "^1.0.12",
     "svelte-awesome": "^2.3.2"
   }
