@@ -2,7 +2,7 @@
 default_stages: [commit]
 repos:
 
-# Make sure the lock file is up-to-date with
+# Make sure the lock file is up-to-date with pyproject.toml.
 - repo: https://github.com/pdm-project/pdm
   rev: 2.3.2
   hooks:

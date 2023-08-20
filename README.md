@@ -257,16 +257,15 @@ frontend to get a UI.
 
 Run the backend first!
 
-Install [npm](https://www.npmjs.com/get-npm), then cd to the `frontend`
-directory and the frontend with:
-
-    npm run dev
+1. Install [npm](https://www.npmjs.com/get-npm).
+2. Then cd to the `frontend` directory and run `npm install`
+3. Run `npm run dev`
 
 The application will be available on http://localhost:5001, with hot-reload.
 
 You can also:
 
-    npm build
+    npm run build
 
 To build the production frontend.
 
