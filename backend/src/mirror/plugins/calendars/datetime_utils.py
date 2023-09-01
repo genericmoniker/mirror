@@ -1,7 +1,5 @@
 import datetime
 
-import tzlocal
-
 
 def now_tz():
     """Get the current local time as a time zone aware datetime."""
@@ -26,6 +24,5 @@ def parse_date_tz(date):
 
     If you want parsing of times and time zones, try the dateutil package.
     """
-    parsed = datetime.datetime.strptime(date, "%Y-%m-%d")
-    time_zone = tzlocal.get_localzone()
-    return time_zone.localize(parsed)
+    parsed = datetime.datetime.fromisoformat(date)
+    return parsed.astimezone()

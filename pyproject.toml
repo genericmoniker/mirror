@@ -14,7 +14,6 @@ dependencies = [
     "aiofiles>=0.6.0",
     "sqlitedict>=1.7.0",
     "cryptography>=3.3.1",
-    "tzlocal>=2.1",
     "httpx>=0.23.0",
     "aiogoogle>=2.1.0",
     "google-auth-oauthlib>=0.4.2",
@@ -26,8 +25,6 @@ dependencies = [
 name = "mirror"
 version = "3.0.0"
 description = "A life dashboard application for Raspberry Pi"
-
-[project.urls]
 
 [project.scripts]
 mirror = "mirror.main:main"
@@ -75,10 +72,6 @@ exclude = '''
 profile = "black"
 multi_line_output = 3
 
-[tool.mypy]
-# Coming soon?
-# https://github.com/python/mypy/issues/5205
-
 [tool.pylint.messages_control]
 # Coming soon.
 # https://docs.pylint.org/en/latest/whatsnew/2.5.html
@@ -88,6 +81,3 @@ R0903,W0631,W0212,W0603,R1710,R0201
 """
 j = '0'
 
-[tool.pytest]
-# Coming someday?
-# https://github.com/pytest-dev/pytest/issues/1556

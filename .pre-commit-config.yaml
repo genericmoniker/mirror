@@ -4,7 +4,7 @@ repos:
 
 # Make sure the lock file is up-to-date with pyproject.toml.
 - repo: https://github.com/pdm-project/pdm
-  rev: 2.3.2
+  rev: 2.9.0
   hooks:
     - id: pdm-lock-check
 
