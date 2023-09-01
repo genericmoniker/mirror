@@ -13,39 +13,39 @@ repos:
   - id: isort
     name: isort
     language: system
-    entry: poetry run isort
+    entry: pdm run isort
     types: [python]
 
   - id: black
     name: black
     language: system
-    entry: poetry run black --quiet
+    entry: pdm run black --quiet
     types: [python]
 
   - id: pylint
     name: pylint
     language: system
-    entry: poetry run pylint
+    entry: pdm run pylint
     types: [python]
 
   - id: mypy
     name: mypy
     language: system
-    entry: poetry run mypy
+    entry: pdm run mypy
     types: [python]
     pass_filenames: false
 
   - id: pytest
     name: pytest
     language: system
-    entry: poetry run pytest
+    entry: pdm run pytest
     types: [python]
     pass_filenames: false
 
   - id: svelte-prettier
     name: svelte-prettier
     language: system
-    entry: poetry run pre-commit-npm frontend run pretty
+    entry: pdm run pre-commit-npm frontend run pretty
     files: frontend.*\.svelte
 
 - repo: meta
