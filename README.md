@@ -74,14 +74,28 @@ configure services as described below.
 
 ## Mirror Configuration
 
-To do any configuration that plugins might need, run:
+To do any configuration that plugins might need, run the config utility. This can be
+done in a couple of ways:
+
+In the development environment:
 
 ```
-~/mirror/system/mirror-config
+pdm run mirror-config
 ```
 
-That will prompt you for any settings, storing them well-obfuscated in
-`instance/mirror.db`.
+On device, when a Docker image exists:
+
+```
+~/mirror/system/config.sh
+```
+
+That will prompt you for any settings for all plugins, storing them well-obfuscated in
+`instance/mirror.db`. Specific plugins can be configured using the `--plugins` switch.
+For example:
+
+```
+pdm run mirror-config --plugins mail weather
+```
 
 Some configuration requires using a web browser, so you'll either need to have
 a keyboard attached to the device, or you can do configuration on another
@@ -118,6 +132,13 @@ Fitbit step count for the data.
 Note: The authorization code can only be used once, so if something goes wrong, you may
 need to generate a new one and re-run configuration to try again.
 
+### Air Quality
+
+AQI from AirNow.
+
+Setup for this plugin requires an API key, which you can get
+[here](https://docs.airnowapi.org/account/request/).
+
 ### Calendar
 
 Data from your Google Calendar.
@@ -147,12 +168,13 @@ You can send an email with "Mirror" in the subject (case-insensitive) and have
 that appear on the mirror for a week, rotated with other bottom-half messages.
 To do that, you need to configure mail settings in the config file:
 
-```py
+```python
 IMAP_HOST = 'imap.gmail.com'
 IMAP_PORT = 993
 IMAP_USERNAME = 'somebody@sample.com'
 IMAP_PASSWORD = 'mysecretpassword'
 ```
+
 If you want to use a Gmail account, you'll need to enable IMAP in the settings.
 Also, it might work best to use two-factor authentication and create an app
 password.
@@ -257,15 +279,16 @@ frontend to get a UI.
 
 Run the backend first!
 
-1. Install [npm](https://www.npmjs.com/get-npm).
-2. Then cd to the `frontend` directory and run `npm install`
-3. Run `npm run dev`
+Install [npm](https://www.npmjs.com/get-npm), then cd to the `frontend`
+directory and the frontend with:
+
+    npm run dev
 
 The application will be available on http://localhost:5001, with hot-reload.
 
 You can also:
 
-    npm run build
+    npm build
 
 To build the production frontend.
 
