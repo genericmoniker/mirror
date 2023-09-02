@@ -1,6 +1,7 @@
 <script>
   import { subscribe } from "./Events.svelte";
   import { DateTime } from "luxon";
+  import AirQuality from "./AirQuality.svelte";
 
   let temp = "";
   let icon = "";
@@ -81,6 +82,11 @@
         />
         &nbsp;{uvi.toFixed(1)}&nbsp; ↑ {uviMax.toFixed(1)}
       </div>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="5">
+      <AirQuality />
     </td>
   </tr>
   <tr>
