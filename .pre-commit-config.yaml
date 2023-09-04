@@ -10,22 +10,17 @@ repos:
 
 - repo: local
   hooks:
-  - id: isort
-    name: isort
+  - id: ruff
+    name: ruff
+    stages: [commit]
     language: system
-    entry: pdm run isort
+    entry: pdm run ruff --fix --exit-non-zero-on-fix --respect-gitignore
     types: [python]
 
   - id: black
     name: black
     language: system
     entry: pdm run black --quiet
-    types: [python]
-
-  - id: pylint
-    name: pylint
-    language: system
-    entry: pdm run pylint
     types: [python]
 
   - id: mypy
@@ -45,7 +40,7 @@ repos:
   - id: svelte-prettier
     name: svelte-prettier
     language: system
-    entry: pdm run pre-commit-npm frontend run pretty
+    entry: pdm run pre_commit_npm.py frontend run pretty
     files: frontend.*\.svelte
 
 - repo: meta

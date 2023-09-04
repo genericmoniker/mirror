@@ -1,13 +1,14 @@
+"""Logging configuration."""
 from copy import deepcopy
 
 from uvicorn.config import LOGGING_CONFIG
 
 
-def uvicorn_log_config():
+def uvicorn_log_config() -> dict:
     config = deepcopy(LOGGING_CONFIG)
     default_fmt = "%(asctime)s %(levelprefix)s %(name)s -> %(message)s"
     config["formatters"]["default"]["fmt"] = default_fmt
-    access_fmt = '%(asctime)s %(levelprefix)s %(client_addr)s - "%(request_line)s" %(status_code)s'  # pylint:disable=line-too-long
+    access_fmt = '%(asctime)s %(levelprefix)s %(client_addr)s - "%(request_line)s" %(status_code)s'  # noqa: E501
     config["formatters"]["access"]["fmt"] = access_fmt
 
     config["loggers"] = {

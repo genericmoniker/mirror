@@ -4,6 +4,7 @@ import logging
 from datetime import datetime, timedelta
 
 import httpx
+from mirror.plugin_context import PluginContext
 
 REFRESH_INTERVAL = timedelta(hours=8)
 
@@ -18,18 +19,18 @@ _logger = logging.getLogger(__name__)
 _state = {}
 
 
-def start_plugin(context):
+def start_plugin(context: PluginContext) -> None:
     task = asyncio.create_task(_refresh(context), name="menu.refresh")
     _state["task"] = task
 
 
-def stop_plugin(context):  # pylint: disable=unused-argument
+def stop_plugin(context: PluginContext) -> None:  # noqa: ARG001
     task = _state.get("task")
     if task:
         task.cancel()
 
 
-async def _refresh(context):
+async def _refresh(context: PluginContext) -> None:
     while True:
         try:
             async with httpx.AsyncClient() as client:
@@ -43,7 +44,7 @@ async def _refresh(context):
             # https://www.python-httpx.org/exceptions/
             context.vote_disconnected(ex)
             _logger.exception("Network error getting menu.")
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             _logger.exception("Error getting menu.")
         await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
 
@@ -51,7 +52,7 @@ async def _refresh(context):
 def _build_url() -> str:
     # This URL returns the week containing the specified date, not 7 days starting
     # from the specified date.
-    today = datetime.now()
+    today = datetime.now()  # noqa: DTZ005
     return URL_TEMPLATE.format(year=today.year, month=today.month, day=today.day)
 
 

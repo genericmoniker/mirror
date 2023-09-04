@@ -1,3 +1,4 @@
+# ruff: noqa: ANN201, D100, S101
 from datetime import datetime
 
 from cryptography.fernet import Fernet
@@ -6,7 +7,7 @@ from mirror.plugin_context import PluginDatabase
 
 
 def test_database_round_trip():
-    PluginDatabase._key = Fernet.generate_key()  # pylint:disable=protected-access
+    PluginDatabase._key = Fernet.generate_key()  # noqa: SLF001
 
     db = PluginDatabase("test_plugin", ":memory:")
 
@@ -16,7 +17,7 @@ def test_database_round_trip():
         ("list", [1, 2, 3, 4, 5, True, False]),
         ("dict", {"one": 1, "two": 2, "three": 3, "hero": "🦸‍♂️"}),
         # And special handling for datetime:
-        ("now", datetime.now()),
+        ("now", datetime.now().astimezone()),
     ]
     for key, item in test_data:
         db[key] = item

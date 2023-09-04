@@ -21,6 +21,7 @@ dependencies = [
     "IMAPClient>=2.2.0",
     "Authlib>=0.15.5",
     "aiohttp>=3.8.1",
+    "defusedxml>=0.7.1",
 ]
 name = "mirror"
 version = "3.0.0"
@@ -29,23 +30,7 @@ description = "A life dashboard application for Raspberry Pi"
 [project.scripts]
 mirror = "mirror.main:main"
 mirror-config = "mirror.main_config:main"
-pre-commit-npm = "pre_commit_npm:main"
 
-[tool.pdm]
-[tool.pdm.dev-dependencies]
-dev = [
-    "black",
-    "isort",
-    "mypy",
-    "pre-commit",
-    "pylint",
-    "pytest",
-    "pytest-asyncio<1.0.0,>=0.14.0",
-]
-
-[tool.pdm.build]
-includes = ["backend/src/"]
-package-dir = "backend/src/"
 [build-system]
 requires = ["pdm-pep517>=1.0.0"]
 build-backend = "pdm.pep517.api"
@@ -68,16 +53,40 @@ exclude = '''
 )
 '''
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+dev = [
+    "black",
+    "mypy",
+    "pre-commit",
+    "pytest",
+    "pytest-asyncio<1.0.0,>=0.14.0",
+    "ruff>=0.0.287",
+]
 
-[tool.pylint.messages_control]
-# Coming soon.
-# https://docs.pylint.org/en/latest/whatsnew/2.5.html
-disable = """
-bad-continuation,attribute-defined-outside-init,W0511,R0902,R0913,W0622,C0116,C0103,
-R0903,W0631,W0212,W0603,R1710,R0201
-"""
-j = '0'
+[tool.pdm.build]
+includes = ["backend/src/"]
+package-dir = "backend/src/"
 
+[tool.ruff]
+select = ["ALL"]
+ignore = [
+    "ANN101",   # Missing type annotation for `self` in method
+    "ANN002",   # Missing type annotation for `*args`
+    "ANN003",   # Missing type annotation for `**kwargs`
+    "D107",     # Missing docstring in `__init__`
+    "D102",     # Missing docstring in public method
+    "D103",     # Missing docstring in public function
+    "D104",     # Missing docstring in public package
+    "D203",     # 1 blank line required before class docstring
+    "D213",     # Multi-line docstring summary should start at the second line
+    "FIX002",   # Line contains TODO, consider resolving the issue
+    "PGH003",   # Use specific rule codes when ignoring type issues
+    "RET504",   # Unnecessary variable assignment before `return` statement
+    "S105",     # Possible hardcoded password
+    "S106",     # Possible hardcoded password
+    "T201",     # `print` found
+    "TD002",    # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`
+    "TD003",    # Missing issue link on the line following this TODO
+    "TRY300",   # Consider moving this statement to an `else` block
+]

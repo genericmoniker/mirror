@@ -1,3 +1,4 @@
+"""Context given to plugins."""
 import copy
 import json
 import logging
@@ -6,7 +7,7 @@ from datetime import datetime
 from cryptography.fernet import Fernet
 from sqlitedict import SqliteDict
 
-from mirror.event_bus import Event
+from mirror.event_bus import Event, EventBus
 from mirror.paths import ROOTDIR
 
 _logger = logging.getLogger(__name__)
@@ -19,7 +20,8 @@ class PluginContext:
     themselves.
     """
 
-    def __init__(self, plugin_name, event_bus) -> None:
+    def __init__(self, plugin_name: str, event_bus: EventBus) -> None:
+        """Initialize the plugin context."""
         self.plugin_name = plugin_name
         self._event_bus = event_bus
         self.db = PluginDatabase(plugin_name)
@@ -45,18 +47,18 @@ class PluginContext:
         data = copy.deepcopy(data)  # Copy data to avoid caller side-effects.
         full_name = f"{self.plugin_name}.{name}"
         data["_source"] = self.plugin_name
-        data["_time"] = datetime.now().isoformat()
+        data["_time"] = datetime.now().astimezone().isoformat()
         await self._event_bus.post(Event(name=full_name, data=data))
 
     _connectivity_score = 0
 
     @property
-    def is_connected(self):
+    def is_connected(self) -> bool:
         """Whether the network is connected."""
         return PluginContext._connectivity_score >= 0
 
-    def vote_connected(self):
-        """Allows a plugin to vote that the network is connected."""
+    def vote_connected(self) -> None:
+        """Allow a plugin to vote that the network is connected."""
         score = min(PluginContext._connectivity_score + 1, 10)
         PluginContext._connectivity_score = score
         _logger.info(
@@ -65,8 +67,8 @@ class PluginContext:
             score,
         )
 
-    def vote_disconnected(self, cause: Exception):
-        """Allows a plugin to vote that the network is disconnected."""
+    def vote_disconnected(self, cause: Exception) -> None:
+        """Allow a plugin to vote that the network is disconnected."""
         score = max(PluginContext._connectivity_score - 1, -10)
         PluginContext._connectivity_score = score
         _logger.info(
@@ -77,7 +79,7 @@ class PluginContext:
         )
 
 
-class PluginDatabase(SqliteDict):  # pylint: disable=too-many-ancestors
+class PluginDatabase(SqliteDict):
     """Database for persistent plug-in data.
 
     The database exposes a dict-like interface, and can be used in either async or sync
@@ -88,9 +90,11 @@ class PluginDatabase(SqliteDict):  # pylint: disable=too-many-ancestors
     _data_dir = ROOTDIR / "instance"
     _key = None
 
-    def __init__(self, plugin_name, filename=None):
+    def __init__(self, plugin_name: str, filename: str | None = None) -> None:
+        """Initialize the database."""
         self._init_key()
-        self._fernet = Fernet(self._key)
+        assert self._key is not None  # noqa: S101
+        self._fernet: Fernet = Fernet(self._key)
         super().__init__(
             filename=filename or self._data_dir / "mirror.db",
             tablename=plugin_name,
@@ -100,7 +104,7 @@ class PluginDatabase(SqliteDict):  # pylint: disable=too-many-ancestors
         )
 
     @staticmethod
-    def _init_key():
+    def _init_key() -> None:
         if PluginDatabase._key:
             return
         key_path = PluginDatabase._data_dir / "mirror.key"
@@ -114,7 +118,7 @@ class PluginDatabase(SqliteDict):  # pylint: disable=too-many-ancestors
             PluginDatabase._key = key_path.read_bytes()
             _logger.debug("Existing database key used at %s", key_path.absolute())
 
-    def _encrypted_json_encoder(self, obj: object):
+    def _encrypted_json_encoder(self, obj: object) -> bytes:
         return self._fernet.encrypt(json.dumps(obj, cls=_ExtendedEncoder).encode())
 
     def _encrypted_json_decoder(self, data: bytes) -> object:
@@ -124,7 +128,7 @@ class PluginDatabase(SqliteDict):  # pylint: disable=too-many-ancestors
 class _ExtendedEncoder(json.JSONEncoder):
     """JSON encoder that handles additional object types."""
 
-    def default(self, o):
+    def default(self, o: object) -> object:
         if hasattr(o, "isoformat"):
             return {"_dt_": o.isoformat()}
 
@@ -139,7 +143,7 @@ class _ExtendedDecoder(json.JSONDecoder):
         super().__init__(*args, **kwargs)
 
     @staticmethod
-    def _object_hook(obj):
+    def _object_hook(obj: dict) -> object:
         if "_dt_" in obj:
             try:
                 return datetime.fromisoformat(obj["_dt_"])

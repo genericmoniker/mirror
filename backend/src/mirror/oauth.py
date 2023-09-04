@@ -1,6 +1,4 @@
-"""
-Simple OAuth 2.0 helper library.
-"""
+"""Simple OAuth 2.0 helper library."""
 import logging
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -14,7 +12,14 @@ from authlib.integrations.httpx_client import OAuth2Client
 logger = logging.getLogger(__name__)
 
 
-def authorize(auth_url, client_id, client_secret, scope, redirect_uri, **kwargs):
+def authorize(
+    auth_url: str,
+    client_id: str,
+    client_secret: str,
+    scope: str,
+    redirect_uri: str,
+    **kwargs: dict,
+) -> tuple[str, str]:
     """Interactively prompt the user for access to protected resources.
 
     Uses an OAuth 2.0 authorization code flow, which requires a browser and user input.
@@ -49,14 +54,24 @@ def authorize(auth_url, client_id, client_secret, scope, redirect_uri, **kwargs)
     response = server.wait_for_auth_redirect()
     error = _get_authorize_response_error(response)
     if error:
-        raise Exception(f"Authorization failed: {error}")
+        msg = f"Authorization failed: {error}"
+        raise AuthError(msg)
 
     return response, state
 
 
-def fetch_token(
-    token_url, client_id, client_secret, redirect_uri, auth_response, state
-):  # pylint: disable=too-many-arguments
+class AuthError(Exception):
+    """An error occurred during authorization."""
+
+
+def fetch_token(  # noqa: PLR0913
+    token_url: str,
+    client_id: str,
+    client_secret: str,
+    redirect_uri: str,
+    auth_response: str,
+    state: str,
+) -> dict:
     """Fetch an access token.
 
     The access token can then be used to access protected resources.
@@ -74,7 +89,7 @@ def fetch_token(
     return auth_client.fetch_token(token_url, authorization_response=auth_response)
 
 
-def _get_authorize_response_error(response):
+def _get_authorize_response_error(response: str) -> list[str] | None:
     """Get the authorization error from a redirect URI, if any.
 
     When the authorization server redirects to the redirect URI, it will either include
@@ -95,7 +110,7 @@ class _AuthHTTPServer:
     """
 
     class _AuthServerHandler(BaseHTTPRequestHandler):
-        def do_GET(self):  # pylint: disable=invalid-name
+        def do_GET(self) -> None:  # noqa: N802
             self.send_response(200)
             self.end_headers()
             if _get_authorize_response_error(self.path):  # path includes query string
@@ -103,19 +118,19 @@ class _AuthHTTPServer:
             else:
                 self.wfile.write(SUCCESS_HTML)
             logger.debug("Queueing %s", self.path)
-            self.server.queue.put(self.path)
+            self.server.queue.put(self.path)  # type: ignore
 
-    def __init__(self, url):
+    def __init__(self, url: str) -> None:
         self.url = urlparse(url)
-        self.queue = Queue()
-        self.server = None
+        self.queue: Queue = Queue()
+        self.server: HTTPServer | None = None
 
-    def start(self):
+    def start(self) -> None:
         """Start the server."""
         thread = Thread(target=self._run_server, name="HTTPServer")
         thread.start()
 
-    def wait_for_auth_redirect(self):
+    def wait_for_auth_redirect(self) -> str:
         """Wait for the authorization redirect.
 
         :return: the path + query string of the redirect URI from the auth server.
@@ -126,13 +141,14 @@ class _AuthHTTPServer:
             path = self.queue.get()
             logger.debug("Received %s", path)
         logger.debug("Matched expected redirect; stopping server.")
+        assert self.server  # noqa: S101
         self.server.shutdown()
         return path
 
-    def _run_server(self):
-        address = ("", self.url.port)
+    def _run_server(self) -> None:
+        address = ("", self.url.port or 80)
         self.server = HTTPServer(address, _AuthHTTPServer._AuthServerHandler)
-        self.server.queue = self.queue
+        self.server.queue = self.queue  # type: ignore
         self.server.serve_forever()
 
 

@@ -4,6 +4,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import httpx
+from mirror.plugin_context import PluginContext
 
 REFRESH_INTERVAL = timedelta(seconds=60)
 OFFLINE_THRESHOLD = 30
@@ -12,28 +13,27 @@ OFFLINE_THRESHOLD = 30
 _state = {}
 
 
-def start_plugin(context):
+def start_plugin(context: PluginContext) -> None:
     task = asyncio.create_task(_refresh(context), name="connectivity.refresh")
     _state["task"] = task
 
 
-def stop_plugin(context):  # pylint: disable=unused-argument
+def stop_plugin(context: PluginContext) -> None:  # noqa: ARG001
     task = _state.get("task")
     if task:
         task.cancel()
 
 
-async def _refresh(context):
+async def _refresh(context: PluginContext) -> None:
     disconnected_count = 0
     while True:
-        data = {"error": None}
+        data = {"connected": True, "error": ""}
         try:
             async with httpx.AsyncClient(timeout=10) as client:
                 response = await client.get("https://api.ipify.org?format=json")
                 response.raise_for_status()
                 context.vote_connected()
                 data = response.json()
-                data.update({"connected": True, "error": None})
         except httpx.RequestError as ex:
             context.vote_disconnected(ex)
             data.update({"error": str(ex) or repr(ex)})

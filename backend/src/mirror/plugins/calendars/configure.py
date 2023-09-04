@@ -1,8 +1,8 @@
+"""Calendars plugin configuration."""
 # TODO: Maybe PyInquirer for this?
 # https://github.com/CITGuru/PyInquirer
 
-# TODO:
-# How do you indicate you want to clear a value in a simple prompt with a default?
+# TODO: How do you indicate you want to clear a value in a simple prompt with a default?
 
 # Google API Console (client credentials)
 # https://console.developers.google.com/
@@ -10,11 +10,13 @@
 import json
 from pathlib import Path
 
+from mirror.plugin_configure_context import PluginConfigureContext
+
 from .common import CLIENT_CREDENTIALS, COMING_UP_FILTER, USER_CREDENTIALS
 from .google_calendar import obtain_user_permission
 
 
-def configure_plugin(config_context):
+def configure_plugin(config_context: PluginConfigureContext) -> None:
     db = config_context.db
     print("Calendar Plugin Set Up")
 
@@ -23,7 +25,7 @@ def configure_plugin(config_context):
     _configure_coming_up_filter(db)
 
 
-def _configure_client_credentials(db):
+def _configure_client_credentials(db: dict) -> dict:
     client_creds = db.get(CLIENT_CREDENTIALS)
     if client_creds:
         prompt = "Path to credentials.json [keep existing credentials]: "
@@ -41,13 +43,13 @@ def _configure_client_credentials(db):
             db[CLIENT_CREDENTIALS] = client_creds
             db[USER_CREDENTIALS] = {}
             success = True
-        except Exception as ex:  # pylint: disable=broad-except
+        except Exception as ex:  # noqa: BLE001
             print(ex)
 
     return client_creds
 
 
-def _configure_user_credentials(db, client_creds):
+def _configure_user_credentials(db: dict, client_creds: dict) -> None:
     user_creds = db.get(USER_CREDENTIALS)
     if user_creds:
         response = input("Reset user permission? [y/N] ")
@@ -59,7 +61,7 @@ def _configure_user_credentials(db, client_creds):
         db[USER_CREDENTIALS] = user_creds
 
 
-def _configure_coming_up_filter(db):
+def _configure_coming_up_filter(db: dict) -> None:
     filter_regex = db.get(COMING_UP_FILTER)
     response = input(f"Coming up regex filter [{filter_regex}]: ").strip()
     if response:

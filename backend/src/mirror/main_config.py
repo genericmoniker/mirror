@@ -1,10 +1,11 @@
+"""Mirror configuration utility."""
 import argparse
 
 from mirror.plugin_configure_context import PluginConfigureContext
 from mirror.plugin_discovery import discover_plugins
 
 
-def main():
+def main() -> None:
     plugins = discover_plugins()
     parser = argparse.ArgumentParser(
         description="Mirror configuration utility",

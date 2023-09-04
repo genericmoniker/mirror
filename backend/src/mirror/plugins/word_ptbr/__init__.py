@@ -1,11 +1,12 @@
-"""Brazilian Portuguese Word-of-the-Day from transparent.com"""
+"""Brazilian Portuguese Word-of-the-Day from transparent.com."""
 
 import logging
-import xml.etree.ElementTree as ET
 from asyncio import create_task, sleep
 from datetime import timedelta
 
 import httpx
+from defusedxml import ElementTree
+from mirror.plugin_context import PluginContext
 
 REFRESH_INTERVAL = timedelta(hours=8)
 
@@ -13,18 +14,18 @@ _logger = logging.getLogger(__name__)
 _state = {}
 
 
-def start_plugin(context):
+def start_plugin(context: PluginContext) -> None:
     task = create_task(_refresh(context), name="word_ptbr.refresh")
     _state["task"] = task
 
 
-def stop_plugin(context):  # pylint: disable=unused-argument
+def stop_plugin(context: PluginContext) -> None:  # noqa: ARG001
     task = _state.get("task")
     if task:
         task.cancel()
 
 
-async def _refresh(context):
+async def _refresh(context: PluginContext) -> None:
     """Get the word of the day."""
     url = "https://wotd.transparent.com/rss/pt-widget.xml"
     while True:
@@ -40,14 +41,14 @@ async def _refresh(context):
             # https://www.python-httpx.org/exceptions/
             context.vote_disconnected(ex)
             _logger.exception("Network error getting word-of-the-day data.")
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             _logger.exception("Error getting word-of-the-day data.")
 
         await sleep(REFRESH_INTERVAL.total_seconds())
 
 
-def _parse(xml):
-    root = ET.fromstring(xml)
+def _parse(xml: str) -> dict:
+    root = ElementTree.fromstring(xml)
     return {
         "word": root.find("./words/word").text,
         "translation": root.find("./words/translation").text,

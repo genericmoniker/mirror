@@ -1,5 +1,7 @@
+"""Configure the worth plugin."""
 from getpass import getpass
 
+from mirror.plugin_configure_context import PluginConfigureContext
 from personalcapital import (
     PersonalCapital,
     RequireTwoFactorException,
@@ -9,7 +11,7 @@ from personalcapital import (
 from .common import PC_PASSWORD, PC_SESSION, PC_USERNAME
 
 
-def configure_plugin(config_context):
+def configure_plugin(config_context: PluginConfigureContext) -> None:
     db = config_context.db
     print("Worth Plugin Set Up")
     username = input("Personal Capital username: ").strip()

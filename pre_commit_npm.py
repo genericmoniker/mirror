@@ -1,5 +1,4 @@
-"""
-pre-commit helper to call npm in a subdirectory.
+"""pre-commit helper to call npm in a subdirectory.
 
 The first command-line argument is the --prefix.
 Following arguments are executed.
@@ -14,11 +13,11 @@ import subprocess
 import sys
 
 
-def main():
+def main() -> None:
     prefix = sys.argv[1]
     args = [adjust(prefix, arg) for arg in sys.argv[2:]]
-    args = [shutil.which("npm"), "--prefix", prefix] + args
-    result = subprocess.run(args)  # pylint: disable=subprocess-run-check
+    args = [shutil.which("npm"), "--prefix", prefix, *args]
+    result = subprocess.run(args)  # noqa: PLW1510, S603
     sys.exit(result.returncode)
 
 

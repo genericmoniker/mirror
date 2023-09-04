@@ -1,5 +1,4 @@
-"""
-Plugin to show the currently playing track on a Spotify Premium account.
+"""Plugin to show the currently playing track on a Spotify Premium account.
 
 Spotify authorization guide:
 https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
@@ -13,6 +12,8 @@ from functools import partial
 
 import httpx
 from authlib.integrations.httpx_client import AsyncOAuth2Client
+from mirror.plugin_configure_context import PluginConfigureContext
+from mirror.plugin_context import PluginContext
 
 API_URL = "https://api.spotify.com/"
 AUTH_URL = "https://accounts.spotify.com/authorize"
@@ -26,7 +27,7 @@ _logger = logging.getLogger(__name__)
 _state = {}
 
 
-def start_plugin(context):
+def start_plugin(context: PluginContext) -> None:
     if context.db.get("client_id"):
         task = create_task(_refresh(context), name="now_playing.refresh")
         task.add_done_callback(_task_done)
@@ -35,7 +36,7 @@ def start_plugin(context):
         _logger.info("Plugin not configured.")
 
 
-def stop_plugin(context):  # pylint: disable=unused-argument
+def stop_plugin(context: PluginContext) -> None:  # noqa: ARG001
     task = _state.get("task")
     if task:
         task.remove_done_callback(_task_done)
@@ -46,7 +47,7 @@ def _task_done(task: Task) -> None:
     _logger.warning("Now playing task unexpectedly done: %s", task.exception())
 
 
-def configure_plugin(config_context):
+def configure_plugin(config_context: PluginConfigureContext) -> None:
     db = config_context.db
     oauth = config_context.oauth
     print("Now Playing Plugin Set Up")
@@ -66,18 +67,23 @@ def configure_plugin(config_context):
             show_dialog=True,
         )
         token = oauth.fetch_token(
-            TOKEN_URL, client_id, client_secret, REDIRECT_URI, response, state
+            TOKEN_URL,
+            client_id,
+            client_secret,
+            REDIRECT_URI,
+            response,
+            state,
         )
         db["client_id"] = client_id
         db["client_secret"] = client_secret
         db["state"] = state
         db["token"] = json.dumps(token)
         print("Authorization succeeded")
-    except Exception as ex:  # pylint: disable=broad-except
+    except Exception as ex:  # noqa: BLE001
         print("Authorization failed:", ex)
 
 
-async def _refresh(context):
+async def _refresh(context: PluginContext) -> None:
     while True:
         sleep_time = REFRESH_INTERVAL.total_seconds()
         try:
@@ -90,13 +96,13 @@ async def _refresh(context):
             # https://www.python-httpx.org/exceptions/
             context.vote_disconnected(ex)
             _logger.exception("Network error getting now playing data.")
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             _logger.exception("Error getting now playing data.")
         _logger.debug("sleep time: %s", sleep_time)
         await sleep(sleep_time)
 
 
-async def _get_currently_playing(db):
+async def _get_currently_playing(db: dict) -> httpx.Response:
     # We use the OAuth client, which is a subclass of httpx.AsyncClient,
     # to automatically send the authorization header and handle refresh
     # tokens.
@@ -114,16 +120,16 @@ async def _get_currently_playing(db):
         return await client.get(url)
 
 
-async def _update_token(db, token, **kwargs):  # pylint: disable=unused-argument
+async def _update_token(db: dict, token: dict, **_kwargs: dict) -> None:
     # update old token
     db["token"] = json.dumps(token)
 
 
-def _transform_currently_playing_track(response):
+def _transform_currently_playing_track(response: httpx.Response) -> dict:
     """Create a simplified view of the currently playing track."""
     response.raise_for_status()
 
-    if response.status_code == 204:
+    if response.status_code == 204:  # noqa: PLR2004
         # Nothing playing right now.
         return {}
 
@@ -138,7 +144,7 @@ def _transform_currently_playing_track(response):
     }
 
 
-def _get_next_poll_seconds(data):
+def _get_next_poll_seconds(data: dict[str, int]) -> float:
     """Get the number of seconds until the next poll.
 
     This attempts to catch track changes right away.

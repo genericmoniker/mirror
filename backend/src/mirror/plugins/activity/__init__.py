@@ -4,6 +4,8 @@ from asyncio import create_task, sleep
 from datetime import datetime, timedelta
 
 from httpx import TransportError
+from mirror.plugin_configure_context import PluginConfigureContext
+from mirror.plugin_context import PluginContext
 
 from .fitbit import CredentialsError, get_activity
 
@@ -21,7 +23,7 @@ _logger = logging.getLogger(__name__)
 _state = {}
 
 
-def configure_plugin(config_context):
+def configure_plugin(config_context: PluginConfigureContext) -> None:
     # See README.md for detailed instructions.
     db = config_context.db
     db.clear()
@@ -31,7 +33,7 @@ def configure_plugin(config_context):
         _get_person_creds(db, i + 1)
 
 
-def _get_person_creds(db, person_num):
+def _get_person_creds(db: dict, person_num: int) -> None:
     print(f"Person #{person_num}")
     name = input("Name (to display): ").strip()
     client_id = input("Fitbit client ID (from app registration): ").strip()
@@ -39,36 +41,36 @@ def _get_person_creds(db, person_num):
     auth_code = input("Authorization code (from user grant URL): ").strip()
 
     # In case of copy-paste errors, strip these too.
-    auth_code = auth_code.strip("#_=_")
+    auth_code = auth_code.strip("#_=_")  # noqa: B005
 
     creds = {}
     creds[CLIENT_ID] = client_id
     creds[CLIENT_SECRET] = client_secret
     creds[AUTHORIZATION_CODE] = auth_code
-    creds[ACCESS_TOKEN] = None
-    creds[REFRESH_TOKEN] = None
+    creds[ACCESS_TOKEN] = ""
+    creds[REFRESH_TOKEN] = ""
 
     # Need to assign dict all at once; the DB can't detect nested changes.
     db[name] = creds
 
 
-def start_plugin(context):
+def start_plugin(context: PluginContext) -> None:
     task = create_task(_refresh(context), name="activity.refresh")
     _state["task"] = task
 
 
-def stop_plugin(context):  # pylint: disable=unused-argument
+def stop_plugin(context: PluginContext) -> None:  # noqa: ARG001
     task = _state.get("task")
     if task:
         task.cancel()
 
 
-async def _refresh(context):
+async def _refresh(context: PluginContext) -> None:
     """Get the step count data."""
     data = {name: {"stepsGoal": None, "steps": None} for name in context.db}
     while True:
         try:
-            for_date = datetime.now()
+            for_date = datetime.now().astimezone()
             for name in context.db:
                 creds = context.db[name]
                 activity_data = await get_activity(creds, for_date)
@@ -84,11 +86,13 @@ async def _refresh(context):
             await context.post_event("refresh", data)
             context.vote_connected()
         except CredentialsError:
-            _logger.error("Please run `mirror-config --plugins=activity`")
+            _logger.error(  # noqa: TRY400
+                "Please run `mirror-config --plugins=activity`",
+            )
         except TransportError as ex:
             # https://www.python-httpx.org/exceptions/
             context.vote_disconnected(ex)
             _logger.exception("Network error updating activity data.")
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             _logger.exception("Error updating activity data.")
         await sleep(REFRESH_INTERVAL.total_seconds())

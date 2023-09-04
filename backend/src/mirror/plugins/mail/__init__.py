@@ -1,5 +1,4 @@
-"""
-Mail plugin using IMAP to read messages.
+"""Mail plugin using IMAP to read messages.
 
 This is currently implemented using the imapclient package, which is blocking, so calls
 to the server are done with run_in_executor.
@@ -13,10 +12,13 @@ import email
 import functools
 import logging
 import socket
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from getpass import getpass
 
 from imapclient import IMAPClient
+from mirror.plugin_configure_context import PluginConfigureContext
+from mirror.plugin_context import PluginContext
 
 # database keys
 IMAP_HOST = "IMAP_HOST"
@@ -30,7 +32,7 @@ _logger = logging.getLogger(__name__)
 _state = {}
 
 
-def configure_plugin(config_context):
+def configure_plugin(config_context: PluginConfigureContext) -> None:
     db = config_context.db
     print("Mail Plugin Set Up")
 
@@ -40,36 +42,36 @@ def configure_plugin(config_context):
     db[IMAP_PASSWORD] = getpass("Email password: ").strip()
 
 
-def start_plugin(context):
+def start_plugin(context: PluginContext) -> None:
     task = asyncio.create_task(_refresh(context), name="mail.refresh")
     _state["task"] = task
 
 
-def stop_plugin(context):  # pylint: disable=unused-argument
+def stop_plugin(context: PluginContext) -> None:  # noqa: ARG001
     task = _state.get("task")
     if task:
         task.cancel()
 
 
-async def _refresh(context):
+async def _refresh(context: PluginContext) -> None:
     while True:
         try:
             emails = await _fetch_messages(context.db)
             data = {"items": emails}
             await context.post_event("refresh", data)
             context.vote_connected()
-        except (socket.error, socket.timeout) as ex:
+        except (OSError, socket.timeout) as ex:
             # https://imapclient.readthedocs.io/en/2.2.0/api.html#exceptions
             context.vote_disconnected(ex)
             _logger.exception("Network error getting emails.")
-        except Exception:  # pylint:disable=broad-except
+        except Exception:
             _logger.exception("Error getting emails.")
         await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
 
 
-def run_in_executor(func):
+def run_in_executor(func: Callable) -> Callable:
     @functools.wraps(func)
-    def inner(*args, **kwargs):
+    def inner(*args, **kwargs) -> asyncio.Future:
         loop = asyncio.get_running_loop()
         return loop.run_in_executor(None, lambda: func(*args, **kwargs))
 
@@ -77,7 +79,7 @@ def run_in_executor(func):
 
 
 @run_in_executor
-def _fetch_messages(db):
+def _fetch_messages(db: dict) -> list[dict[str, str]]:
     """Fetch email messages from the configured IMAP account.
 
     Only messages from the past week that have "Mirror" in the subject are
@@ -91,9 +93,9 @@ def _fetch_messages(db):
     with IMAPClient(host=db.get(IMAP_HOST), port=db.get(IMAP_PORT)) as client:
         client.login(db.get(IMAP_USERNAME), db.get(IMAP_PASSWORD))
         client.select_folder("INBOX")
-        since = (datetime.now() - timedelta(days=6)).date()
+        since = (datetime.now() - timedelta(days=6)).date()  # noqa: DTZ005
         message_ids = client.search(
-            ["SINCE", since.strftime("%d-%b-%Y"), "SUBJECT", "Mirror"]
+            ["SINCE", since.strftime("%d-%b-%Y"), "SUBJECT", "Mirror"],
         )
         raw_messages = client.fetch(message_ids, ["RFC822"])
 
@@ -110,10 +112,10 @@ def _fetch_messages(db):
             else:
                 message = parts[0]
         body = message.get_payload(decode=True).decode()
-        result.append(dict(sender=sender, body=body, body_lines=body.splitlines()))
+        result.append({"sender": sender, "body": body, "body_lines": body.splitlines()})
     return result
 
 
-def _parse_sender_name(message):
+def _parse_sender_name(message: email.message.Message) -> str:
     from_ = message["From"]
     return from_.split("<")[0].strip()

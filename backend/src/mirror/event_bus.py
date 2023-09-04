@@ -1,8 +1,9 @@
+"""Event support."""
 import json
 import logging
 from asyncio import Queue
+from collections.abc import AsyncGenerator
 from dataclasses import dataclass
-from typing import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 _TERMINATE_SENTINEL = "__exit__"
 
@@ -26,7 +27,8 @@ class Event:
         o_data.pop("_time", None)
         return self.name == o.name and self_data == o_data
 
-    def as_sse_dict(self):
+    def as_sse_dict(self) -> dict:
+        """Get the event as a dict for SSE."""
         return {
             "event": self.name,
             "data": json.dumps(self.data),
@@ -37,10 +39,12 @@ class EventBus:
     """Bus for posting events and streaming them to listeners."""
 
     def __init__(self) -> None:
-        self._listener_queues: List[Queue] = []
-        self._cached_events: Dict[str, Event] = {}
+        """Initialize the event bus."""
+        self._listener_queues: list[Queue] = []
+        self._cached_events: dict[str, Event] = {}
 
     async def shutdown(self) -> None:
+        """Shutdown the event bus."""
         for queue in self._listener_queues:
             _logger.info("queuing terminate sentinel")
             await queue.put(_TERMINATE_SENTINEL)
@@ -65,12 +69,12 @@ class EventBus:
         for queue in self._listener_queues:
             await queue.put(event)
 
-    async def listen_for_events(self):
-        """A generator that yields events (as dicts) from the bus."""
-        queue = Queue(maxsize=50)
+    async def listen_for_events(self) -> AsyncGenerator:
+        """Yield events (as dicts) from the bus."""
+        queue: Queue = Queue(maxsize=50)
 
         # Queue the most recent events.
-        for _, event in self._cached_events.items():
+        for event in self._cached_events.values():
             await queue.put(event)
 
         # Subscribe to future events.

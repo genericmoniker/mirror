@@ -30,20 +30,20 @@ async def get_activity(creds: dict, for_date: datetime) -> dict:
     url_path = f"activities/date/{date}.json"
     return await _api_request(creds, url_path)
 
-    # Use this instead of _api_request for testing:
-    # return _get_activity_test_data()
+    # Use this instead of _api_request for manual testing:
+    # return _get_activity_test_data()  # noqa: ERA001
 
 
-def _get_activity_test_data():
+def _get_activity_test_data() -> dict:
     """Get sample data for testing w/o authenticating to the Fitbit API."""
-    import json  # pylint:disable=import-outside-toplevel
-    import random  # pylint:disable=import-outside-toplevel
-    from pathlib import Path  # pylint:disable=import-outside-toplevel
+    import json
+    import random
+    from pathlib import Path
 
     root_dir = Path(__file__).parent.parent.parent.parent.parent.parent
-    data = (root_dir / ".data_samples/fitbit-activity.json").read_text()
-    data = json.loads(data)
-    data["summary"]["steps"] = random.randint(0, 10_000)
+    data_str = (root_dir / ".data_samples/fitbit-activity.json").read_text()
+    data = json.loads(data_str)
+    data["summary"]["steps"] = random.randint(0, 10_000)  # noqa: S311
     return data
 
 
@@ -57,18 +57,18 @@ async def _api_request(creds: dict, url_path: str) -> dict:
         try:
             return await _do_resource_get(client, creds, url)
         except httpx.HTTPStatusError as ex:
-            if ex.response.status_code == 401:
+            if ex.response.status_code == 401:  # noqa: PLR2004
                 try:
                     await _refresh_access_token(client, creds)
                     return await _do_resource_get(client, creds, url)
                 except httpx.HTTPStatusError as ex:
-                    if ex.response.status_code == 401:
+                    if ex.response.status_code == 401:  # noqa: PLR2004
                         raise CredentialsError from ex
                     raise
             raise
 
 
-async def _get_access_token(client, creds: dict) -> None:
+async def _get_access_token(client: httpx.AsyncClient, creds: dict) -> None:
     """Exchange an authorization code for an access token and refresh token.
 
     https://dev.fitbit.com/build/reference/web-api/oauth2/#access_token-request
@@ -83,7 +83,7 @@ async def _get_access_token(client, creds: dict) -> None:
     creds["refresh_token"] = data["refresh_token"]
 
 
-async def _refresh_access_token(client, creds: dict) -> None:
+async def _refresh_access_token(client: httpx.AsyncClient, creds: dict) -> None:
     """Exchange a refresh token for a new access token and refresh token.
 
     https://dev.fitbit.com/build/reference/web-api/oauth2/#refreshing-tokens
@@ -97,7 +97,7 @@ async def _refresh_access_token(client, creds: dict) -> None:
     creds["refresh_token"] = data["refresh_token"]
 
 
-async def _do_resource_get(client, creds: dict, url) -> dict:
+async def _do_resource_get(client: httpx.AsyncClient, creds: dict, url: str) -> dict:
     """Make a GET to the resource server."""
     headers = {"Authorization": "Bearer " + creds["access_token"]}
     response = await client.get(url, headers=headers)
@@ -105,7 +105,11 @@ async def _do_resource_get(client, creds: dict, url) -> dict:
     return response.json()
 
 
-async def _do_auth_post(client, creds: dict, post_data: dict) -> dict:
+async def _do_auth_post(
+    client: httpx.AsyncClient,
+    creds: dict,
+    post_data: dict,
+) -> dict:
     """Make a POST to the authorization server."""
     url = "https://api.fitbit.com/oauth2/token"
     auth_value = b64encode(f"{creds['client_id']}:{creds['client_secret']}".encode())

@@ -1,6 +1,8 @@
+"""Plugin to fetch the net worth from Personal Capital."""
 import asyncio
 import functools
 import logging
+from collections.abc import Callable
 from datetime import datetime
 
 from personalcapital import PersonalCapital
@@ -12,7 +14,7 @@ _logger = logging.getLogger(__name__)
 MAX_VALUES = 30
 
 
-async def update_worth(db, limit):
+async def update_worth(db: dict, limit: int = MAX_VALUES) -> dict:
     """Update the worth, returning at most limit days of history.
 
     :param db: database set up with PC credentials.
@@ -26,7 +28,7 @@ async def update_worth(db, limit):
     value = round(value / 1000)  # Store $ in whole thousands.
 
     existing_data = db.get(PC_CASHFLOW, {})
-    now = datetime.now()
+    now = datetime.now().astimezone()
     today = now.date().isoformat()
     existing_data[today] = value
     existing_data = _limit_values(existing_data, MAX_VALUES)
@@ -38,7 +40,7 @@ async def update_worth(db, limit):
     }
 
 
-def _limit_values(data, limit):
+def _limit_values(data: dict, limit: int) -> dict:
     return dict(sorted(data.items())[-limit:])
 
 
@@ -46,7 +48,7 @@ class DataError(Exception):
     """Raised when there is an error fetching data."""
 
 
-def _calculate_cashflow_worth(data):
+def _calculate_cashflow_worth(data: dict) -> float:
     cash = data["spData"]["cashAccountsTotal"]
     credit = data["spData"]["creditCardAccountsTotal"]
     net = cash - credit
@@ -54,9 +56,9 @@ def _calculate_cashflow_worth(data):
     return net
 
 
-def run_in_executor(func):
+def run_in_executor(func: Callable) -> Callable:
     @functools.wraps(func)
-    def inner(*args, **kwargs):
+    def inner(*args, **kwargs) -> asyncio.Future:
         loop = asyncio.get_running_loop()
         return loop.run_in_executor(None, lambda: func(*args, **kwargs))
 
@@ -64,7 +66,7 @@ def run_in_executor(func):
 
 
 @run_in_executor
-def _fetch_accounts_data(db):
+def _fetch_accounts_data(db: dict) -> dict[str, str]:
     username = db.get(PC_USERNAME)
     password = db.get(PC_PASSWORD)
     session = db.get(PC_SESSION)

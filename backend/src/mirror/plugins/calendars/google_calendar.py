@@ -12,6 +12,8 @@ https://developers.google.com/identity/protocols/oauth2#expiration
 """
 
 import logging
+from collections.abc import Callable
+from typing import Any
 
 from aiogoogle import Aiogoogle, HTTPError
 from aiogoogle.auth import UserCreds
@@ -23,7 +25,7 @@ SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 _logger = logging.getLogger(__name__)
 
 
-def obtain_user_permission(client_creds) -> dict:
+def obtain_user_permission(client_creds: dict) -> dict:
     """Run the authorization flow to grant permission to access a user's calendar.
 
     If the user doesn't authorize the application, this will just block...
@@ -55,12 +57,17 @@ def obtain_user_permission(client_creds) -> dict:
     )
 
 
-def no_filter(_event):
-    """An event filter that doesn't filter out any events."""
+def no_filter(_event: dict) -> bool:
+    """Allow all events."""
     return True
 
 
-async def get_events(user_creds, client_creds, list_args, filter_func=None):
+async def get_events(
+    user_creds: dict,
+    client_creds: dict,
+    list_args: dict,
+    filter_func: Callable | None = None,
+) -> dict:
     """List events from all calendars according to the parameters given.
 
     The supplied credentials dict may be updated if tokens are refreshed.
@@ -76,14 +83,16 @@ async def get_events(user_creds, client_creds, list_args, filter_func=None):
     """
     filter_func = filter_func or no_filter
     if "access_token" not in user_creds:
-        raise CredentialsError("No access token in user credentials.")
+        msg = "No access token in user credentials."
+        raise CredentialsError(msg)
 
     async with Aiogoogle(user_creds=user_creds, client_creds=client_creds) as aiogoogle:
         # Is there a way to cache service discovery?
         service = await aiogoogle.discover("calendar", "v3")
         try:
             calendar_list = await aiogoogle.as_user(
-                service.calendarList.list(), timeout=30
+                service.calendarList.list(),
+                timeout=30,
             )
             _update_user_creds(user_creds, aiogoogle.user_creds)
 
@@ -96,10 +105,11 @@ async def get_events(user_creds, client_creds, list_args, filter_func=None):
                     calendar_list_entry,
                     filter_func,
                 )
-            return dict(items=sorted(events, key=_event_sort_key_function))
+            return {"items": sorted(events, key=_event_sort_key_function)}
         except HTTPError as ex:
             if "invalid_grant" in str(ex):
-                raise CredentialsError("User credentials rejected.") from ex
+                msg = "User credentials rejected."
+                raise CredentialsError(msg) from ex
             raise
 
 
@@ -107,7 +117,13 @@ class CredentialsError(Exception):
     """Credentials are invalid (e.g. empty or expired)."""
 
 
-async def _get_calendar_events(aiogoogle, service, list_args, calendar, filter_func):
+async def _get_calendar_events(
+    aiogoogle: Aiogoogle,
+    service: Any,  # noqa: ANN401
+    list_args: dict,
+    calendar: dict,
+    filter_func: Callable,
+) -> list[dict]:
     calendar_id = calendar["id"]
     try:
         events_result = await aiogoogle.as_user(
@@ -115,7 +131,7 @@ async def _get_calendar_events(aiogoogle, service, list_args, calendar, filter_f
             timeout=30,
         )
     except HTTPError as ex:
-        _logger.error(
+        _logger.error(  # noqa: TRY400
             'Error getting events from "%s". %s',
             calendar["summary"],
             ex,
@@ -125,13 +141,13 @@ async def _get_calendar_events(aiogoogle, service, list_args, calendar, filter_f
         return [e for e in events_result.get("items", []) if filter_func(e)]
 
 
-def _event_sort_key_function(event):
+def _event_sort_key_function(event: dict) -> str:
     start = event.get("start", {})
     # start may be specified by either 'date' or 'dateTime'
     return start.get("date", start.get("dateTime", ""))
 
 
-def _update_user_creds(existing_creds, new_creds):
+def _update_user_creds(existing_creds: dict, new_creds: dict) -> None:
     # Don't just `update` the existing creds with the new ones -- that will overwrite
     # the refresh-related fields with None because the creds received after refreshing
     # don't include them. It seems odd that `aiogoogle.as_user` effectively wipes out

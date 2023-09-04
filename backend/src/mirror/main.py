@@ -1,6 +1,8 @@
+"""The main entry point for the backend server."""
 import uvicorn
 from sse_starlette.sse import EventSourceResponse
 from starlette.applications import Starlette
+from starlette.requests import Request
 from starlette.responses import Response
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
@@ -12,7 +14,7 @@ from mirror.paths import ROOTDIR
 from mirror.plugin_manager import PluginManager
 
 
-async def stream_events(request):
+async def stream_events(request: Request) -> EventSourceResponse:
     event_bus = request.app.state.event_bus
 
     # Allow requests from the frontend dev server (npm run dev):
@@ -21,16 +23,16 @@ async def stream_events(request):
     return EventSourceResponse(event_bus.listen_for_events(), headers=headers)
 
 
-async def diagnostics(request):  # pylint: disable=unused-argument
+async def diagnostics(request: Request) -> Response:  # noqa: ARG001
     log_task_stacks()
     return Response(status_code=204)
 
 
-async def ready(request):  # pylint: disable=unused-argument
+async def ready(request: Request) -> Response:  # noqa: ARG001
     return Response()
 
 
-def create_app():
+def create_app() -> Starlette:
     event_bus = EventBus()
     plugins = PluginManager(event_bus)
     static_dir = ROOTDIR / "frontend/public"
@@ -58,8 +60,13 @@ def create_app():
 app = create_app()
 
 
-def main():
-    uvicorn.run(app, host="0.0.0.0", port=5000, log_config=uvicorn_log_config())
+def main() -> None:
+    uvicorn.run(
+        app,
+        host="0.0.0.0",  # noqa: S104
+        port=5000,
+        log_config=uvicorn_log_config(),
+    )
 
 
 if __name__ == "__main__":

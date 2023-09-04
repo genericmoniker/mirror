@@ -1,3 +1,4 @@
+"""Diagnostic utilities."""
 import asyncio
 import logging
 from io import StringIO
@@ -5,7 +6,7 @@ from io import StringIO
 _logger = logging.getLogger(__name__)
 
 
-def log_task_stacks():
+def log_task_stacks() -> None:
     file = StringIO()
     print("Dumping tasks", file=file)
     for task in asyncio.all_tasks():
