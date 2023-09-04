@@ -36,8 +36,6 @@ class PluginManager:
 def plugin_error_logger(name: str, action: str) -> Generator:
     try:
         yield
-    except AttributeError:
-        pass  # plugin entrypoints are optional
     except Exception as ex:  # noqa: BLE001
         _logger.error(  # noqa: TRY400
             "Error from plugin '%s' (%s): %s",

@@ -37,6 +37,10 @@ def configure_plugin(config_context: PluginConfigureContext) -> None:
 
 async def _refresh(context: PluginContext) -> None:
     while True:
+        if "api_key" not in context.db or "zip_code" not in context.db:
+            _logger.warning("Air quality plugin not configured.")
+            await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
+            continue
         try:
             async with httpx.AsyncClient() as client:
                 params = {
