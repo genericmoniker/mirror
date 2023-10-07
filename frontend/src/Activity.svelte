@@ -6,9 +6,8 @@
   import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 
   export let width;
-  export let ring = true; // Otherwise a bar graph.
   export let person = null;
-  let height = ring ? 150 : 11;
+  let height = 150;
 
   let canvas;
   let stepsStr = "0";
@@ -26,30 +25,7 @@
   function drawProgress(percent) {
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (ring) {
-      drawProgressRing(ctx, percent);
-    } else {
-      drawProgressBar(ctx, percent);
-    }
-  }
-
-  function drawProgressBar(ctx, percent) {
-    let barWidth = Math.min(1, percent) * width;
-    console.log("===BAR WIDTH:" + barWidth);
-    drawLine(ctx, canvas.width, 1);
-    drawLine(ctx, barWidth, height);
-  }
-
-  function drawLine(ctx, width, height) {
-    let y = canvas.height / 2;
-    const pad = 6; // leave space for rounded caps beyond line width
-    ctx.strokeStyle = "#FFFFFF";
-    ctx.lineWidth = height;
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    ctx.moveTo(pad, y);
-    ctx.lineTo(width - pad, y);
-    ctx.stroke();
+    drawProgressRing(ctx, percent);
   }
 
   function drawProgressRing(ctx, percent) {
@@ -82,19 +58,15 @@
   });
 </script>
 
-<div id="component" class:stacked={ring}>
+<div id="component" class:stacked={true}>
   <div class="text" style="width: {width}px; height: {height}px;">
     <br />
     <!-- Cheat vertical center! -->
     <Icon id="steps-icon" data={faShoePrints} scale="2" />
-    {#if ring}
-      <br />
-    {:else}
-      &nbsp;
-    {/if}
+    <br />
     {stepsStr}
-    {#if !ring && percent >= 1}
-      &nbsp;
+    {#if percent >= 1}
+      <br />
       <span id="goal-icon"
         ><Icon id="goal-icon" data={faCheckCircle} scale="1.6" /></span
       >
@@ -126,7 +98,7 @@
       opacity: 0;
     }
     50% {
-      opacity: 1;
+      opacity: 0.5;
     }
   }
 </style>
