@@ -20,6 +20,8 @@ LOCATION = "location"
 # every 5 minutes (288 per day).
 REFRESH_INTERVAL = timedelta(minutes=5)
 
+CONFIG_REFRESH_INTERVAL = timedelta(minutes=1)
+
 _logger = logging.getLogger(__name__)
 _state = {}
 
@@ -48,17 +50,22 @@ async def _refresh(context: PluginContext) -> None:
 
     :return: dict of weather data.
     """
-    key = context.db.get(API_KEY)
-    loc = context.db.get(LOCATION)
-    lat, lon = loc.split(",")
-    params = {
-        "lat": lat,
-        "lon": lon,
-        "units": "imperial",
-        "appid": key,
-        "exclude": "hourly,minutely",
-    }
     while True:
+        key = context.db.get(API_KEY)
+        loc = context.db.get(LOCATION)
+        if not key or not loc:
+            _logger.warning("Weather plugin not configured.")
+            await sleep(CONFIG_REFRESH_INTERVAL.total_seconds())
+            continue
+
+        lat, lon = loc.split(",")
+        params = {
+            "lat": lat,
+            "lon": lon,
+            "units": "imperial",
+            "appid": key,
+            "exclude": "hourly,minutely",
+        }
         try:
             async with httpx.AsyncClient(timeout=10) as client:
                 url = "https://api.openweathermap.org/data/2.5/onecall"
