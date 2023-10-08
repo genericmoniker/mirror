@@ -90,15 +90,15 @@
   }
   #goal-icon {
     opacity: 1;
-    animation: fade 8s ease-in-out infinite;
+    animation: fade 2s ease-in-out infinite;
   }
   @keyframes fade {
     0%,
     100% {
-      opacity: 0;
+      opacity: 0.25;
     }
     50% {
-      opacity: 0.5;
+      opacity: 1;
     }
   }
 </style>
