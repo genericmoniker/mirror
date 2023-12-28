@@ -57,7 +57,13 @@ async def _refresh(context: PluginContext) -> None:
         except httpx.TransportError as ex:
             # https://www.python-httpx.org/exceptions/
             context.vote_disconnected(ex)
-            _logger.exception("Network error getting air quality.")
+            _logger.exception(
+                "Network error getting air quality. Retry in %s.",
+                REFRESH_INTERVAL,
+            )
         except Exception:
-            _logger.exception("Error getting air quality.")
+            _logger.exception(
+                "Error getting air quality. Retry in %s.",
+                REFRESH_INTERVAL,
+            )
         await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
