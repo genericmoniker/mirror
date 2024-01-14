@@ -5,7 +5,7 @@ authors = [
     {name = "Eric Smith", email = "eric@esmithy.net"},
 ]
 license = {text = "MIT"}
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.11,<4.0"
 dependencies = [
     "starlette>=0.14.1",
     "uvicorn>=0.12.2",
@@ -22,9 +22,10 @@ dependencies = [
     "Authlib>=0.15.5",
     "aiohttp>=3.8.1",
     "defusedxml>=0.7.1",
+    "jinja2>=3.1.2",
 ]
 name = "mirror"
-version = "3.0.0"
+version = "4.0.0"
 description = "A life dashboard application for Raspberry Pi"
 
 [project.scripts]
@@ -78,6 +79,7 @@ ignore = [
     "D102",     # Missing docstring in public method
     "D103",     # Missing docstring in public function
     "D104",     # Missing docstring in public package
+    "D105",     # Missing docstring in magic method
     "D203",     # 1 blank line required before class docstring
     "D213",     # Multi-line docstring summary should start at the second line
     "FIX002",   # Line contains TODO, consider resolving the issue
