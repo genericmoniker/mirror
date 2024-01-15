@@ -1,0 +1,31 @@
+{#
+    Template to rotate through the list of "bottom" widgets.
+
+    Note: Doing calculations here instead of in the Python rotator endpoint so that this
+    template can be included simply with only the widget list as context.
+#}
+{%- set widgets = layout.bottom %}
+{%- set rotation_interval = "every 5s" %}
+{% if widgets|length == 0%}
+<!-- No content -->
+{% else %}
+    {# index selects the widget to render. #}
+    {% set index = request.query_params.get('index', 0)|int %}
+    {% if index < widgets|length - 1%}
+        {% set next_index = index + 1 %}
+    {% else %}
+        {% set next_index = 0 %}
+    {% endif %}
+    {% set widget = widgets[index] %}
+
+    {# n is the number of times looped through all widgets, which is passed to the
+    widget being rendered so it can loop through its own list of content, if any. #}
+    {% set n = request.query_params.get('n', 0)|int %}
+    {% set next_n = n + 1 %}
+
+    <div hx-get="/rotator?index={{ next_index }}&n={{ next_n }}"
+        hx-trigger="{{rotation_interval }}"
+        hx-swap="outerHTML">
+        {{ render_widget(widget, n)|safe }}
+    </div>
+{% endif %}
