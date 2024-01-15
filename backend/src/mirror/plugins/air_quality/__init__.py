@@ -51,8 +51,8 @@ async def _refresh(context: PluginContext) -> None:
                 }
                 response = await client.get(URL, params=params)
                 response.raise_for_status()
-                data = response.json()[0]
-                await context.post_event("refresh", data)
+                data = response.json()
+                await context.widget_updated(_reshape(data))
                 context.vote_connected()
         except httpx.TransportError as ex:
             # https://www.python-httpx.org/exceptions/
@@ -67,3 +67,16 @@ async def _refresh(context: PluginContext) -> None:
                 REFRESH_INTERVAL,
             )
         await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
+
+
+def _reshape(data_list: list) -> dict:
+    if not data_list:
+        return {
+            "aqi": 0,
+            "category": "Unavailable",
+        }
+    data: dict = data_list[0]
+    return {
+        "aqi": data["AQI"],
+        "category": data["Category"]["Name"],
+    }
