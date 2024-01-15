@@ -4,7 +4,8 @@ https://openweathermap.org/api/one-call-api
 """
 import logging
 from asyncio import create_task, sleep
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import httpx
 from mirror.plugin_configure_context import PluginConfigureContext
@@ -72,7 +73,7 @@ async def _refresh(context: PluginContext) -> None:
                 response = await client.get(url, params=params)
             response.raise_for_status()
             data = response.json()
-            await context.post_event("refresh", data)
+            await context.widget_updated(_reshape(data))
             context.vote_connected()
         except httpx.TransportError as ex:
             # https://www.python-httpx.org/exceptions/
@@ -81,3 +82,57 @@ async def _refresh(context: PluginContext) -> None:
         except Exception:
             _logger.exception("Error getting weather data.")
         await sleep(REFRESH_INTERVAL.total_seconds())
+
+
+def _reshape(data: dict) -> dict:
+    """Reshape the data from the API to be easier to work with."""
+    tz = ZoneInfo(data["timezone"])
+    return {
+        "temp": data["current"]["temp"],
+        "icon": _icon_class(
+            data["current"]["weather"][0]["icon"],
+            data["current"]["weather"][0]["id"],
+        ),
+        "summary": data["current"]["weather"][0]["description"],
+        "feels": data["current"]["feels_like"],
+        "wind": data["current"]["wind_speed"],
+        "uvi": data["current"]["uvi"],
+        "uviMax": data["daily"][0]["uvi"],
+        "sunrise": _time_from_seconds(data["current"]["sunrise"], tz),
+        "sunset": _time_from_seconds(data["current"]["sunset"], tz),
+        "daily": _reshape_daily(data["daily"][:5], tz),
+        "alerts": data.get("alerts", []),
+    }
+
+
+def _reshape_daily(daily: list[dict], tz: ZoneInfo) -> list[dict]:
+    """Reshape the daily data from the API to be easier to work with."""
+    return [
+        {
+            "day": datetime.fromtimestamp(day["dt"]).astimezone(tz).strftime("%a")
+            if i > 0
+            else "Today",
+            "icon": _icon_class(day["weather"][0]["icon"], day["weather"][0]["id"]),
+            "temp_max": day["temp"]["max"],
+            "temp_min": day["temp"]["min"],
+            "precipitation": day["pop"] * 100,
+        }
+        for i, day in enumerate(daily)
+    ]
+
+
+def _icon_class(icon: str, id_: str) -> str:
+    """Get the CSS class for the icon."""
+    time = ""  # Neutral in terms of night/day by default.
+    last_char = icon[-1]
+    if last_char == "d":
+        time = "day-"
+    elif last_char == "n":
+        time = "night-"
+    return f"wi wi-owm-{time}{id_}"
+
+
+def _time_from_seconds(seconds: int, tz: ZoneInfo) -> str:
+    """Get a time string from seconds since epoch."""
+    local = datetime.fromtimestamp(seconds, tz=UTC).astimezone(tz)
+    return local.strftime("%I:%M %p")
