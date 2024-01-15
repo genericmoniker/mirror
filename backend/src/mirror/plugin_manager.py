@@ -18,18 +18,32 @@ class PluginManager:
         self._discovered_plugins = discover_plugins()
         _logger.info(
             "Discovered plugins: %s",
-            ", ".join(self._discovered_plugins.keys()),
+            ", ".join(plugin.name for plugin in self._discovered_plugins),
         )
 
+    def __iter__(self) -> Generator:
+        """Iterate over the discovered plugins."""
+        yield from self._discovered_plugins
+
     def startup(self) -> None:
-        for name, module in self._discovered_plugins.items():
-            with plugin_error_logger(name, "start_plugin"):
-                module.start_plugin(PluginContext(name, self._event_bus))
+        """Start all discovered plugins."""
+        for plugin in self._discovered_plugins:
+            with plugin_error_logger(plugin.name, "start_plugin"):
+                plugin.startup(PluginContext(plugin, self._event_bus))
 
     def shutdown(self) -> None:
-        for name, module in self._discovered_plugins.items():
-            with plugin_error_logger(name, "stop_plugin"):
-                module.stop_plugin(PluginContext(name, self._event_bus))
+        """Stop all discovered plugins."""
+        for plugin in self._discovered_plugins:
+            with plugin_error_logger(plugin.name, "stop_plugin"):
+                plugin.shutdown(PluginContext(plugin, self._event_bus))
+
+    def render_widget(self, widget_name: str, n: int | None = None) -> str:
+        plugin_name, _, widget_name = widget_name.partition(".")
+        for plugin in self._discovered_plugins:
+            if plugin.name == plugin_name:
+                return plugin.render(context=None, widget=widget_name, n=n)
+        msg = f"Unknown plugin: {plugin_name}"
+        raise ValueError(msg)
 
 
 @contextlib.contextmanager

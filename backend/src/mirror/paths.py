@@ -2,7 +2,9 @@
 from pathlib import Path
 
 # When running in Docker container:
-ROOTDIR = Path("/home/appuser")
-if not ROOTDIR.exists():
+ROOT_DIR = Path("/home/appuser")
+if not ROOT_DIR.exists():
     # When running from source:
-    ROOTDIR = Path(__file__).resolve().parent.parent.parent.parent
+    ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
+
+INSTANCE_DIR = ROOT_DIR / "instance"

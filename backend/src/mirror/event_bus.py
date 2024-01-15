@@ -1,5 +1,4 @@
 """Event support."""
-import json
 import logging
 from asyncio import Queue
 from collections.abc import AsyncGenerator
@@ -15,23 +14,13 @@ class Event:
     """An event that can be sent from the server."""
 
     name: str
-    data: dict
-
-    def __eq__(self, o: object) -> bool:
-        """Equal comparason except for data['_time']."""
-        if not isinstance(o, Event):
-            return False
-        self_data = dict(self.data)
-        o_data = dict(o.data)
-        self_data.pop("_time", None)
-        o_data.pop("_time", None)
-        return self.name == o.name and self_data == o_data
+    data: str
 
     def as_sse_dict(self) -> dict:
         """Get the event as a dict for SSE."""
         return {
             "event": self.name,
-            "data": json.dumps(self.data),
+            "data": self.data,
         }
 
 

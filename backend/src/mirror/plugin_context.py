@@ -1,5 +1,4 @@
 """Context given to plugins."""
-import copy
 import json
 import logging
 from datetime import datetime
@@ -8,7 +7,8 @@ from cryptography.fernet import Fernet
 from sqlitedict import SqliteDict
 
 from mirror.event_bus import Event, EventBus
-from mirror.paths import ROOTDIR
+from mirror.paths import INSTANCE_DIR
+from mirror.plugin import Plugin
 
 _logger = logging.getLogger(__name__)
 
@@ -20,20 +20,43 @@ class PluginContext:
     themselves.
     """
 
-    def __init__(self, plugin_name: str, event_bus: EventBus) -> None:
+    def __init__(self, plugin: Plugin, event_bus: EventBus) -> None:
         """Initialize the plugin context."""
-        self.plugin_name = plugin_name
+        self._plugin = plugin
         self._event_bus = event_bus
-        self.db = PluginDatabase(plugin_name)
+        self.db = PluginDatabase(self.plugin_name)
 
-    async def post_event(self, name: str, data: dict) -> None:
+    @property
+    def plugin_name(self) -> str:
+        """Get the plugin's name."""
+        return self._plugin.name
+
+    async def widget_updated(self, data: dict, widget_name: str | None = None) -> None:
+        """Indicate that a widget has been updated.
+
+        If appropriate, the widget will be refreshed via a server-sent event (SSE).
+
+        :param data: Data to pass as the widget's template context.
+        :param widget_name: Name of the widget to refresh, defaults to the plugin name.
+        """
+        event_name = self.plugin_name
+        if widget_name:
+            event_name += f".{widget_name}"
+        event_name += ".refresh"
+
+        event_data = self._plugin.render(context=data, widget=widget_name)
+
+        await self._event_bus.post(Event(name=event_name, data=event_data))
+
+    async def post_event(self, name: str, data: dict) -> None:  # noqa: ARG002
         """Post an event that is available to client-side JavaScript.
 
         :param name: Name of the event (see notes below).
-        :param data: Data sent with the event. Send {} if there is no data.
+        :param data: Data sent with the event. Send "" if there is no data.
 
         The plugin name is automatically used to namespace all events as they appear on
-        the client side. For example:
+        the client side. For example, if the plugin name is `myplugin` and the event
+        name is `myeventname`, the event name on the client side will be:
 
         `myplugin.myeventname`
 
@@ -42,13 +65,7 @@ class PluginContext:
         _source: The name of the plugin
         _time: When the event was raised
         """
-        if data is None:
-            return
-        data = copy.deepcopy(data)  # Copy data to avoid caller side-effects.
-        full_name = f"{self.plugin_name}.{name}"
-        data["_source"] = self.plugin_name
-        data["_time"] = datetime.now().astimezone().isoformat()
-        await self._event_bus.post(Event(name=full_name, data=data))
+        _logger.warning("post_event is deprecated; use widget_updated() instead")
 
     _connectivity_score = 0
 
@@ -87,7 +104,7 @@ class PluginDatabase(SqliteDict):
     operations to be handled on a separate thread).
     """
 
-    _data_dir = ROOTDIR / "instance"
+    _data_dir = INSTANCE_DIR
     _key = None
 
     def __init__(self, plugin_name: str, filename: str | None = None) -> None:

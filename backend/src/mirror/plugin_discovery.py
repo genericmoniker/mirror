@@ -1,12 +1,12 @@
 """Plugin discovery module."""
 import importlib
 import pkgutil
-from types import ModuleType
 
 import mirror.plugins
+from mirror.plugin import Plugin
 
 
-def discover_plugins() -> dict[str, ModuleType]:
+def discover_plugins() -> list[Plugin]:
     """Discover mirror plugins using the approach described in the URL below.
 
     https://packaging.python.org/guides/creating-and-discovering-plugins/#using-namespace-packages
@@ -17,8 +17,7 @@ def discover_plugins() -> dict[str, ModuleType]:
         namespace_package.__path__,
         namespace_package.__name__ + ".",
     )
-
-    return {
-        name.split(".")[-1]: importlib.import_module(name)
+    return [
+        Plugin(name=name.split(".")[-1], module=importlib.import_module(name))
         for _, name, _ in namespace_modules
-    }
+    ]

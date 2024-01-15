@@ -1,4 +1,8 @@
-"""Mirror configuration utility."""
+"""Mirror configuration utility.
+
+This program interactively prompts the user for plugin configuration and writes the
+configuration to the database for the plugin to read at runtime.
+"""
 import argparse
 
 from mirror.plugin_configure_context import PluginConfigureContext
@@ -9,21 +13,20 @@ def main() -> None:
     plugins = discover_plugins()
     parser = argparse.ArgumentParser(
         description="Mirror configuration utility",
-        epilog="Available plugins: " + ", ".join(plugins.keys()),
+        epilog="Available plugins: " + ", ".join(str(plugins)),
     )
     parser.add_argument("--plugins", nargs="*")
     args = parser.parse_args()
 
     # TODO: Set up file logging (since we're using stdout).
 
-    plugins_to_configure = args.plugins or plugins.keys()
+    plugins_to_configure = [p for p in plugins if p.name in args.plugins] or plugins
 
-    for name in plugins_to_configure:
-        module = plugins[name]
-        if not hasattr(module, "configure_plugin"):
+    for plugin in plugins_to_configure:
+        if not hasattr(plugin.module, "configure_plugin"):
             continue
-        with PluginConfigureContext(name) as context:
-            module.configure_plugin(context)
+        with PluginConfigureContext(plugin.name) as context:
+            plugin.module.configure_plugin(context)
 
 
 if __name__ == "__main__":
