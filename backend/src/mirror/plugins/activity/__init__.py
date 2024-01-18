@@ -67,23 +67,30 @@ def stop_plugin(context: PluginContext) -> None:  # noqa: ARG001
 
 async def _refresh(context: PluginContext) -> None:
     """Get the step count data."""
-    data = {name: {"stepsGoal": None, "steps": None} for name in context.db}
+    data = {
+        "persons": [
+            {"name": name, "steps_goal": None, "steps": None, "percent": 0}
+            for name in context.db
+        ],
+    }
     while True:
         try:
             for_date = datetime.now().astimezone()
-            for name in context.db:
+            for i, name in enumerate(context.db):
+                person = data["persons"][i]
                 creds = context.db[name]
                 activity_data = await get_activity(creds, for_date)
                 context.db[name] = creds  # potentially update creds
-                data[name]["stepsGoal"] = activity_data["goals"]["steps"]
-                data[name]["steps"] = activity_data["summary"]["steps"]
+                person["steps_goal"] = activity_data["goals"]["steps"]
+                person["steps"] = activity_data["summary"]["steps"]
+                person["percent"] = round(person["steps"] / person["steps_goal"])
                 _logger.info(
                     "%s steps goal: %s, steps: %s",
                     name,
-                    data[name]["stepsGoal"],
-                    data[name]["steps"],
+                    person["steps_goal"],
+                    person["steps"],
                 )
-            await context.post_event("refresh", data)
+            await context.widget_updated(data)
             context.vote_connected()
         except CredentialsError:
             _logger.error(  # noqa: TRY400

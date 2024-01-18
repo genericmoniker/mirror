@@ -1,0 +1,38 @@
+#activity component {
+    padding-left: 0px;
+}
+
+#activity .text {
+    text-align: center;
+}
+
+#activity .stacked div {
+    position: absolute;
+}
+
+#activity .icon {
+    padding-top: 30px;
+    width: 30px;
+    height: 30px;
+    filter: invert(100%);
+}
+
+#activity .goal-icon {
+    width: 30px;
+    height: 30px;
+    filter: invert(100%);
+    opacity: 1;
+    animation: fade 2s ease-in-out infinite;
+}
+
+@keyframes fade {
+
+    0%,
+    100% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
