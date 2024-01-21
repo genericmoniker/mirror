@@ -1,0 +1,34 @@
+<span class="huge" id="clock-time"></span><br />
+<span class="large" id="clock-date"></span>
+
+<script type="text/javascript">
+
+    const dateOptions = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    };
+
+    const timeOptions = {
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+    };
+
+    function updateClock() {
+        var now = new Date();
+        var time = now.toLocaleTimeString(undefined, timeOptions);
+        var date = now.toLocaleDateString(undefined, dateOptions);
+        var timeElement = document.getElementById('clock-time');
+        var dateElement = document.getElementById('clock-date');
+        if (timeElement.innerHTML != time) {
+            timeElement.innerHTML = time;
+        }
+        if (dateElement.innerHTML != date) {
+            dateElement.innerHTML = date;
+        }
+    }
+
+    setInterval(updateClock, 1000);
+</script>
