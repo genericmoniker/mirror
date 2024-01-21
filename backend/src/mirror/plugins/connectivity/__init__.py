@@ -52,5 +52,5 @@ async def _refresh(context: PluginContext) -> None:
             with suppress(IOError):
                 Path("/home/appuser/instance/mirror-offline").touch(exist_ok=True)
 
-        await context.post_event("refresh", data)
+        await context.widget_updated(data)
         await asyncio.sleep(REFRESH_INTERVAL.total_seconds())

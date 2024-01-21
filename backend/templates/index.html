@@ -17,6 +17,7 @@
 </head>
 
 {% from "macros.html" import add_widgets %}
+{% from "macros.html" import add_widget %}
 
 <body>
     <main hx-ext="sse" sse-connect="/events">
@@ -29,6 +30,7 @@
         <section id="bottom">
             {% include "rotator.html" %}
         </section>
+        {{ add_widget("connectivity") }}
     </main>
 </body>
 

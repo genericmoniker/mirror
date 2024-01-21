@@ -1,0 +1,6 @@
+{% if not connected %}
+  <div id="connectivity">
+    <span class="small">{{ error }}</span>
+    <img src="{{ url_for('connectivity-network-error.svg') }}" alt="{{ error }}" />
+  </div>
+{% endif %}
