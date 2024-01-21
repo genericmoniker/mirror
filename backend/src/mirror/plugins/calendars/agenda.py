@@ -1,7 +1,7 @@
 """Plugin module for getting events from the calendar agenda."""
 import asyncio
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from mirror.plugin_context import PluginContext
 
@@ -18,7 +18,7 @@ async def refresh(context: PluginContext) -> None:
         try:
             data = await _refresh_data(context.db)
             if data:
-                await context.post_event("refresh_agenda", data)
+                await context.widget_updated(_reshape(data), "agenda")
         except Exception:
             _logger.exception("Error getting agenda events.")
 
@@ -38,3 +38,30 @@ def _get_agenda_event_range() -> tuple[str, str]:
     stop = end_of_day_tz()
     _logger.info("agenda range: %s - %s", start.isoformat(), stop.isoformat())
     return start.isoformat(), stop.isoformat()
+
+
+def _reshape(data: dict) -> dict:
+    """Reshape the data for the template."""
+    return {
+        "items": [_reshape_item(item) for item in data["items"]],
+    }
+
+
+def _reshape_item(item: dict) -> dict:
+    if "dateTime" not in item["start"]:
+        return {
+            "start": "All day - ",
+            "summary": item["summary"],
+            "current": False,
+        }
+
+    start_time = datetime.fromisoformat(item["start"]["dateTime"])
+    end_time = datetime.fromisoformat(item["end"]["dateTime"])
+    now = datetime.now(tz=start_time.tzinfo)
+    return {
+        "start": start_time.strftime("%-I:%M %p"),
+        "summary": item["summary"],
+        "current": start_time <= now <= end_time,
+        "start_time": start_time,
+        "end_time": end_time,
+    }

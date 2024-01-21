@@ -6,7 +6,7 @@ from datetime import timedelta
 from mirror.plugin_context import PluginContext
 
 from . import common
-from .datetime_utils import end_of_day_tz
+from .datetime_utils import end_of_day_tz, parse_date_tz, relative_time
 
 REFRESH_INTERVAL = timedelta(minutes=20)
 
@@ -18,7 +18,7 @@ async def refresh(context: PluginContext) -> None:
         try:
             data = await _refresh_data(context.db)
             if data:
-                await context.post_event("refresh_countdown", data)
+                await context.widget_updated(_reshape(data), "countdown")
         except Exception:
             _logger.exception("Error getting countdown events.")
 
@@ -35,3 +35,18 @@ async def _refresh_data(db: dict) -> dict | None:
     list_args = {"timeMin": start, "q": query}
     _logger.info("countdown start: %s", start)
     return await common.refresh_data(db, list_args)
+
+
+def _reshape(data: dict) -> dict:
+    """Reshape the data to be more useful for the widget."""
+    return {
+        "items": [
+            {
+                "summary": event["summary"],
+                "date": (start := parse_date_tz(event["start"]["date"])),
+                "relative": relative_time(start),
+                "days_from_now": (start - end_of_day_tz()).days,
+            }
+            for event in data["items"]
+        ],
+    }

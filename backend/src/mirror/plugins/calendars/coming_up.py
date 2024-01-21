@@ -8,7 +8,12 @@ from functools import partial
 from mirror.plugin_context import PluginContext
 
 from . import common
-from .datetime_utils import end_of_day_tz, parse_date_tz, start_of_day_tz
+from .datetime_utils import (
+    end_of_day_tz,
+    parse_date_tz,
+    relative_time,
+    start_of_day_tz,
+)
 
 REFRESH_INTERVAL = timedelta(minutes=10)
 
@@ -20,7 +25,7 @@ async def refresh(context: PluginContext) -> None:
         try:
             data = await _refresh_data(context.db)
             if data:
-                await context.post_event("refresh_coming_up", data)
+                await context.widget_updated(_reshape(data), "coming_up")
         except Exception:
             _logger.exception("Error getting coming up events.")
 
@@ -59,3 +64,19 @@ def _coming_up_filter(pattern: str, event: dict) -> bool:
         return False
 
     return True
+
+
+def _reshape(data: dict) -> dict:
+    """Reshape the data for the template."""
+    return {
+        "items": [_reshape_item(item) for item in data["items"]],
+    }
+
+
+def _reshape_item(item: dict) -> dict:
+    start = item["start"]
+    start_time = parse_date_tz(start.get("dateTime", start["date"]))
+    return {
+        "summary": item["summary"],
+        "relative": relative_time(start_time),
+    }

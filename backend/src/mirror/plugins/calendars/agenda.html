@@ -1,0 +1,12 @@
+<table>
+    {% for item in items %}
+    <tr>
+        <td>{{item.start}}</td>
+        <td><span class={{"current" if item.current else "" }}>{{ item.summary }}</span></td>
+    </tr>
+    {% else %}
+    <tr>
+        <td>No more jobs!</td>
+    </tr>
+    {% endfor %}
+</table>

@@ -4,7 +4,7 @@ import datetime
 
 def now_tz() -> datetime.datetime:
     """Get the current local time as a time zone aware datetime."""
-    now = datetime.datetime.now(datetime.timezone.utc)
+    now = datetime.datetime.now(datetime.UTC)
     return now.astimezone()
 
 
@@ -27,3 +27,32 @@ def parse_date_tz(date: str) -> datetime.datetime:
     """
     parsed = datetime.datetime.fromisoformat(date)
     return parsed.astimezone()
+
+
+def relative_time(time: datetime.datetime) -> str:  # noqa: PLR0911
+    """Get a relative time string from the given datetime.
+
+    Doesn't currently handle dates in the past.
+    """
+    tomorrow_start = start_of_day_tz() + datetime.timedelta(days=1)
+    tomorrow_end = end_of_day_tz() + datetime.timedelta(days=1)
+    if tomorrow_start <= time <= tomorrow_end:
+        return "tomorrow"
+    delta = time - now_tz()
+    if delta < datetime.timedelta(days=7):
+        return "on " + time.strftime("%A")
+    if delta < datetime.timedelta(days=14):
+        return "next " + time.strftime("%A")
+    if delta < datetime.timedelta(days=21):
+        return "in a couple of weeks"
+    if delta < datetime.timedelta(days=28):
+        return "in a few weeks"
+    if delta < datetime.timedelta(days=60):
+        return "in a month"
+    if delta < datetime.timedelta(days=90):
+        return "in a couple of months"
+    if delta < datetime.timedelta(days=180):
+        return "in a few months"
+    if delta < datetime.timedelta(days=365):
+        return "in several months"
+    return "in a long time from now"
