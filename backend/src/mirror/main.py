@@ -14,6 +14,7 @@ from mirror.layout import Layout
 from mirror.log import uvicorn_log_config
 from mirror.paths import INSTANCE_DIR, ROOT_DIR
 from mirror.plugin_manager import PluginManager
+from mirror.rotator import render_rotator_widget
 
 
 async def stream_events(request: Request) -> EventSourceResponse:
@@ -88,11 +89,13 @@ def create_app() -> Starlette:
         on_startup=[plugins.startup],
         on_shutdown=[plugins.shutdown, event_bus.shutdown],
     )
-    application.state.layout = layout
-    application.state.templates = Jinja2Templates(directory=template_dir)
-    application.state.templates.env.globals["render_widget"] = plugins.render_widget
-    application.state.event_bus = event_bus
-    application.state.plugins = plugins
+    state = application.state
+    state.layout = layout
+    state.templates = Jinja2Templates(directory=template_dir)
+    state.templates.env.globals["render_widget"] = plugins.render_widget
+    state.templates.env.globals["render_rotator_widget"] = render_rotator_widget
+    state.event_bus = event_bus
+    state.plugins = plugins
 
     return application
 
