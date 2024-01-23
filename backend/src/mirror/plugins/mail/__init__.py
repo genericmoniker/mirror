@@ -58,7 +58,7 @@ async def _refresh(context: PluginContext) -> None:
         try:
             emails = await _fetch_messages(context.db)
             data = {"items": emails}
-            await context.post_event("refresh", data)
+            await context.widget_updated(data)
             context.vote_connected()
         except (OSError, socket.timeout) as ex:
             # https://imapclient.readthedocs.io/en/2.2.0/api.html#exceptions

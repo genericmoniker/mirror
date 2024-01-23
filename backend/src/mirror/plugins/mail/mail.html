@@ -1,0 +1,15 @@
+{% if items %}
+<div style="text-align: left">
+    {% set item = items[n % items|length]%}
+    {% set item_lines = item.body_lines|length %}
+    <div class="{{ 'large' if item_lines <= 5 else '' }}">
+        <p>
+            {% for line in item.body_lines %}{{ line }} <br /> {% endfor %}
+        </p>
+    </div>
+    <div style="display:flex; align-items:center; color: #e1e1e1">
+        <img style="filter: invert(100%);" src="{{ url_for('mail.svg')}}" width="40" />
+        <span style="padding-left: 10px">{{ item.sender }}</span>
+    </div>
+</div>
+{% endif %}
