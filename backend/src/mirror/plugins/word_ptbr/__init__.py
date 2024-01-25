@@ -35,7 +35,7 @@ async def _refresh(context: PluginContext) -> None:
                 response = await client.get(url)
             response.raise_for_status()
             data = _parse(response.text)
-            await context.post_event("refresh", data)
+            await context.widget_updated(data)
             context.vote_connected()
         except httpx.TransportError as ex:
             # https://www.python-httpx.org/exceptions/

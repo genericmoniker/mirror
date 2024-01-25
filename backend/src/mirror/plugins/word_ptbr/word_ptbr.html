@@ -1,0 +1,9 @@
+{% if word != "" %}
+    <p><span class="huge">{{ word }}</span></p>
+    <p class="large">
+        <span><i>{{ part_of_speech }}</i></span> &#8226;
+        <span>{{ translation }}</span>
+    </p>
+    <p>{{ sentence }}</p>
+    <p>{{ sentence_translation }}</p>
+{% endif %}
