@@ -89,7 +89,7 @@ async def _refresh(context: PluginContext) -> None:
         try:
             response = await _get_currently_playing(context.db)
             data = _transform_currently_playing_track(response)
-            await context.post_event("refresh", data)
+            await context.widget_updated(data)
             context.vote_connected()
             sleep_time = _get_next_poll_seconds(data)
         except httpx.TransportError as ex:

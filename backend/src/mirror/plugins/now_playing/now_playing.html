@@ -1,0 +1,14 @@
+{% if name %}
+<div id="component">
+    <div id="text">
+        {% if is_playing %}
+        <img src="{{ url_for('now_playing.gif')}}" alt="playing" width="40px" />
+        {% else %}
+        <img src="{{ url_for('pause.png')}}" alt="paused" width="40px" />
+        {% endif %}
+        &nbsp;
+        <span class="large">{{ name }}</span><br />
+        {{ ",".join(artists) }}
+    </div>
+</div>
+{% endif %}
