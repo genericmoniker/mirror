@@ -60,8 +60,8 @@ def create_app() -> Starlette:
     plugins = PluginManager(event_bus)
     layout = Layout(INSTANCE_DIR / "mirror.toml", plugins)
 
-    static_dir = ROOT_DIR / "backend" / "static"
-    template_dir = [ROOT_DIR / "backend" / "templates"]
+    static_dir = ROOT_DIR / "static"
+    template_dir = [ROOT_DIR / "templates"]
 
     plugin_static_mounts = [
         Mount(

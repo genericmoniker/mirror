@@ -5,6 +5,6 @@ from pathlib import Path
 ROOT_DIR = Path("/home/appuser")
 if not ROOT_DIR.exists():
     # When running from source:
-    ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
+    ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 
 INSTANCE_DIR = ROOT_DIR / "instance"

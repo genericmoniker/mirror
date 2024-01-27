@@ -66,8 +66,8 @@ dev = [
 ]
 
 [tool.pdm.build]
-includes = ["backend/src/"]
-package-dir = "backend/src/"
+includes = ["src/"]
+package-dir = "src/"
 
 [tool.ruff]
 select = ["ALL"]
