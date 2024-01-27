@@ -24,12 +24,7 @@ class PluginContext:
         """Initialize the plugin context."""
         self._plugin = plugin
         self._event_bus = event_bus
-        self.db = PluginDatabase(self.plugin_name)
-
-    @property
-    def plugin_name(self) -> str:
-        """Get the plugin's name."""
-        return self._plugin.name
+        self.db = PluginDatabase(plugin.name)
 
     async def widget_updated(self, data: dict, widget_name: str | None = None) -> None:
         """Indicate that a widget has been updated.
@@ -39,7 +34,7 @@ class PluginContext:
         :param data: Data to pass as the widget's template context.
         :param widget_name: Name of the widget to refresh, defaults to the plugin name.
         """
-        event_name = self.plugin_name
+        event_name = self._plugin.name
         if widget_name:
             event_name += f".{widget_name}"
         event_name += ".refresh"
@@ -47,25 +42,6 @@ class PluginContext:
         event_data = self._plugin.render(context=data, widget=widget_name)
 
         await self._event_bus.post(Event(name=event_name, data=event_data))
-
-    async def post_event(self, name: str, data: dict) -> None:  # noqa: ARG002
-        """Post an event that is available to client-side JavaScript.
-
-        :param name: Name of the event (see notes below).
-        :param data: Data sent with the event. Send "" if there is no data.
-
-        The plugin name is automatically used to namespace all events as they appear on
-        the client side. For example, if the plugin name is `myplugin` and the event
-        name is `myeventname`, the event name on the client side will be:
-
-        `myplugin.myeventname`
-
-        Some metadata keys are also automatically added to the event data:
-
-        _source: The name of the plugin
-        _time: When the event was raised
-        """
-        _logger.warning("post_event is deprecated; use widget_updated() instead")
 
     _connectivity_score = 0
 
@@ -80,7 +56,7 @@ class PluginContext:
         PluginContext._connectivity_score = score
         _logger.info(
             "%s votes connected; score: %s",
-            self.plugin_name,
+            self._plugin.name,
             score,
         )
 
@@ -90,7 +66,7 @@ class PluginContext:
         PluginContext._connectivity_score = score
         _logger.info(
             "%s votes disconnected because of %s; score: %s",
-            self.plugin_name,
+            self._plugin.name,
             cause,
             score,
         )
