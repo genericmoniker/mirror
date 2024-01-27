@@ -37,12 +37,6 @@ repos:
     types: [python]
     pass_filenames: false
 
-  - id: svelte-prettier
-    name: svelte-prettier
-    language: system
-    entry: pdm run pre_commit_npm.py frontend run pretty
-    files: frontend.*\.svelte
-
 - repo: meta
   hooks:
   - id: check-hooks-apply
