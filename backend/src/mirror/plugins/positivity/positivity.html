@@ -4,4 +4,4 @@
 "You rock!",
 ] %}
 
-<p>{{ messages[n] }}</p>
+<p class="large">{{ messages[n % messages|length] }}</p>
