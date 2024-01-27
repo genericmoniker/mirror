@@ -9,15 +9,15 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
   apt-get install -y --no-install-recommends curl build-essential python-dev libffi-dev libssl-dev
 
 # Install PDM.
-RUN curl -sSL https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm.py | python3 - --version=2.3.2
+RUN curl -sSL https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm.py | python3 - --version=2.12.2
 ENV PATH=/root/.local/bin:${PATH}
 
 # Need Rust for Python Cryptography >=3.5 build for linux/arm/v7.
 # I'm having trouble making this work (e.g. "spurious network error" trying to
 # get pyo3 dependency) after updating from 3.3.1 to 3.4.8. So for now...
-# RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
-# ENV PATH="/root/.cargo/bin:$PATH"
-ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+ENV PATH="/root/.cargo/bin:$PATH"
+# ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
 # We don't create the appuser yet, but we'll still use this as the WORKDIR
 # so that shebangs in any scripts match up when we copy the virtualenv.
