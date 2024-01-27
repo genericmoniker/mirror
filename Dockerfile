@@ -13,11 +13,9 @@ RUN curl -sSL https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm
 ENV PATH=/root/.local/bin:${PATH}
 
 # Need Rust for Python Cryptography >=3.5 build for linux/arm/v7.
-# I'm having trouble making this work (e.g. "spurious network error" trying to
-# get pyo3 dependency) after updating from 3.3.1 to 3.4.8. So for now...
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+RUN curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain=1.72.1 -y
 ENV PATH="/root/.cargo/bin:$PATH"
-# ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
+ENV RUSTUP_TOOLCHAIN=1.72.1
 
 # We don't create the appuser yet, but we'll still use this as the WORKDIR
 # so that shebangs in any scripts match up when we copy the virtualenv.
@@ -30,7 +28,7 @@ WORKDIR ${ROOTDIR}
 # Best practices:
 # * `COPY` in files only when needed.
 COPY pyproject.toml pdm.lock ./
-RUN pdm install --prod --no-lock --no-editable
+RUN pdm install --prod --frozen-lockfile --no-editable
 
 # Copy in the code.
 WORKDIR ${ROOTDIR}
