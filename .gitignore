@@ -51,6 +51,7 @@ coverage.xml
 
 # Other tools
 .mypy_cache
+.ruff_cache
 
 # Translations
 *.mo
