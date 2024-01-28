@@ -1,7 +1,8 @@
 # syntax = docker/dockerfile:1.2
+ARG PYTHON_VERSION=3.11
 
 # Best practice: Choose a stable base image and tag.
-FROM python:3.11-slim-buster AS build-image
+FROM python:${PYTHON_VERSION}-slim-buster AS build-image
 
 # Best practice: Make sure apt-get doesn't run in interactive mode.
 RUN export DEBIAN_FRONTEND=noninteractive && \
@@ -26,22 +27,12 @@ ENV ROOTDIR=/home/appuser
 WORKDIR ${ROOTDIR}
 
 # Install dependencies.
-#
-# Best practices:
-# * `COPY` in files only when needed.
 COPY pyproject.toml pdm.lock ./
 RUN pdm install --prod --frozen-lockfile --no-editable
 
-# Copy in the code.
-WORKDIR ${ROOTDIR}
-COPY . .
-
-# Install application.
-RUN pdm install --prod --no-lock --no-editable
-
 # ============================================================================
 
-FROM python:3.11-slim-buster AS run-image
+FROM python:${PYTHON_VERSION}-slim-buster AS run-image
 
 # Install security updates, and some useful packages.
 #
@@ -64,12 +55,14 @@ RUN useradd --create-home appuser
 USER appuser
 WORKDIR /home/appuser
 
-# Copy virtualenv -- location is /build/.venv because of:
-# - WORKDIR in the build phase
-# - `in-project = true` in poetry.toml
+# Copy virtualenv from build image.
 # Best practices: Avoid extra chowns.
 COPY --from=build-image --chown=appuser /home/appuser/.venv ./.venv
 ENV PATH="/home/appuser/.venv/bin:$PATH"
+
+# Copy in the application code.
+WORKDIR ${ROOTDIR}
+COPY . .
 
 # Best practices: Prepare for C crashes.
 ENV PYTHONFAULTHANDLER=1
@@ -79,4 +72,4 @@ ENV PYTHONFAULTHANDLER=1
 # Best practices:
 # * Add an `init` process
 # * Make sure images shut down correctly (via ENTRYPOINT [] syntax).
-ENTRYPOINT ["tini", "--", "mirror"]
+CMD ["tini", "--", "uvicorn", "--host", "0.0.0.0", "--port", "5000", "--app-dir", "src", "--log-config", "conf/uvicorn.logger.json", "mirror.main:app"]

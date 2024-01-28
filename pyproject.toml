@@ -24,17 +24,19 @@ dependencies = [
     "defusedxml>=0.7.1",
     "jinja2>=3.1.2",
 ]
-name = "mirror"
+name = ""  # PDM uses a blank name to indicate an application instead of a library.
 version = "4.0.0"
 description = "A life dashboard application for Raspberry Pi"
 
-[project.scripts]
-mirror = "mirror.main:main"
-mirror-config = "mirror.main_config:main"
+[tool.pdm.scripts]
 
-[build-system]
-requires = ["pdm-pep517>=1.0.0"]
-build-backend = "pdm.pep517.api"
+[tool.pdm.scripts.mirror]
+cmd = "uvicorn --port 5000 --app-dir src --log-config conf/uvicorn.logger.json mirror.main:app"
+help = "Run the mirror web server"
+
+[tool.pdm.scripts.config]
+shell = "cd src && python -m mirror.main_config"
+help = "Configure the mirror"
 
 [tool.black]
 exclude = '''
@@ -46,10 +48,8 @@ exclude = '''
     | \.mypy_cache
     | \.pytest_cache
     | \.venv
-    | \frontend
     | _build
     | build
-    | dist
   )/
 )
 '''

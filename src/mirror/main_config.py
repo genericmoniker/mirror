@@ -20,10 +20,11 @@ def main() -> None:
     )
     parser.add_argument("--plugins", nargs="*")
     args = parser.parse_args()
+    args.plugins = args.plugins or []
 
     # TODO: Set up file logging (since we're using stdout).
 
-    for plugin_name in args.plugins or []:
+    for plugin_name in args.plugins:
         if plugin_name not in plugin_names:
             print(f"Unknown plugin: {plugin_name}")
             print(available)
@@ -47,7 +48,7 @@ def configure(plugins: list[Plugin], plugin_names: list[str]) -> None:
             with PluginConfigureContext(plugin.name) as context:
                 plugin.module.configure_plugin(context)
     except KeyboardInterrupt:
-        pass
+        print()
 
 
 if __name__ == "__main__":

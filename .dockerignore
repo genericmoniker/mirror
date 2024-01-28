@@ -1,17 +1,13 @@
-.cache
-.data_samples
-.github
-.mypy_cache
-.pytest_cache
-.venv
-.vscode
-instance
-system
-.dockerignore
-.gitignore
-.pre-commit-config.yaml
-docker-build.sh
-docker-run.sh
-Dockerfile
-LICENSE
-README.md
+# Ignore everything by default.
+*
+
+# Allow these:
+!/conf
+!/src
+!/static
+!/templates
+!/pdm.lock
+!/pyproject.toml
+
+# Ignore these in otherwise allowed directories:
+**/__pycache__

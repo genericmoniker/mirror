@@ -262,7 +262,7 @@ Install [pdm](https://pdm.fming.dev/latest/), then:
 
     pdm install --dev
 
-Run the backend with either:
+Run with either:
 
     pdm run mirror
 

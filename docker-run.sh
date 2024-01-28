@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # This is for running docker for dev/test purposes.
+# See system/run.sh for running the app in production.
 
 set -euo pipefail
 
