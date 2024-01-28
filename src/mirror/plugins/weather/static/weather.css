@@ -1,0 +1,16 @@
+#weather-summary {
+    text-transform: capitalize;
+}
+
+#weather-alerts {
+    margin-top: 40px;
+    font-weight: bold;
+}
+
+#weather-uvi {
+    filter: invert(100%);
+}
+
+#weather td {
+    padding-right: 20px;
+}

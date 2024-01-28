@@ -1,0 +1,23 @@
+{#
+    Template to rotate through the list of "bottom" widgets.
+#}
+{%- set widgets = layout.bottom %}
+{%- set rotation_interval = "every 30s" %}
+{% if widgets|length == 0 %}
+<!-- No content -->
+{% else %}
+    {# index selects the widget to render. #}
+    {% set index = request.query_params.get('index', 0)|int %}
+
+    {# n is the number of times looped through all widgets, which is passed to the
+    widget being rendered so it can loop through its own list of content, if any. #}
+    {% set n = request.query_params.get('n', 0)|int %}
+
+    {% set markup, next_index, next_n = render_rotator_widget(plugins, widgets, index, n) %}
+
+    <div hx-get="/rotator?index={{ next_index }}&n={{ next_n }}"
+        hx-trigger="{{rotation_interval }}"
+        hx-swap="outerHTML">
+        {{ markup|safe }}
+    </div>
+{% endif %}

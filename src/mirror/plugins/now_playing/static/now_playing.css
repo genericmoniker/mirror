@@ -1,0 +1,10 @@
+#now_playing #component {
+    padding-left: 10px;
+}
+
+#now_playing #text {
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

@@ -1,0 +1,69 @@
+{% if temp is defined %}
+
+<div class="huge">
+    <i class="huge {{ icon }}"></i> <span>{{ temp|round|int }}</span>°
+</div>
+<div><span id="weather-summary" class="large">{{ summary }}</span></div>
+<br />
+
+<table>
+    <!-- Include these in the table for uniform horizontal spacing. -->
+    <tr>
+        <td colspan="5">Feels like {{ feels|round|int }}°</td>
+    </tr>
+    <tr>
+        <td colspan="5">
+            <i class="wi wi-strong-wind"></i>
+            {{ wind|round|int}}
+            <sup class="small">mph</sup>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5">
+            <div style="display:flex;align-items:center;">
+                <img id="weather-uvi" src="{{ url_for('weather-glasses.svg') }}" alt="uv index" width="40px" />
+                &nbsp;{{ uvi|round }}&nbsp; ↑ {{ uviMax|round }}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5">
+            {{ widget("air_quality") }}
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5"><i class="wi wi-sunrise"></i> {{ sunrise }}</td>
+    </tr>
+    <tr>
+        <td colspan="5"><i class="wi wi-sunset"></i> {{ sunset }}</td>
+    </tr>
+
+    <tr>
+        <td colspan="5" />
+    </tr>
+
+    {% for day in daily %}
+    <tr>
+        <td>{{ day.day }}</td>
+        <td><i class="{{ day.icon_class}}"></i></td>
+        <td>↑ <b>{{ day.temp_max|round|int}}</b>°</td>
+        <td>↓ {{ day.temp_min|round|int }}°</td>
+        <td>
+            <i class="wi wi-umbrella"></i>
+            {{ day.precipitation|round|int }}<sup class="small">%</sup>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<div id="weather-alerts">
+    {% for alert in alerts %}
+    <div>{{ alert.event }}</div>
+    {% endfor %}
+</div>
+
+{% else %}
+
+<b>Loading...</b>
+
+{% endif %}

@@ -1,0 +1,14 @@
+#connectivity {
+    display: block;
+    height: 70px;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 999;
+    padding-right: 20px;
+    padding-bottom: 10px;
+}
+
+#connectivity img {
+    height: 100%;
+}

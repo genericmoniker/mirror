@@ -1,0 +1,7 @@
+{% set messages = [
+"You look great today!",
+"Hello, awesome!",
+"You rock!",
+] %}
+
+<p class="large">{{ messages[n % messages|length] }}</p>

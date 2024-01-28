@@ -1,0 +1,19 @@
+{% macro add_widgets(widgets) -%}
+    {#
+        Add a list of widgets to the page.
+    #}
+    {% for widget in widgets %}
+        {{ add_widget(widget) }}
+        <br /> {# Insert some space between widgets. #}
+    {% endfor %}
+{%- endmacro %}
+
+
+{% macro add_widget(name) -%}
+    {#
+        Add a widget to the page that may be dynamically refreshed by SSE.
+    #}
+    <div id="{{ name }}" sse-swap="{{ name }}.refresh">
+    {{ render_widget(name)|safe }}
+    </div>
+{%- endmacro %}

@@ -1,0 +1,75 @@
+{% set width = 225 %}
+{% set height = 150 %}
+
+<script>
+    function drawProgress(canvas_id, percent) {
+        let canvas = document.getElementById(canvas_id);
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // TODO: fix flicker
+        drawProgressRing(ctx, percent, canvas.width, canvas.height);
+    }
+
+    function drawProgressRing(ctx, percent, width, height) {
+        let thinLineWidth = 1;
+        let thickLineWidth = 6;
+        let x = width / 2;
+        let y = height / 2;
+        let radius = height / 2 - thickLineWidth / 2;
+        let rotation = Math.PI / 2; // amount to subtract to start with 0 at north
+        let startAngle = 0 - rotation;
+        let endAngleCircle = 2 * Math.PI - rotation;
+        let endAnglePercent = 2 * Math.PI * percent - rotation;
+        // Thin, full circle:
+        drawArc(ctx, x, y, radius, startAngle, endAngleCircle, thinLineWidth);
+        // Thick, progress:
+        drawArc(ctx, x, y, radius, startAngle, endAnglePercent, thickLineWidth);
+    }
+
+    function drawArc(ctx, x, y, radius, start, end, lineWidth) {
+        ctx.strokeStyle = "#FFFFFF";
+        ctx.lineWidth = lineWidth;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.arc(x, y, radius, start, end);
+        ctx.stroke();
+    }
+
+    {% for person in persons %}
+        drawProgress("activity-canvas-{{ loop.index }}", {{ person.percent }});
+    {% endfor %}
+</script>
+
+
+{% macro activity_component(i, person) -%}
+{#
+    Add a step progress component for a person.
+#}
+<div class="component stacked">
+    <div class="text" style="width: {{ width }}px; height: {{ height }}px;">
+        {# <br /> Cheat vertical center! #}
+        <img class="icon" src="{{ url_for('footsteps.svg') }}" />
+        <br />
+        {{ "{:,}".format(person.steps) }}
+        {% if person.percent >= 1 %}
+        <br />
+        <span id="goal-icon">
+            <img class="goal-icon" src="{{ url_for('done.svg') }}" />
+        </span>
+        {% endif %}
+    </div>
+    <canvas id="activity-canvas-{{ i }}" width="{{ width }}" height="{{ height }}">
+    </canvas>
+    <div class="text" style="width: {{width}}px; height: {{height}}px;">
+        {{ person.name }}
+    </div>
+</div>
+{% endmacro %}
+
+
+<table>
+    <tr>
+    {% for person in persons %}
+        <td>{{ activity_component(loop.index, person) }}</td>
+    {% endfor %}
+    </tr>
+</table>

@@ -144,11 +144,14 @@ Setup for this plugin requires an API key, which you can get
 Data from your Google Calendar.
 
 You'll first need to set up access to the calendar API. You can do that from
-[this page](https://goo.gl/5ao8u2) and clicking on "Enable the Google Calendar
-API".
+[this page](https://goo.gl/5ao8u2) and clicking on "Enable the API".
 
 Follow the prompts to get a client id json file. You'll need that when running
 configure.py.
+
+Scope: .../auth/calendar.events.readonly	View events on all your calendars
+
+Application type: Desktop Application
 
 Running configure.py will also launch your default browser so that you can
 authorize the mirror application that you just set up for read-only access to
@@ -253,12 +256,7 @@ cd ~/mirror
 
 ## Development
 
-The mirror application has two main parts:
-
-1. The backend, developed with Python using starlette
-2. The frontend, developed with JavaScript using svelte
-
-### Backend
+The mirror application is built with Python using starlette and htmx.
 
 Install [pdm](https://pdm.fming.dev/latest/), then:
 
@@ -270,27 +268,19 @@ Run the backend with either:
 
 or
 
-    python3 backend/src/mirror/main.py
+    python3 src/mirror/main.py
 
-The server runs on http://localhost:5000, but you'll need to have built the
-frontend to get a UI.
+The server runs on http://localhost:5000.
 
-### Frontend
+### Plugins
 
-Run the backend first!
+Templates can use `url_for("somefile.png")` to reference a file in the plugin's static
+directory. This is **not** the same `url_for` provided by Starlette.
 
-Install [npm](https://www.npmjs.com/get-npm), then cd to the `frontend`
-directory and the frontend with:
+Use #plugin scoping on CSS
 
-    npm run dev
-
-The application will be available on http://localhost:5001, with hot-reload.
-
-You can also:
-
-    npm build
-
-To build the production frontend.
+Return no markup if you don't have anything... works for rotating but what about others?
+I guess still applies. Even "no more jobs" is something.
 
 ### Pre-commit hook
 

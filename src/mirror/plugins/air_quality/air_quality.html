@@ -1,0 +1,4 @@
+<div style="display:flex;align-items:center;">
+  <img style="filter: invert(100%);" src="{{ url_for('air_quality.svg') }}" alt="aqi" width="40px" />
+  &nbsp;{{ category }} {%if aqi > 0 %}({{ aqi }}&nbsp;<sup class="small">aqi</sup>){%endif%}
+</div>

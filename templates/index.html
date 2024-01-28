@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Mirror</title>
+    <link rel="icon" href="{{ url_for('static', path='favicon.ico') }}" type="image/x-icon" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700">
+    <link rel="stylesheet" href="{{ url_for('static', path='main.css') }}">
+    {# Include plugin stylesheets: #}
+    {% for plugin in plugins %}
+    {% for stylesheet in plugin.stylesheets %}
+    <link rel="stylesheet" href="{{ url_for(plugin.name, path=stylesheet) }}">
+    {% endfor %}
+    {% endfor %}
+    <script src="{{ url_for('static', path='htmx.min.js') }}"></script>
+    <script src="{{ url_for('static', path='sse.js') }}"></script>
+</head>
+
+{% from "macros.html" import add_widgets %}
+{% from "macros.html" import add_widget %}
+
+<body>
+    <main hx-ext="sse" sse-connect="/events">
+        <section id="left">
+            {{ add_widgets(layout.left) }}
+        </section>
+        <section id="right">
+            {{ add_widgets(layout.right) }}
+        </section>
+        <section id="bottom">
+            {% include "rotator.html" %}
+        </section>
+        {{ add_widget("connectivity") }}
+    </main>
+</body>
+
+</html>
