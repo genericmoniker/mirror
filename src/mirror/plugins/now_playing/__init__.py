@@ -149,7 +149,7 @@ def _get_next_poll_seconds(data: dict[str, int]) -> float:
 
     This attempts to catch track changes right away.
     """
-    if not data or not data["is_playing"]:
+    if not data or not data.get("is_playing"):
         return REFRESH_INTERVAL.total_seconds()
     duration_ms = data["duration_ms"]
     progress_ms = data["progress_ms"]
