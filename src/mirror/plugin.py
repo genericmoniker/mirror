@@ -74,15 +74,16 @@ class Plugin:
     ) -> str:
         """Render a plugin's widget template.
 
-        `context` is passed to the widget template. If `context` is not specified, the
-        context from the previous call to `render()` is used. If there is no previous
-        context, an empty context is used.
+        `context` is passed to the widget template. If `context` is None, the context
+        from the previous call to `render()` is used. If there is no previous context,
+        an empty context is used.
 
         `widget` is the name of the widget to render. If `widget` is not specified, the
-        plugin's main template (<plugin-name>.html) is rendered.
+        plugin's main template (<plugin_name>.html) is rendered.
         """
         widget = widget or self.name
-        context = context or self.widget_contexts.get(widget, {})
+        if context is None:
+            context = self.widget_contexts.get(widget, {})
         context["n"] = n
         self.widget_contexts[widget] = copy.deepcopy(context)
         template_name = f"{widget}.html"
