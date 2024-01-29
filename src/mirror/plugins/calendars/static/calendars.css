@@ -1,0 +1,17 @@
+#calendars-agenda table {
+    width: auto;
+    margin-right: 0px;
+    margin-left: auto;
+}
+
+#calendars-agenda td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 400px;
+    text-align: left;
+}
+
+#calendars-agenda .current {
+    font-weight: bold;
+}
