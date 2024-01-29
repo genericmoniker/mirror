@@ -67,28 +67,30 @@ def stop_plugin(context: PluginContext) -> None:  # noqa: ARG001
 
 async def _refresh(context: PluginContext) -> None:
     """Get the step count data."""
+    names = sorted(context.db)
     data = {
         "persons": [
-            {"name": name, "steps_goal": None, "steps": None, "percent": 0}
-            for name in context.db
+            {"name": name, "steps_goal": None, "steps": None, "percent": 0.0}
+            for name in names
         ],
     }
     while True:
         try:
             for_date = datetime.now().astimezone()
-            for i, name in enumerate(context.db):
+            for i, name in enumerate(names):
                 person = data["persons"][i]
                 creds = context.db[name]
                 activity_data = await get_activity(creds, for_date)
                 context.db[name] = creds  # potentially update creds
                 person["steps_goal"] = activity_data["goals"]["steps"]
                 person["steps"] = activity_data["summary"]["steps"]
-                person["percent"] = round(person["steps"] / person["steps_goal"])
+                person["percent"] = round(person["steps"] / person["steps_goal"], 2)
                 _logger.info(
-                    "%s steps goal: %s, steps: %s",
+                    "%s steps goal: %s, steps: %s (%s%%)",
                     name,
                     person["steps_goal"],
                     person["steps"],
+                    person["percent"] * 100,
                 )
             await context.widget_updated(data)
             context.vote_connected()
