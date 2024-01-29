@@ -36,7 +36,7 @@ class PluginContext:
         """
         event_name = self._plugin.name
         if widget_name:
-            event_name += f".{widget_name}"
+            event_name += f"-{widget_name}"
         event_name += ".refresh"
 
         event_data = self._plugin.render(context=data, widget=widget_name)

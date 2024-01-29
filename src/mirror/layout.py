@@ -36,7 +36,7 @@ class Layout:
     ) -> list[str]:
         valid_widgets = []
         for widget in widgets:
-            plugin_name, _, widget_name = widget.partition(".")
+            plugin_name, _, widget_name = widget.partition("-")
             for plugin in plugins:
                 if plugin.name == plugin_name:
                     # TODO: Check if widget_name is valid for plugin (template exists?)

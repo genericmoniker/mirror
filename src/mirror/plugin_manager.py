@@ -38,7 +38,7 @@ class PluginManager:
                 plugin.shutdown(PluginContext(plugin, self._event_bus))
 
     def render_widget(self, widget_name: str, n: int | None = None) -> str:
-        plugin_name, _, widget_name = widget_name.partition(".")
+        plugin_name, _, widget_name = widget_name.partition("-")
         for plugin in self._discovered_plugins:
             if plugin.name == plugin_name:
                 return plugin.render(context=None, widget=widget_name, n=n)
