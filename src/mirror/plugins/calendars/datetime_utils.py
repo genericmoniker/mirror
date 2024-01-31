@@ -29,6 +29,20 @@ def parse_date_tz(date: str) -> datetime.datetime:
     return parsed.astimezone()
 
 
+def short_relative_time(time: datetime.datetime) -> str:
+    """Get a short relative time string from the given datetime.
+
+    Short in length, and in the time range it is good for.
+
+    Doesn't currently handle dates in the past.
+    """
+    tomorrow_start = start_of_day_tz() + datetime.timedelta(days=1)
+    tomorrow_end = end_of_day_tz() + datetime.timedelta(days=1)
+    if tomorrow_start <= time <= tomorrow_end:
+        return "tomorrow"
+    return time.strftime("%a")
+
+
 def relative_time(time: datetime.datetime) -> str:  # noqa: PLR0911
     """Get a relative time string from the given datetime.
 

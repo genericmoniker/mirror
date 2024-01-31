@@ -1,3 +1,8 @@
-{% for item in items %}
-  <div>{{item.summary}} {{item.relative}}</div>
-{% endfor %}
+<table>
+    {% for item in items %}
+    <tr>
+        <td>{{ item.relative }}</td>
+        <td>{{ item.summary }}</td>
+    </tr>
+    {% endfor %}
+</table>

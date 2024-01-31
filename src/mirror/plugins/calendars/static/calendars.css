@@ -1,10 +1,4 @@
-#calendars-agenda table {
-    width: auto;
-    margin-right: 0px;
-    margin-left: auto;
-}
-
-#calendars-agenda td {
+#calendars-agenda td, #calendars-coming_up td {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

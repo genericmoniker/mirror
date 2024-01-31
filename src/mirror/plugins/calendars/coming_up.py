@@ -11,7 +11,7 @@ from . import common
 from .datetime_utils import (
     end_of_day_tz,
     parse_date_tz,
-    relative_time,
+    short_relative_time,
     start_of_day_tz,
 )
 
@@ -78,5 +78,5 @@ def _reshape_item(item: dict) -> dict:
     start_time = parse_date_tz(start.get("dateTime", start["date"]))
     return {
         "summary": item["summary"],
-        "relative": relative_time(start_time),
+        "relative": short_relative_time(start_time),
     }
