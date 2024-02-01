@@ -39,7 +39,7 @@ def short_relative_time(time: datetime.datetime) -> str:
     tomorrow_start = start_of_day_tz() + datetime.timedelta(days=1)
     tomorrow_end = end_of_day_tz() + datetime.timedelta(days=1)
     if tomorrow_start <= time <= tomorrow_end:
-        return "tomorrow"
+        return "Tomorrow"
     return time.strftime("%a")
 
 
