@@ -84,13 +84,13 @@ async def _refresh(context: PluginContext) -> None:
                 context.db[name] = creds  # potentially update creds
                 person["steps_goal"] = activity_data["goals"]["steps"]
                 person["steps"] = activity_data["summary"]["steps"]
-                person["percent"] = round(person["steps"] / person["steps_goal"], 2)
+                person["percent"] = person["steps"] / person["steps_goal"]
                 _logger.info(
                     "%s steps goal: %s, steps: %s (%s%%)",
                     name,
                     person["steps_goal"],
                     person["steps"],
-                    person["percent"] * 100,
+                    round(person["percent"] * 100, 2),
                 )
             await context.widget_updated(data)
             context.vote_connected()
