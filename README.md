@@ -2,9 +2,11 @@
 
 Smart/Magic Mirror
 
-WARNING: Work-in-progress; meets my needs but isn't fully generalized.
+![Mirror](./mirror.jpg)
 
-WARNING: This document is not fully up-to-date.
+Note: I'm not currently seeking extensive contributions on this project, mainly because
+I want to be free to significantly change how it works without supporting an installed
+base, but feel free to use it if it seems interesting to you.
 
 ## Raspberry Pi Setup
 
@@ -72,7 +74,52 @@ https://www.raspberrypi.org/documentation/linux/usage/cron.md
 You'll also need to create a `/home/pi/mirror/instance` directory, and
 configure services as described below.
 
+The software runs in a Docker container. You can run it the first time or update it
+later with the `system/run.sh` script.
+
+## Development
+
+The mirror application is built with Python using Starlette and htmx.
+
+Information on the mirror is provided by plugins. A plugin is a data source, plus one or
+more widgets that specify how the data is displayed. More information about developing
+plugins appears later in this document.
+
+### Setup
+
+Install [pdm](https://pdm.fming.dev/latest/), then:
+
+    pdm install --dev
+
+Run with either:
+
+    pdm run mirror
+
+or
+
+    python3 src/mirror/main.py
+
+The server runs on http://localhost:5000.
+
+### Pre-commit hook
+
+For tests, linting and other checks before commit:
+
+    pdm run pre-commit install
+
 ## Mirror Configuration
+
+Widgets can generally appear on the mirror in three zones: left and right, where all
+widgets are shown all the time, and bottom, where widgets are rotated to display them
+one at a time. The enabled widgets and their zone are configured in
+instance/mirror.toml.
+
+```toml
+[widgets]
+left = ["weather", "activity", "now_playing"]
+right = ["clock", "calendars-agenda", "calendars-coming_up", "calendars-countdown"]
+bottom = ["word_ptbr", "mail", "positivity"]
+```
 
 To do any configuration that plugins might need, run the config utility. This can be
 done in a couple of ways:
@@ -97,12 +144,14 @@ For example:
 pdm run mirror-config --plugins mail weather
 ```
 
-Some configuration requires using a web browser, so you'll either need to have
-a keyboard attached to the device, or you can do configuration on another
-machine (like a desktop PC) and copy `instance/mirror.db` and
+Some configuration requires using a web browser (such as to handle OAuth), so you'll
+either need to have a keyboard attached to the device, or you can do configuration on
+another machine (like a desktop PC) and copy `instance/mirror.db` and
 `instance/mirror.key` to the device.
 
 ## Plugins
+
+Details about plugins requiring non-trivial configuration are explained below.
 
 ### Activity
 
@@ -139,7 +188,9 @@ AQI from AirNow.
 Setup for this plugin requires an API key, which you can get
 [here](https://docs.airnowapi.org/account/request/).
 
-### Calendar
+The config utility will prompt for your location.
+
+### Calendars
 
 Data from your Google Calendar.
 
@@ -165,11 +216,11 @@ If you want to have calendar events farther out show up, you can put
 "mirror-countdown" in them somewhere (probably the description makes the most
 sense).
 
-### Emails
+### Mail
 
-You can send an email with "Mirror" in the subject (case-insensitive) and have
-that appear on the mirror for a week, rotated with other bottom-half messages.
-To do that, you need to configure mail settings in the config file:
+You can send an email with "Mirror" in the subject (case-insensitive) and have that
+appear on the mirror for a week. Usually that makes the most sense rotated with other
+bottom widgets. The config utility will ask for IMAP settings. For example:
 
 ```python
 IMAP_HOST = 'imap.gmail.com'
@@ -178,9 +229,9 @@ IMAP_USERNAME = 'somebody@sample.com'
 IMAP_PASSWORD = 'mysecretpassword'
 ```
 
-If you want to use a Gmail account, you'll need to enable IMAP in the settings.
+If you want to use a Gmail account, you'll need to enable IMAP in the Gmail settings.
 Also, it might work best to use two-factor authentication and create an app
-password.
+password for the mirror.
 
 ### Now Playing
 
@@ -195,37 +246,6 @@ Currently playing track from Spotify (requires a Spotify Premium account).
 ### Weather
 
 Current weather and forecasts using Open Weather Map.
-
-### Worth
-
-If you use [Personal Capital](https://www.personalcapital.com/), you can set up
-the mirror to show a simplified graph of "net worth". This is just the total of
-cash accounts minus the total of credit accounts, to give a quick spending
-metric. The value is shown rounded to the nearest $1000, and doesn't actually
-show a dollar sign anywhere.
-
-Configuration will prompt you for your username and password, and will go
-through the two-factor process (send an SMS to your registered phone number).
-
-Your credentials are stored in a well-obfuscated form in `instance/mirror.db`.
-
-### Tasks
-
-(Currently disabled)
-
-Tasks are pulled from Trello cards. There are several items to set in
-instance/config.py. First are [API keys](https://trello.com/app-key),
-while the last couple are used to choose which Boards/Lists are
-displayed.
-
-```py
-TRELLO_API_KEY = '<api key here>'
-TRELLO_API_SECRET = '<api secret here>'
-TRELLO_TOKEN = '<token here>'
-TRELLO_TOKEN_SECRET = '<token secret here>'
-TRELLO_BOARD_RE = '<board selection regular expression>'
-TRELLO_LIST_RE = '<list selection regular expression>'
-```
 
 ## Sentry Logging
 
@@ -247,43 +267,51 @@ Or, to see more logs:
 
     journalctl -u mirror-server
 
-If you want to run the application stand-alone:
+## Plugin development
 
-```bash
-cd ~/mirror
-~/.envs/mirror/bin/python3 mirrorapp.py
+A typical plugin has this structure:
+
+```
+mirror/plugins/my_plugin
+    static
+        my_plugin.css
+        my_plugin.png
+    __init__.py
+    my_plugin.html
 ```
 
-## Development
+- The `static` directory has static assets needed for rendering, if any.
+- The `__init__.py` module exposes the plugin interface to the mirror application. At
+  minimum, the file must exist, but typically it will also expose any of these functions
+  that it needs:
+    - `configure_plugin` - Called by the config utility to prompt the user for config.
+    - `start_plugin` - Called by the main mirror app at startup time.
+    - `stop_plugin` - Called by the main mirror app at shutdown time.
+- The `my_plugin.html` is the Jinja2 template to render the plugin's main widget.
 
-The mirror application is built with Python using starlette and htmx.
-
-Install [pdm](https://pdm.fming.dev/latest/), then:
-
-    pdm install --dev
-
-Run with either:
-
-    pdm run mirror
-
-or
-
-    python3 src/mirror/main.py
-
-The server runs on http://localhost:5000.
-
-### Plugins
-
-Templates can use `url_for("somefile.png")` to reference a file in the plugin's static
+Templates can use `url_for("my_plugin.png")` to reference a file in the plugin's static
 directory. This is **not** the same `url_for` provided by Starlette.
 
-Use #plugin scoping on CSS
+By convention, to avoid style conflicts, use #my_plugin scoping on CSS selectors. For
+example:
 
-Return no markup if you don't have anything... works for rotating but what about others?
-I guess still applies. Even "no more jobs" is something.
+```css
+#my_plugin p { color: white; }
+```
 
-### Pre-commit hook
+Return no markup if a widget doesn't have anything to display (for example, the mail
+plugin does this is there aren't any emails). Especially with the bottom zone, the
+widget is skipped while rotating if there is nothing to show, rather than being blank
+for the rotation period.
 
-For tests, linting and other checks before commit:
+The mirror application provides some services to plugins via the `PluginContext` class,
+such as the ability to read and write persistent config data. A plugin should call the
+`PluginContext.widget_updated` when its data has been updated such that one of its
+widgets would display differently.
 
-    pdm run pre-commit install
+You can look at the existing plugins for examples of how things work, including:
+
+- The `calendars` plugin, which has multiple widgets.
+- The `weather` plugin, which embeds another plugin's widget (`air_quality`).
+- The `positivity` plugin, which has multiple messages that rotate each time the
+  plugin itself is rotated.
