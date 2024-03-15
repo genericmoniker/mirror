@@ -72,7 +72,7 @@ async def _refresh(context: PluginContext) -> None:
 def _reshape(data_list: list) -> dict:
     if not data_list:
         return {
-            "aqi": 0,
+            "aqi": -1,
             "category": "Unavailable",
         }
     data: dict = data_list[0]
