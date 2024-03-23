@@ -5,7 +5,10 @@
 set -euo pipefail
 
 echo "> Pulling latest image"
-docker pull "genericmoniker/mirror:main"
+if docker pull "genericmoniker/mirror:main" | grep -q "Image is up to date"; then
+    echo "> Image is up to date"
+    exit 0
+fi
 
 echo "> Removing previous container"
 docker stop mirror || true && docker rm mirror || true
