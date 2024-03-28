@@ -5,8 +5,9 @@
 set -euo pipefail
 
 echo "> Pulling latest image"
-if docker pull "genericmoniker/mirror:main" | grep -q "Image is up to date"; then
+if docker pull "genericmoniker/mirror:main" | grep "Image is up to date" > /dev/null; then
     echo "> Image is up to date"
+    echo "> Done"
     exit 0
 fi
 
