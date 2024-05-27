@@ -69,6 +69,15 @@ dev = [
 includes = ["src/"]
 package-dir = "src/"
 
+[tool.pytest.ini_options]
+addopts = [
+    "--durations=10",
+    "--import-mode=importlib",
+]
+testpaths = "test"
+xfail_strict = true
+pythonpath = "src"
+
 [tool.ruff]
 select = ["ALL"]
 ignore = [

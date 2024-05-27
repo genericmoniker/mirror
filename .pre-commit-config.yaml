@@ -33,7 +33,7 @@ repos:
   - id: pytest
     name: pytest
     language: system
-    entry: pdm run pytest
+    entry: pdm run pytest tests
     types: [python]
     pass_filenames: false
 
