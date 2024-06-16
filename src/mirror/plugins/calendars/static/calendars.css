@@ -9,3 +9,7 @@
 #calendars-agenda .current {
     font-weight: bold;
 }
+
+#calendars-agenda .dim {
+   opacity: 50%;
+}

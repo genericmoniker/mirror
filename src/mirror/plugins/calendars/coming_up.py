@@ -2,6 +2,7 @@
 import asyncio
 import logging
 import re
+from collections.abc import Callable
 from datetime import timedelta
 from functools import partial
 
@@ -20,10 +21,10 @@ REFRESH_INTERVAL = timedelta(minutes=10)
 _logger = logging.getLogger(__name__)
 
 
-async def refresh(context: PluginContext) -> None:
+async def refresh(context: PluginContext, get_events: Callable) -> None:
     while True:
         try:
-            data = await _refresh_data(context.db)
+            data = await _refresh_data(context.db, get_events)
             if data:
                 await context.widget_updated(_reshape(data), "coming_up")
         except Exception:
@@ -32,11 +33,11 @@ async def refresh(context: PluginContext) -> None:
         await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
 
 
-async def _refresh_data(db: dict) -> dict | None:
+async def _refresh_data(db: dict, get_events: Callable) -> dict | None:
     filter_pattern = db.get(common.COMING_UP_FILTER)
     filter_func = partial(_coming_up_filter, filter_pattern)
     list_args = common.range_to_list_args(_get_coming_up_event_range)
-    return await common.refresh_data(db, list_args, filter_func)
+    return await common.refresh_data(db, get_events, list_args, filter_func)
 
 
 def _get_coming_up_event_range() -> tuple[str, str]:

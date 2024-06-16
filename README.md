@@ -127,7 +127,7 @@ done in a couple of ways:
 In the development environment:
 
 ```
-pdm run mirror-config
+pdm run config
 ```
 
 On device, when a Docker image exists:

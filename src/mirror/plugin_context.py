@@ -39,9 +39,9 @@ class PluginContext:
             event_name += f"-{widget_name}"
         event_name += ".refresh"
 
-        event_data = self._plugin.render(context=data, widget=widget_name)
+        html = self._plugin.render(context=data, widget=widget_name)
 
-        await self._event_bus.post(Event(name=event_name, data=event_data))
+        await self._event_bus.post(Event(name=event_name, data=html))
 
     _connectivity_score = 0
 

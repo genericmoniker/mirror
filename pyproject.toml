@@ -77,6 +77,7 @@ addopts = [
 testpaths = "test"
 xfail_strict = true
 pythonpath = "src"
+asyncio_mode = "auto"
 
 [tool.ruff]
 select = ["ALL"]
@@ -101,3 +102,6 @@ ignore = [
     "TD003",    # Missing issue link on the line following this TODO
     "TRY300",   # Consider moving this statement to an `else` block
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D", "S101"]

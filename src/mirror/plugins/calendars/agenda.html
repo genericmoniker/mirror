@@ -2,7 +2,7 @@
     {% for item in items %}
     <tr>
         <td>{{item.start}}</td>
-        <td><span class={{"current" if item.current else "" }}>{{ item.summary }}</span></td>
+        <td><span class={{"dim" if item.subordinate else "current" if item.current else "" }}>{{ item.summary }}</span></td>
     </tr>
     {% else %}
     <tr>

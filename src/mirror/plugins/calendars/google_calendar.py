@@ -12,7 +12,6 @@ https://developers.google.com/identity/protocols/oauth2#expiration
 """
 
 import logging
-from collections.abc import Callable
 from typing import Any
 
 from aiogoogle import Aiogoogle, HTTPError
@@ -57,17 +56,11 @@ def obtain_user_permission(client_creds: dict) -> dict:
     )
 
 
-def no_filter(_event: dict) -> bool:
-    """Allow all events."""
-    return True
-
-
 async def get_events(
     user_creds: dict,
     client_creds: dict,
     list_args: dict,
-    filter_func: Callable | None = None,
-) -> dict:
+) -> list[dict]:
     """List events from all calendars according to the parameters given.
 
     The supplied credentials dict may be updated if tokens are refreshed.
@@ -76,12 +69,10 @@ async def get_events(
     :param client_creds: Client credentials from configuration.
     :param list_args: Arguments to pass to the calendar API's event list
         function.
-    :param filter_func: Callable that can filter out individual events.
-        The function should return True to include, False to exclude.
+    :return: List of event dicts.
     :raise CredentialsError: if the credentials have not been set up,
         or if they have expired.
     """
-    filter_func = filter_func or no_filter
     if "access_token" not in user_creds:
         msg = "No access token in user credentials."
         raise CredentialsError(msg)
@@ -103,9 +94,8 @@ async def get_events(
                     service,
                     list_args,
                     calendar_list_entry,
-                    filter_func,
                 )
-            return {"items": sorted(events, key=_event_sort_key_function)}
+            return sorted(events, key=_event_sort_key_function)
         except HTTPError as ex:
             if "invalid_grant" in str(ex):
                 msg = "User credentials rejected."
@@ -122,7 +112,6 @@ async def _get_calendar_events(
     service: Any,  # noqa: ANN401
     list_args: dict,
     calendar: dict,
-    filter_func: Callable,
 ) -> list[dict]:
     calendar_id = calendar["id"]
     try:
@@ -138,7 +127,9 @@ async def _get_calendar_events(
         )
         return []
     else:
-        return [e for e in events_result.get("items", []) if filter_func(e)]
+        return [
+            e | {"calendar_id": calendar_id} for e in events_result.get("items", [])
+        ]
 
 
 def _event_sort_key_function(event: dict) -> str:
