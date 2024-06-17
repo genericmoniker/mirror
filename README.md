@@ -141,7 +141,7 @@ That will prompt you for any settings for all plugins, storing them well-obfusca
 For example:
 
 ```
-pdm run mirror-config --plugins mail weather
+pdm run config --plugins mail weather
 ```
 
 Some configuration requires using a web browser (such as to handle OAuth), so you'll
