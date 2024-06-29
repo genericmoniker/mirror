@@ -1,6 +1,6 @@
 {% if name %}
 <div id="component">
-    <div id="text">
+    <div id="text" class="overflow">
         {% if is_playing %}
         <img src="{{ url_for('now_playing.gif')}}" alt="playing" width="40px" />
         {% else %}

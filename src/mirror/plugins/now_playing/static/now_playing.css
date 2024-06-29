@@ -4,7 +4,4 @@
 
 #now_playing #text {
     vertical-align: middle;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }

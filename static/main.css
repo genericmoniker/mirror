@@ -32,6 +32,12 @@ main {
     font-size: 15px;
 }
 
+.overflow {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 #left {
     width: 46%;
     float: left;
