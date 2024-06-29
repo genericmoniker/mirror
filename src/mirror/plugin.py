@@ -1,4 +1,5 @@
 """Plugin definition module."""
+
 from __future__ import annotations
 
 import copy
@@ -31,17 +32,25 @@ class Plugin:
             """Generate a URL for a plugin's static asset."""
             return f"/plugin/{self.name}/{filename}"
 
-        def widget(name: str) -> str:
+        def widget(name: str, reserved_height: int | None = None) -> str:
             """Embed a widget within another widget.
 
             This has its own connection to the server-sent event (SSE) endpoint so that
             it can be refreshed independently of the parent widget.
+
+            The reserved height is used to set the height of the widget's container
+            element. This is useful when the widget's content is loaded asynchronously
+            and the container needs to be a certain height to prevent the page from
+            jumping around as the content loads.
             """
+            style = f"style='height: {reserved_height}px'" if reserved_height else ""
             return f"""
             <div id="{name}"
+                {style}
                 hx-ext="sse"
                 sse-connect="/events"
                 sse-swap="{name}.refresh">
+                &nbsp;
             </div>
             """
 
