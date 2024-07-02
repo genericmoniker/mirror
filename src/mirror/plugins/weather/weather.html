@@ -28,7 +28,10 @@
     </tr>
     <tr>
         <td colspan="5">
-            {{ widget("air_quality", 45) }}
+            <div style="display:flex;align-items:center;" class="overflow">
+            <img style="filter: invert(100%);" src="{{ url_for('air_quality.svg') }}" alt="aqi" width="40px" />
+            &nbsp;{{ air_quality.category }} {%if air_quality.aqi >= 0 %}({{ air_quality.aqi }}&nbsp;<sup class="small">aqi</sup>){%endif%}
+            </div>
         </td>
     </tr>
     <tr>

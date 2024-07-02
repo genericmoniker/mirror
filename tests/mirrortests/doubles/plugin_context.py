@@ -1,4 +1,5 @@
 """A test double for the PluginContext class."""
+
 from dataclasses import dataclass
 
 

@@ -75,7 +75,7 @@ addopts = [
     "--durations=10",
     "--import-mode=importlib",
 ]
-testpaths = "test"
+testpaths = ["tests"]
 xfail_strict = true
 pythonpath = "src"
 asyncio_mode = "auto"

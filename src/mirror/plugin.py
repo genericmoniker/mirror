@@ -17,7 +17,8 @@ from jinja2 import Environment, FileSystemLoader
 class Plugin:
     """A plugin that provides content to the mirror.
 
-    This is the interface that the application uses to interact with plugins.
+    This is the interface that the application uses to interact with plugins and is
+    instantiated automatically when a plugin is discovered.
     """
 
     def __init__(self, name: str, module: ModuleType) -> None:
@@ -32,35 +33,12 @@ class Plugin:
             """Generate a URL for a plugin's static asset."""
             return f"/plugin/{self.name}/{filename}"
 
-        def widget(name: str, reserved_height: int | None = None) -> str:
-            """Embed a widget within another widget.
-
-            This has its own connection to the server-sent event (SSE) endpoint so that
-            it can be refreshed independently of the parent widget.
-
-            The reserved height is used to set the height of the widget's container
-            element. This is useful when the widget's content is loaded asynchronously
-            and the container needs to be a certain height to prevent the page from
-            jumping around as the content loads.
-            """
-            style = f"style='height: {reserved_height}px'" if reserved_height else ""
-            return f"""
-            <div id="{name}"
-                {style}
-                hx-ext="sse"
-                sse-connect="/events"
-                sse-swap="{name}.refresh">
-                &nbsp;
-            </div>
-            """
-
         # Note: leaving autoescape=False (the default) so that the widget() macro can
         # return HTML markup (otherwise it will be escaped). Thus ignoring S701.
         self.env = Environment(loader=FileSystemLoader(self.path))  # noqa: S701
 
         # Widget templates can use the `url_for` and `widget` functions.
         self.env.globals["url_for"] = url_for
-        self.env.globals["widget"] = widget
 
     def __str__(self) -> str:
         return self.name
@@ -89,6 +67,9 @@ class Plugin:
 
         `widget` is the name of the widget to render. If `widget` is not specified, the
         plugin's main template (<plugin_name>.html) is rendered.
+
+        `n` is the number of times the widget has been rendered. This is useful for
+        widgets that need to maintain state across multiple renderings.
         """
         widget = widget or self.name
         if context is None:

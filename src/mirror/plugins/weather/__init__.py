@@ -1,7 +1,9 @@
-"""Weather data backed by the Open Weather Map API.
+"""Weather data backed by the Open Weather Map API and AirNow API.
 
 https://openweathermap.org/api/one-call-api
+https://docs.airnowapi.org/
 """
+
 import logging
 from asyncio import create_task, sleep
 from datetime import UTC, datetime, timedelta
@@ -14,14 +16,22 @@ from mirror.plugin_context import PluginContext
 # database keys:
 API_KEY = "api-key"
 LOCATION = "location"
+AIR_API_KEY = "air-api-key"
+AIR_LOCATION = "air-location"
 
 # Open Weather Map allows 1000 calls per day to their "One Call API". Leaving some room
 # for development where we might be making double the number of requests for a while on
 # some particular day, and since it seems plenty real-time we'll go with refreshing
 # every 5 minutes (288 per day).
+#
+# AirNow typically updates observations once per hour, with a rate limit of 500 requests
+# per hour.
 REFRESH_INTERVAL = timedelta(minutes=5)
 
 CONFIG_REFRESH_INTERVAL = timedelta(minutes=1)
+
+WEATHER_URL = "https://api.openweathermap.org/data/2.5/onecall"
+AIR_QUALITY_URL = "https://www.airnowapi.org/aq/observation/zipCode/current/"
 
 _logger = logging.getLogger(__name__)
 _state = {}
@@ -32,7 +42,10 @@ def configure_plugin(config_context: PluginConfigureContext) -> None:
     print("Weather Plugin Set Up")
     db[API_KEY] = input("Open Weather Map API key: ").strip()
     db[LOCATION] = input("Weather location (lat,lon): ").strip()
+    db[AIR_API_KEY] = input("AirNow API key: ").strip()
+    db[AIR_LOCATION] = input("Zip Code: ").strip()
     # TODO: General config setting implementation?
+    # TODO: Only require the user to enter the location once with conversion.
 
 
 def start_plugin(context: PluginContext) -> None:
@@ -60,20 +73,28 @@ async def _refresh(context: PluginContext) -> None:
             continue
 
         lat, lon = loc.split(",")
-        params = {
+        weather_params = {
             "lat": lat,
             "lon": lon,
             "units": "imperial",
             "appid": key,
             "exclude": "hourly,minutely",
         }
+        air_params = {
+            "format": "application/json",
+            "distance": 25,
+            "zipCode": context.db[AIR_LOCATION],
+            "API_KEY": context.db[AIR_API_KEY],
+        }
         try:
             async with httpx.AsyncClient(timeout=10) as client:
-                url = "https://api.openweathermap.org/data/2.5/onecall"
-                response = await client.get(url, params=params)
-            response.raise_for_status()
-            data = response.json()
-            await context.widget_updated(_reshape(data))
+                weather_response = await client.get(WEATHER_URL, params=weather_params)
+                air_response = await client.get(AIR_QUALITY_URL, params=air_params)
+            weather_response.raise_for_status()
+            air_response.raise_for_status()
+            data = _reshape(weather_response.json())
+            data["air_quality"] = _reshape_air(air_response.json())
+            await context.widget_updated(data)
             context.vote_connected()
         except httpx.TransportError as ex:
             # https://www.python-httpx.org/exceptions/
@@ -109,9 +130,11 @@ def _reshape_daily(daily: list[dict], tz: ZoneInfo) -> list[dict]:
     """Reshape the daily data from the API to be easier to work with."""
     return [
         {
-            "day": datetime.fromtimestamp(day["dt"]).astimezone(tz).strftime("%a")
-            if i > 0
-            else "Today",
+            "day": (
+                datetime.fromtimestamp(day["dt"]).astimezone(tz).strftime("%a")
+                if i > 0
+                else "Today"
+            ),
             "icon": _icon_class(day["weather"][0]["icon"], day["weather"][0]["id"]),
             "temp_max": day["temp"]["max"],
             "temp_min": day["temp"]["min"],
@@ -136,3 +159,16 @@ def _time_from_seconds(seconds: int, tz: ZoneInfo) -> str:
     """Get a time string from seconds since epoch."""
     local = datetime.fromtimestamp(seconds, tz=UTC).astimezone(tz)
     return local.strftime("%I:%M %p")
+
+
+def _reshape_air(data_list: list) -> dict:
+    if not data_list:
+        return {
+            "aqi": -1,
+            "category": "Unavailable",
+        }
+    data: dict = data_list[0]
+    return {
+        "aqi": data["AQI"],
+        "category": data["Category"]["Name"],
+    }

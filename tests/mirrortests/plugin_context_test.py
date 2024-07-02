@@ -2,7 +2,6 @@
 from datetime import datetime
 
 from cryptography.fernet import Fernet
-
 from mirror.plugin_context import PluginDatabase
 
 

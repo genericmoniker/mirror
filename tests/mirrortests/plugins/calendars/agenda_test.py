@@ -3,7 +3,6 @@
 from datetime import timedelta
 
 import pytest
-
 from mirror.plugins.calendars import agenda
 from mirror.plugins.calendars.common import (
     CLIENT_CREDENTIALS,
@@ -11,7 +10,8 @@ from mirror.plugins.calendars.common import (
     USER_CREDENTIALS,
 )
 from mirror.plugins.calendars.datetime_utils import now_tz
-from tests.mirror.doubles.plugin_context import PluginContext
+
+from mirrortests.doubles.plugin_context import PluginContext
 
 
 @pytest.fixture()

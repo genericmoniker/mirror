@@ -175,20 +175,11 @@ Fitbit step count for the data.
    an error), and will have a `code` query parameter like
    `?code=7b64c4b088b9c841d15bcac15d4aa7433d35af3e#_=`. Copy the
    `7b64c4b088b9c841d15bcac15d4aa7433d35af3e` part.
-1. Run mirror-config, and enter the prompted values. For Authorization code,
+1. Run the mirror config and enter the prompted values. For Authorization code,
    enter the value copied from the URL in the previous step.
 
 Note: The authorization code can only be used once, so if something goes wrong, you may
 need to generate a new one and re-run configuration to try again.
-
-### Air Quality
-
-AQI from AirNow.
-
-Setup for this plugin requires an API key, which you can get
-[here](https://docs.airnowapi.org/account/request/).
-
-The config utility will prompt for your location.
 
 ### Calendars
 
@@ -245,7 +236,14 @@ Currently playing track from Spotify (requires a Spotify Premium account).
 
 ### Weather
 
-Current weather and forecasts using Open Weather Map.
+Current weather and forecasts using Open Weather Map, and air quality from
+AirNow.
+
+Setup for this plugin requires two API keys, which you can get from:
+
+- [Open Weather Map](https://home.openweathermap.org/users/sign_up)
+- [AirNow](https://docs.airnowapi.org/account/request/)
+
 
 ## Sentry Logging
 
@@ -312,6 +310,6 @@ widgets would display differently.
 You can look at the existing plugins for examples of how things work, including:
 
 - The `calendars` plugin, which has multiple widgets.
-- The `weather` plugin, which embeds another plugin's widget (`air_quality`).
+- The `weather` plugin, which has two data sources.
 - The `positivity` plugin, which has multiple messages that rotate each time the
   plugin itself is rotated.

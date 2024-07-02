@@ -14,7 +14,7 @@ repos:
     name: ruff
     stages: [commit]
     language: system
-    entry: pdm run ruff --fix --exit-non-zero-on-fix --respect-gitignore
+    entry: pdm run ruff check --fix --exit-non-zero-on-fix --respect-gitignore
     types: [python]
 
   - id: black
