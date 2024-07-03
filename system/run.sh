@@ -44,7 +44,10 @@ docker run \
     "genericmoniker/mirror:main"
 
 echo "> Removing dangling images"
-docker image rm $(docker images -qa -f 'dangling=true') || true
+dangling_images=$(docker images -q -f 'dangling=true')
+if [ -n "$dangling_images" ]; then
+    docker image rm $dangling_images
+fi
 
 echo "> Refreshing the browser"
 until $(curl --output /dev/null --silent --head --fail http://localhost:5000/ready); do
