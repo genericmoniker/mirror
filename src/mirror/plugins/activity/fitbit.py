@@ -11,6 +11,7 @@ It may also have these keys, and they may be updated during function calls:
     - access_token
     - refresh_token
 """
+
 import logging
 from base64 import b64encode
 from datetime import datetime
@@ -26,12 +27,15 @@ class CredentialsError(Exception):
 
 async def get_activity(creds: dict, for_date: datetime) -> dict:
     """Get activity data for the given date."""
-    date = for_date.strftime("%Y-%m-%d")
-    url_path = f"activities/date/{date}.json"
-    return await _api_request(creds, url_path)
+    # Set to True for manual testing:
+    manual_test = False
 
-    # Use this instead of _api_request for manual testing:
-    # return _get_activity_test_data()  # noqa: ERA001
+    if not manual_test:
+        date = for_date.strftime("%Y-%m-%d")
+        url_path = f"activities/date/{date}.json"
+        return await _api_request(creds, url_path)
+
+    return _get_activity_test_data()
 
 
 def _get_activity_test_data() -> dict:
@@ -40,7 +44,7 @@ def _get_activity_test_data() -> dict:
     import random
     from pathlib import Path
 
-    root_dir = Path(__file__).parent.parent.parent.parent.parent.parent
+    root_dir = Path(__file__).parent.parent.parent.parent.parent
     data_str = (root_dir / ".data_samples/fitbit-activity.json").read_text()
     data = json.loads(data_str)
     data["summary"]["steps"] = random.randint(0, 10_000)  # noqa: S311

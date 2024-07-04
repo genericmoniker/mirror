@@ -1,11 +1,11 @@
 {% set width = 225 %}
 {% set height = 150 %}
 
-{% macro activity_component(i, person) -%}
+{% macro activity_widget(i, person) -%}
 {#
     Add a step progress component for a person.
 #}
-<div class="component stacked">
+<div class="widget stacked">
     <div class="text" style="width: {{ width }}px; height: {{ height }}px;">
         {# <br /> Cheat vertical center! #}
         <img class="icon" src="{{ url_for('footsteps.svg') }}" />
@@ -30,66 +30,26 @@
 <table>
     <tr>
     {% for person in persons %}
-        <td>{{ activity_component(loop.index, person) }}</td>
+        <td>{{ activity_widget(loop.index, person) }}</td>
     {% endfor %}
     </tr>
 </table>
 
 
 <script>
-    function drawProgress(canvas_id, percent) {
-        console.log("Drawing activity progress: " + canvas_id + " " + percent);
-        let canvas = document.getElementById(canvas_id);
-        if (!canvas) {
-            console.error("Canvas not found: " + canvas_id);
-            return;
-        }
-
-        // Off-screen canvas for double-buffering to prevent flickering.
-        var offscreenCanvas = document.createElement('canvas');
-        offscreenCanvas.width = canvas.width;
-        offscreenCanvas.height = canvas.height;
-        var offscreenCtx = offscreenCanvas.getContext('2d');
-        offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
-        drawProgressRing(offscreenCtx, percent, offscreenCanvas.width, offscreenCanvas.height);
-
-        // Draw off-screen canvas to visible canvas.
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(offscreenCanvas, 0, 0);
-    }
-
-    function drawProgressRing(ctx, percent, width, height) {
-        let thinLineWidth = 1;
-        let thickLineWidth = 6;
-        let x = width / 2;
-        let y = height / 2;
-        let radius = height / 2 - thickLineWidth / 2;
-        let rotation = Math.PI / 2; // amount to subtract to start with 0 at north
-        let startAngle = 0 - rotation;
-        let endAngleCircle = 2 * Math.PI - rotation;
-        let endAnglePercent = 2 * Math.PI * percent - rotation;
-        // Thin, full circle:
-        drawArc(ctx, x, y, radius, startAngle, endAngleCircle, thinLineWidth);
-        // Thick, progress:
-        drawArc(ctx, x, y, radius, startAngle, endAnglePercent, thickLineWidth);
-    }
-
-    function drawArc(ctx, x, y, radius, start, end, lineWidth) {
-        ctx.strokeStyle = "#FFFFFF";
-        ctx.lineWidth = lineWidth;
-        ctx.lineCap = "round";
-        ctx.beginPath();
-        ctx.arc(x, y, radius, start, end);
-        ctx.stroke();
-    }
-
-    // Draw progress after htmx swap.
-    // TODO: This draws more frequently than we want, but there doesn't seem to
-    // be anything in the event to tell us if the swap is relevant to us.
-    document.addEventListener('htmx:afterSwap', function(event) {
-        console.log("htmx:afterSwap: " + JSON.stringify(event.detail));
+    /*
+    Draw progress after a short delay.
+    The sequence seems to be:
+    1. htmx swap
+    2. drawProgress
+    3. canvas is cleared by something unknown
+    The delay is a workaround to switch the order of 2 and 3.
+    Also/related, it seems like the content is swapped in twice???
+    Maybe?: https://github.com/bigskysoftware/htmx-extensions/issues/16
+    */
+    setTimeout(function() {
         {% for person in persons %}
             drawProgress("activity-canvas-{{ loop.index }}", {{ person.percent }});
         {% endfor %}
-    });
+    }, 100);
 </script>

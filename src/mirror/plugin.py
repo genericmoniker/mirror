@@ -96,6 +96,16 @@ class Plugin:
         return p if p.exists() else None
 
     @property
+    def scripts(self) -> list[str]:
+        """The plugin's script filenames.
+
+        The filenames are relative to the plugin's static directory.
+        """
+        if not self.static_path:
+            return []
+        return [p.name for p in self.static_path.glob("*.js")]
+
+    @property
     def stylesheets(self) -> list[str]:
         """The plugin's stylesheet filenames.
 
