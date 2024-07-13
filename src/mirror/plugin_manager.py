@@ -1,7 +1,8 @@
 """Plugin management module."""
+
 import contextlib
 import logging
-from collections.abc import Generator
+from collections.abc import Generator, Iterator
 
 from mirror.event_bus import EventBus
 from mirror.plugin_context import PluginContext
@@ -21,7 +22,7 @@ class PluginManager:
             ", ".join(plugin.name for plugin in self._discovered_plugins),
         )
 
-    def __iter__(self) -> Generator:
+    def __iter__(self) -> Iterator:
         """Iterate over the discovered plugins."""
         yield from self._discovered_plugins
 

@@ -1,4 +1,5 @@
 """Plugin discovery module."""
+
 import importlib
 import pkgutil
 

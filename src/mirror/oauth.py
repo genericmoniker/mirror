@@ -1,4 +1,5 @@
 """Simple OAuth 2.0 helper library."""
+
 import logging
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer

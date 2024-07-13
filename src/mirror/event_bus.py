@@ -1,4 +1,5 @@
 """Event support."""
+
 import logging
 from asyncio import Queue
 from collections.abc import AsyncGenerator

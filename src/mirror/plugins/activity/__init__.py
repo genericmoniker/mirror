@@ -1,4 +1,5 @@
 """Step count from the Fitbit API."""
+
 import logging
 from asyncio import create_task, sleep
 from datetime import datetime, timedelta

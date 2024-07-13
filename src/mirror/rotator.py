@@ -1,4 +1,5 @@
 """Rotator helper functions."""
+
 from mirror.plugin_manager import PluginManager
 
 

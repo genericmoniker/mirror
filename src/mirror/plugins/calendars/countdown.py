@@ -1,4 +1,5 @@
 """Module for countdown to a calendar event."""
+
 import asyncio
 import logging
 from collections.abc import Callable

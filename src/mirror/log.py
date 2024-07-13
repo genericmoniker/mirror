@@ -1,4 +1,5 @@
 """Logging configuration."""
+
 from copy import deepcopy
 
 from uvicorn.config import LOGGING_CONFIG

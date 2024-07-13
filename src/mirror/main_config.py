@@ -3,6 +3,7 @@
 This program interactively prompts the user for plugin configuration and writes the
 configuration to the database for the plugin to read at runtime.
 """
+
 import argparse
 
 from mirror.plugin import Plugin

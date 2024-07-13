@@ -7,11 +7,11 @@ At the time of writing, there *is* an asyncio IMAP library, aioimaplib, but it s
 from the same problem as the standard library's imaplib: It is too low-level for easy
 use. Comparatively, imapclient is a joy to use.
 """
+
 import asyncio
 import email
 import functools
 import logging
-import socket
 from collections.abc import Callable
 from datetime import datetime, timedelta
 from getpass import getpass
@@ -47,7 +47,7 @@ def start_plugin(context: PluginContext) -> None:
     _state["task"] = task
 
 
-def stop_plugin(context: PluginContext) -> None:  # noqa: ARG001
+def stop_plugin(_context: PluginContext) -> None:
     task = _state.get("task")
     if task:
         task.cancel()
@@ -60,7 +60,7 @@ async def _refresh(context: PluginContext) -> None:
             data = {"items": emails}
             await context.widget_updated(data)
             context.vote_connected()
-        except (OSError, socket.timeout) as ex:
+        except (TimeoutError, OSError) as ex:
             # https://imapclient.readthedocs.io/en/2.2.0/api.html#exceptions
             context.vote_disconnected(ex)
             _logger.exception("Network error getting emails.")
@@ -79,7 +79,7 @@ def run_in_executor(func: Callable) -> Callable:
 
 
 @run_in_executor
-def _fetch_messages(db: dict) -> list[dict[str, str]]:
+def _fetch_messages(db: dict) -> list[dict[str, str | list[str]]]:
     """Fetch email messages from the configured IMAP account.
 
     Only messages from the past week that have "Mirror" in the subject are
@@ -103,15 +103,16 @@ def _fetch_messages(db: dict) -> list[dict[str, str]]:
     for raw in raw_messages.values():
         message = email.message_from_bytes(raw[b"RFC822"])
         sender = _parse_sender_name(message)
+        # mypy ignores because it doesn't realize this check happened:
         if message.is_multipart():
             parts = message.get_payload()
             for part in parts:
-                if part.get_content_type() == "text/plain":
-                    message = part
+                if part.get_content_type() == "text/plain":  # type: ignore
+                    message = part  # type: ignore
                     break
             else:
-                message = parts[0]
-        body = message.get_payload(decode=True).decode()
+                message = parts[0]  # type: ignore
+        body = message.get_payload(decode=True).decode()  # type: ignore
         result.append({"sender": sender, "body": body, "body_lines": body.splitlines()})
     return result
 

@@ -1,4 +1,5 @@
 """Services provided to plugins at configuration time."""
+
 from mirror import oauth
 from mirror.plugin_context import PluginDatabase
 

@@ -16,6 +16,7 @@ from typing import Any
 
 from aiogoogle import Aiogoogle, HTTPError
 from aiogoogle.auth import UserCreds
+from aiogoogle.auth.creds import ClientCreds
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
@@ -76,6 +77,14 @@ async def get_events(
     if "access_token" not in user_creds:
         msg = "No access token in user credentials."
         raise CredentialsError(msg)
+
+    # Convert to aiogoogle format
+    user_creds = UserCreds(**user_creds)
+    client_creds = ClientCreds(
+        client_id=client_creds["client_id"],
+        client_secret=client_creds["client_secret"],
+        scopes=SCOPES,
+    )
 
     async with Aiogoogle(user_creds=user_creds, client_creds=client_creds) as aiogoogle:
         # Is there a way to cache service discovery?
@@ -138,11 +147,13 @@ def _event_sort_key_function(event: dict) -> str:
     return start.get("date", start.get("dateTime", ""))
 
 
-def _update_user_creds(existing_creds: dict, new_creds: dict) -> None:
+def _update_user_creds(existing_creds: UserCreds, new_creds: UserCreds | None) -> None:
     # Don't just `update` the existing creds with the new ones -- that will overwrite
     # the refresh-related fields with None because the creds received after refreshing
     # don't include them. It seems odd that `aiogoogle.as_user` effectively wipes out
     # refresh capability after a refresh is done (may be considered a bug?).
+    if new_creds is None:
+        return
     existing_creds["access_token"] = new_creds["access_token"]
     existing_creds["expires_in"] = new_creds["expires_in"]
     existing_creds["expires_at"] = new_creds["expires_at"]

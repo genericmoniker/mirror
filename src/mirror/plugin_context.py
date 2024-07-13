@@ -1,4 +1,5 @@
 """Context given to plugins."""
+
 import json
 import logging
 from datetime import datetime

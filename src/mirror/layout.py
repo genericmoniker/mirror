@@ -1,4 +1,5 @@
 """Layout configuration for the mirror."""
+
 import logging
 import tomllib
 from collections.abc import Iterable

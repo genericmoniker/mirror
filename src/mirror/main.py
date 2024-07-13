@@ -1,4 +1,5 @@
 """The main entry point for the backend server."""
+
 import uvicorn
 from sse_starlette.sse import EventSourceResponse
 from starlette.applications import Starlette

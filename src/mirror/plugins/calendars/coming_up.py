@@ -1,4 +1,5 @@
 """Plugin module for getting upcoming events."""
+
 import asyncio
 import logging
 import re
@@ -61,7 +62,7 @@ def _coming_up_filter(pattern: str, event: dict) -> bool:
         if start <= start_of_day_tz():
             return False
     # Check any custom filters from the config.
-    if pattern and re.match(pattern, event["summary"]):
+    if pattern and re.match(pattern, event["summary"]):  # noqa: SIM103
         return False
 
     return True
