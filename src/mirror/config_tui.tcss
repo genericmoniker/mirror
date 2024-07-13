@@ -1,0 +1,42 @@
+Widget {
+    margin: 1 0 0 0;
+}
+
+Button {
+    margin: 1 2;
+}
+
+Checkbox {
+    width: 100%;
+}
+
+Label {
+    margin: 1 0 0 1;
+}
+
+Screen {
+    align: center middle;
+}
+
+#main {
+    width: 75%;
+    height: auto;
+}
+
+#title {
+    background: $primary;
+}
+
+#title Label {
+    margin: 1 0 1 0;
+}
+
+#form {
+    height: auto;
+}
+
+#buttons {
+    height: auto;
+    align: center top;
+}
+

@@ -24,6 +24,7 @@ dependencies = [
     "defusedxml>=0.7.1",
     "jinja2>=3.1.2",
     "prompt-toolkit>=3.0.47",
+    "textual>=0.71.0",
 ]
 name = ""  # PDM uses a blank name to indicate an application instead of a library.
 version = "4.0.0"
@@ -64,6 +65,7 @@ dev = [
     "pytest",
     "pytest-asyncio<1.0.0,>=0.14.0",
     "ruff>=0.0.287",
+    "textual-dev>=1.5.1",
 ]
 
 [tool.pdm.build]
