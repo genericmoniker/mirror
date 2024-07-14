@@ -1,0 +1,10 @@
+{% if error == false %}
+    <div hx-ext="class-tools">
+    {% if type == 'single'%}
+        <p>{{ joke }}</p>
+    {% else %}
+        <p>{{ setup }}</p>
+        <p class="hidden" classes="add fade-in:5s, remove hidden">{{ delivery }}</p>
+    {% endif %}
+    </div>
+{% endif %}
