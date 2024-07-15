@@ -26,7 +26,7 @@ def stop_plugin(context: PluginContext) -> None:  # noqa: ARG001
 
 async def _refresh(context: PluginContext) -> None:
     """Get a joke."""
-    url = "https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,explicit"
+    url = "https://v2.jokeapi.dev/joke/Any?safe-mode"
     while True:
         try:
             transport = httpx.AsyncHTTPTransport(retries=3)
