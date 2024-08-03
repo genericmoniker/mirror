@@ -22,7 +22,7 @@ async def poll(context: PluginContext, get_events: Callable) -> None:
             await refresh(context, get_events)
             await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
         except Exception:
-            _logger.exception("Error getting for agenda events.")
+            _logger.exception("Error getting agenda events.")
 
 
 async def refresh(context: PluginContext, get_events: Callable) -> None:
