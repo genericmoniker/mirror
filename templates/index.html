@@ -4,13 +4,13 @@
 <head>
     <title>Mirror</title>
     <link rel="icon" href="{{ url_for('static', path='favicon.ico') }}" type="image/x-icon" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700">
     <link rel="stylesheet" href="{{ url_for('static', path='main.css') }}">
-    {# Include plugin stylesheets: #}
+    {# Include plugin scripts: #}
     {% for plugin in plugins %}
     {% for script in plugin.scripts %}
     <script src="{{ url_for(plugin.name, path=script) }}"></script>
     {% endfor %}
+    {# Include plugin stylesheets: #}
     {% for stylesheet in plugin.stylesheets %}
     <link rel="stylesheet" href="{{ url_for(plugin.name, path=stylesheet) }}">
     {% endfor %}
