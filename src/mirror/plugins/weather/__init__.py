@@ -30,7 +30,7 @@ REFRESH_INTERVAL = timedelta(minutes=5)
 
 CONFIG_REFRESH_INTERVAL = timedelta(minutes=1)
 
-WEATHER_URL = "https://api.openweathermap.org/data/2.5/onecall"
+WEATHER_URL = "https://api.openweathermap.org/data/3.0/onecall"
 AIR_QUALITY_URL = "https://www.airnowapi.org/aq/observation/zipCode/current/"
 
 _logger = logging.getLogger(__name__)
