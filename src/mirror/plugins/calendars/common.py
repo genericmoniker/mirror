@@ -83,14 +83,8 @@ def reshape_events(events: Iterable[dict]) -> dict:
     """Optimize events for clients."""
     items = []
     for event in events:
-        # Some people enter calendar events in ALL CAPS, which is annoying 😉.
-        # Convert them to title-case instead.
-        summary = event["summary"]
-        if summary.isupper():
-            summary = summary.title()
-
         new_event = Event(
-            summary=summary,
+            summary=event["summary"],
             start=event["start"],
             end=event["end"],
             calendar_id=event["calendar_id"],
