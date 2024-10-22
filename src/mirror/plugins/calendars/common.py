@@ -19,11 +19,11 @@ class Event(dict):
     """Event after reshaping for the client."""
 
     def __eq__(self, value: object) -> bool:
-        """Equality comparison that ignores the calendar_id."""
+        """Equality comparison that ignores the calendar_id and calendar_name."""
         if not isinstance(value, dict):
             return False
-        this = self | {"calendar_id": None}
-        that = value | {"calendar_id": None}
+        this = self | {"calendar_id": None, "calendar_name": None}
+        that = value | {"calendar_id": None, "calendar_name": None}
         return this == that
 
 
@@ -88,6 +88,7 @@ def reshape_events(events: Iterable[dict]) -> dict:
             start=event["start"],
             end=event["end"],
             calendar_id=event["calendar_id"],
+            calendar_name=event["calendar_name"],
         )
 
         # Only include one event if it is duplicated across calendars. This overlaps

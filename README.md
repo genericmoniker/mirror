@@ -155,7 +155,7 @@ Details about plugins requiring non-trivial configuration are explained below.
 
 ### Activity
 
-Fitbit step count for the data.
+Fitbit step count for the day.
 
 1. Go to https://dev.fitbit.com/apps, logging in with your Fitbit account.
 1. Click on "Register a new app"
@@ -206,6 +206,8 @@ summary matches the regular expression are *excluded*.
 If you want to have calendar events farther out show up, you can put
 "mirror-countdown" in them somewhere (probably the description makes the most
 sense).
+
+Calendars named "Dinner" or "Meals" show a special icon in the agenda widget.
 
 ### Mail
 

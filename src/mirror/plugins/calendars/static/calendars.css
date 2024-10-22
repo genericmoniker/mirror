@@ -13,3 +13,9 @@
 #calendars-agenda .dim {
    opacity: 75%;
 }
+
+#calendars-agenda .icon {
+    width: 25px;
+    height: 25px;
+    filter: invert(100%);
+}

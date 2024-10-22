@@ -56,6 +56,12 @@ def _reshape_item(item: dict, db: dict) -> dict:
         data["subordinate"] = True
     else:
         data["subordinate"] = False
+
+    if item["calendar_name"].lower() in ("dinner", "meals"):
+        data["meals"] = True
+    else:
+        data["meals"] = False
+
     if "dateTime" not in item["start"]:
         return data | {
             "start": "All day - ",

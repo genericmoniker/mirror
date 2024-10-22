@@ -27,12 +27,14 @@ def create_event(
     start: str = "2024-05-28T19:00:00",
     end: str = "2024-05-28T20:00:00",
     calendar_id: str = "test@test.com",
+    calendar_name: str = "Test Calendar",
 ) -> dict:
     return {
         "summary": summary,
         "start": {"dateTime": start, "timeZone": "America/Denver"},
         "end": {"dateTime": end, "timeZone": "America/Denver"},
         "calendar_id": calendar_id,
+        "calendar_name": calendar_name,
     }
 
 
@@ -112,3 +114,24 @@ async def test_subordinate_filter(context: PluginContext) -> None:
     assert non_sub["subordinate"] is False
     sub_2 = next(item for item in items if item["summary"] == "Subordinate 2")
     assert sub_2["subordinate"] is True
+
+
+async def test_meals_filter(context: PluginContext) -> None:
+    """Events on the "dinner" or "meals" calendars are marked as such."""
+
+    async def get_events(*_args, **_kwargs) -> list[dict]:
+        return [
+            create_event("Tacos", calendar_name="Dinner"),
+            create_event("Pizza", calendar_name="Meals"),
+            create_event("Not Dinner", calendar_name="Not Dinner"),
+        ]
+
+    await agenda.refresh(context, get_events)
+
+    items = context.update.data["items"]
+    tacos = next(item for item in items if item["summary"] == "Tacos")
+    assert tacos["meals"] is True
+    pizza = next(item for item in items if item["summary"] == "Pizza")
+    assert pizza["meals"] is True
+    not_dinner = next(item for item in items if item["summary"] == "Not Dinner")
+    assert not_dinner["meals"] is False

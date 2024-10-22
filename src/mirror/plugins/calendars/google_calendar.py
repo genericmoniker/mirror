@@ -123,6 +123,7 @@ async def _get_calendar_events(
     calendar: dict,
 ) -> list[dict]:
     calendar_id = calendar["id"]
+    calendar_name = calendar.get("summary", calendar_id)
     try:
         events_result = await aiogoogle.as_user(
             service.events.list(calendarId=calendar_id, singleEvents=True, **list_args),
@@ -137,7 +138,8 @@ async def _get_calendar_events(
         return []
     else:
         return [
-            e | {"calendar_id": calendar_id} for e in events_result.get("items", [])
+            e | {"calendar_id": calendar_id, "calendar_name": calendar_name}
+            for e in events_result.get("items", [])
         ]
 
 
