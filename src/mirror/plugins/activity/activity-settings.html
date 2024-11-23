@@ -1,0 +1,39 @@
+{% extends "settings-base.html" %}
+{% block title %}Activity Settings{% endblock %}
+{% block content %}
+<h1>Activity Settings</h1>
+
+Daily step count from Fitbit
+
+<p>For each person whose activity you'd like to include:</p>
+<ol>
+    <li>Register an application at <a
+    href="https://dev.fitbit.com/apps/new">Fitbit</a> on their account</li>
+    <li>Set the callback URL to <code>{{ redirect_uri }}</code></li>
+    <li>Enter the client ID and client secret below</li>
+</ol>
+{% for person in db.keys() %}
+{% set client_id = db[person]["client_id"] %}
+{% set client_secret = db[person]["client_secret"] %}
+{% set scope = "activity" %}
+{% set auth_url =
+"https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=" +
+client_id + "&client_secret=" + client_secret + "&redirect_uri=" + redirect_uri
++ "&scope=" + scope + "&state=" + person %}
+<h2>{{ person }}</h2>
+<table>
+    <tr>
+        <td>Fitbit client ID</td>
+        <td>{{ client_id }}</td>
+    </tr>
+    <tr>
+        <td>Fitbit client secret</td>
+        <td>{{ client_secret }}</td>
+    </tr>
+</table>
+<button onclick="window.location = '{{ auth_url }}'">Authorize</button>
+<button>Edit</button>
+<button>Delete</button>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "settings-base.html" %}
+
+{% block title %}Mirror Settings{% endblock %}
+
+{% block content %}
+<h1>Mirror Settings</h1>
+<ul>
+    {% for plugin in plugins %}
+    {% if plugin.has_settings %}
+    <li><a href="/plugin/{{ plugin.name }}/settings/">{{ plugin.name }}</a></li>
+    {% endif %}
+    {% endfor %}
+</ul>
+{% endblock %}

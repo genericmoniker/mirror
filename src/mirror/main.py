@@ -1,6 +1,5 @@
 """The main entry point for the backend server."""
 
-import uvicorn
 from sse_starlette.sse import EventSourceResponse
 from starlette.applications import Starlette
 from starlette.requests import Request
@@ -12,8 +11,8 @@ from starlette.templating import Jinja2Templates
 from mirror.diagnostics import log_task_stacks
 from mirror.event_bus import EventBus
 from mirror.layout import Layout
-from mirror.log import uvicorn_log_config
 from mirror.paths import INSTANCE_DIR, ROOT_DIR
+from mirror.plugin_configure_context import PluginConfigureContext
 from mirror.plugin_manager import PluginManager
 from mirror.rotator import render_rotator_widget
 
@@ -44,6 +43,12 @@ async def index(request: Request) -> Response:
     return app.state.templates.TemplateResponse("index.html", context)
 
 
+async def settings(request: Request) -> Response:
+    app = request.app
+    context = build_template_context(request)
+    return app.state.templates.TemplateResponse("settings.html", context)
+
+
 def build_template_context(request: Request, extra: dict | None = None) -> dict:
     extra = extra or {}
     app = request.app
@@ -62,16 +67,28 @@ def create_app() -> Starlette:
     layout = Layout(INSTANCE_DIR / "mirror.toml", plugins)
 
     static_dir = ROOT_DIR / "static"
-    template_dir = [ROOT_DIR / "templates"]
+    template_dir = ROOT_DIR / "templates"
 
     plugin_static_mounts = [
         Mount(
-            f"/plugin/{plugin.name}",
+            f"/plugin/{plugin.name}",  # TODO: /plugin/{plugin.name}/static
             StaticFiles(directory=plugin.static_path, html=True),
             name=plugin.name,
         )
         for plugin in plugins
         if plugin.static_path
+    ]
+
+    plugin_settings_routes = [
+        Mount(
+            f"/plugin/{plugin.name}/settings",
+            app=plugin.create_settings_application(
+                template_dir,
+                PluginConfigureContext(plugin.name),
+            ),
+        )
+        for plugin in plugins
+        if plugin.has_settings
     ]
 
     routes = [
@@ -80,8 +97,10 @@ def create_app() -> Starlette:
         Route("/events", endpoint=stream_events),
         Route("/diag", endpoint=diagnostics),
         Mount("/static", StaticFiles(directory=static_dir, html=True), name="static"),
-        Route("/", endpoint=index),
+        Route("/settings", endpoint=settings),
+        *plugin_settings_routes,
         *plugin_static_mounts,
+        Route("/", endpoint=index),
     ]
 
     application = Starlette(
@@ -101,19 +120,4 @@ def create_app() -> Starlette:
     return application
 
 
-# The app object is created globally so that this module can run under an
-# application server other than uvicorn, such as Gunicorn.
 app = create_app()
-
-
-def main() -> None:
-    uvicorn.run(
-        "mirror.main:app",
-        host="0.0.0.0",  # noqa: S104
-        port=5000,
-        log_config=uvicorn_log_config(),
-    )
-
-
-if __name__ == "__main__":
-    main()

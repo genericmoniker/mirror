@@ -9,6 +9,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from types import ModuleType
 
+    from starlette.applications import Starlette
+
+    from mirror.plugin_configure_context import PluginConfigureContext
     from mirror.plugin_context import PluginContext
 
 from jinja2 import Environment, FileSystemLoader
@@ -83,12 +86,12 @@ class Plugin:
 
     @property
     def path(self) -> Path:
-        """The plugin's root directory."""
+        """Get the plugin's root directory."""
         return Path(self.module.__path__[0])
 
     @property
     def static_path(self) -> Path | None:
-        """The plugin's static assets directory.
+        """Get the plugin's static assets directory.
 
         Returns None if the plugin does not have a static directory.
         """
@@ -97,7 +100,7 @@ class Plugin:
 
     @property
     def scripts(self) -> list[str]:
-        """The plugin's script filenames.
+        """Get the plugin's script filenames.
 
         The filenames are relative to the plugin's static directory.
         """
@@ -107,10 +110,30 @@ class Plugin:
 
     @property
     def stylesheets(self) -> list[str]:
-        """The plugin's stylesheet filenames.
+        """Get the plugin's stylesheet filenames.
 
         The filenames are relative to the plugin's static directory.
         """
         if not self.static_path:
             return []
         return [p.name for p in self.static_path.glob("*.css")]
+
+    @property
+    def has_settings(self) -> bool:
+        """Check if the plugin has a settings application."""
+        return hasattr(self.module, "create_settings_application")
+
+    def create_settings_application(
+        self,
+        template_dir: Path,
+        config_context: PluginConfigureContext,
+    ) -> Starlette:
+        """Get the plugin's settings application.
+
+        Raise ValueError if the plugin does not have a settings application.
+        """
+        if not self.has_settings:
+            msg = f"{self.name} does not have a settings application."
+            raise ValueError(msg)
+
+        return self.module.create_settings_application(template_dir, config_context)
