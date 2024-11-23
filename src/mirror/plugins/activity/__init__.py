@@ -95,9 +95,11 @@ async def _refresh(context: PluginContext) -> None:
                 )
             await context.widget_updated(data)
             context.vote_connected()
-        except CredentialsError:
+        except CredentialsError as ex:
             _logger.error(  # noqa: TRY400
-                "Please run `mirror-config --plugins=activity`",
+                "Please re-authenticate to Fitbit for %s. (%s)",
+                name,
+                ex,
             )
         except TransportError as ex:
             # https://www.python-httpx.org/exceptions/

@@ -12,13 +12,10 @@ It may also have these keys, and they may be updated during function calls:
     - refresh_token
 """
 
-import logging
 from base64 import b64encode
 from datetime import datetime
 
 import httpx
-
-_logger = logging.getLogger(__name__)
 
 
 class CredentialsError(Exception):
@@ -54,41 +51,45 @@ def _get_activity_test_data() -> dict:
 async def _api_request(creds: dict, url_path: str) -> dict:
     if not creds:
         raise CredentialsError
+    access_token = creds.get("access_token", "")
     async with httpx.AsyncClient(timeout=10) as client:
-        if not creds.get("access_token"):
-            await _get_access_token(client, creds)
         url = "https://api.fitbit.com/1/user/-/" + url_path
         try:
-            return await _do_resource_get(client, creds, url)
+            return await _do_resource_get(client, access_token, url)
         except httpx.HTTPStatusError as ex:
             if ex.response.status_code == 401:  # noqa: PLR2004
                 try:
-                    await _refresh_access_token(client, creds)
-                    return await _do_resource_get(client, creds, url)
+                    access_token = await _refresh_access_token(client, creds)
+                    return await _do_resource_get(client, access_token, url)
                 except httpx.HTTPStatusError as ex:
-                    if ex.response.status_code == 401:  # noqa: PLR2004
-                        raise CredentialsError from ex
-                    raise
+                    raise CredentialsError(ex.response.json()) from ex
             raise
 
 
-async def _get_access_token(client: httpx.AsyncClient, creds: dict) -> None:
+async def get_access_token(
+    client: httpx.AsyncClient,
+    authorization_code: str,
+    client_id: str,
+    client_secret: str,
+    redirect_uri: str,
+) -> tuple[str, str]:
     """Exchange an authorization code for an access token and refresh token.
 
     https://dev.fitbit.com/build/reference/web-api/oauth2/#access_token-request
     """
     post_data = {
-        "code": creds["authorization_code"],
+        "code": authorization_code,
         "grant_type": "authorization_code",
-        "redirect_uri": "http://localhost:5000/fitbit",
+        "redirect_uri": redirect_uri,
     }
-    data = await _do_auth_post(client, creds, post_data)
-    creds["access_token"] = data["access_token"]
-    creds["refresh_token"] = data["refresh_token"]
+    data = await _do_auth_post(client, client_id, client_secret, post_data)
+    return data["access_token"], data["refresh_token"]
 
 
-async def _refresh_access_token(client: httpx.AsyncClient, creds: dict) -> None:
+async def _refresh_access_token(client: httpx.AsyncClient, creds: dict) -> str:
     """Exchange a refresh token for a new access token and refresh token.
+
+    The new tokens are stored in the creds dict and the access token is returned.
 
     https://dev.fitbit.com/build/reference/web-api/oauth2/#refreshing-tokens
     """
@@ -96,14 +97,24 @@ async def _refresh_access_token(client: httpx.AsyncClient, creds: dict) -> None:
         "refresh_token": creds["refresh_token"],
         "grant_type": "refresh_token",
     }
-    data = await _do_auth_post(client, creds, post_data)
+    data = await _do_auth_post(
+        client,
+        creds["client_id"],
+        creds["client_secret"],
+        post_data,
+    )
     creds["access_token"] = data["access_token"]
     creds["refresh_token"] = data["refresh_token"]
+    return data["access_token"]
 
 
-async def _do_resource_get(client: httpx.AsyncClient, creds: dict, url: str) -> dict:
-    """Make a GET to the resource server."""
-    headers = {"Authorization": "Bearer " + creds["access_token"]}
+async def _do_resource_get(
+    client: httpx.AsyncClient,
+    access_token: str,
+    url: str,
+) -> dict:
+    """Make a GET request to the resource server."""
+    headers = {"Authorization": "Bearer " + access_token}
     response = await client.get(url, headers=headers)
     response.raise_for_status()
     return response.json()
@@ -111,15 +122,14 @@ async def _do_resource_get(client: httpx.AsyncClient, creds: dict, url: str) -> 
 
 async def _do_auth_post(
     client: httpx.AsyncClient,
-    creds: dict,
+    client_id: str,
+    client_secret: str,
     post_data: dict,
 ) -> dict:
-    """Make a POST to the authorization server."""
+    """Make a POST request to the authorization server."""
     url = "https://api.fitbit.com/oauth2/token"
-    auth_value = b64encode(f"{creds['client_id']}:{creds['client_secret']}".encode())
+    auth_value = b64encode(f"{client_id}:{client_secret}".encode())
     headers = {"Authorization": "Basic " + auth_value.decode()}
     response = await client.post(url, headers=headers, data=post_data)
-    if response.is_error:
-        _logger.error(response.content)
     response.raise_for_status()
     return response.json()

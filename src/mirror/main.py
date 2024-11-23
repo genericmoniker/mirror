@@ -1,6 +1,5 @@
 """The main entry point for the backend server."""
 
-import uvicorn
 from sse_starlette.sse import EventSourceResponse
 from starlette.applications import Starlette
 from starlette.requests import Request
@@ -12,7 +11,6 @@ from starlette.templating import Jinja2Templates
 from mirror.diagnostics import log_task_stacks
 from mirror.event_bus import EventBus
 from mirror.layout import Layout
-from mirror.log import uvicorn_log_config
 from mirror.paths import INSTANCE_DIR, ROOT_DIR
 from mirror.plugin_manager import PluginManager
 from mirror.rotator import render_rotator_widget
@@ -104,16 +102,3 @@ def create_app() -> Starlette:
 # The app object is created globally so that this module can run under an
 # application server other than uvicorn, such as Gunicorn.
 app = create_app()
-
-
-def main() -> None:
-    uvicorn.run(
-        "mirror.main:app",
-        host="0.0.0.0",  # noqa: S104
-        port=5000,
-        log_config=uvicorn_log_config(),
-    )
-
-
-if __name__ == "__main__":
-    main()
