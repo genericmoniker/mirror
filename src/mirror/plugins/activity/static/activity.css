@@ -22,7 +22,8 @@
     height: 30px;
     filter: invert(100%);
     opacity: 1;
-    animation: fade 2s ease-in-out infinite;
+    /* Animation causes Xorg process to peg the CPU */
+    /* animation: fade 2s ease-in-out infinite; */
 }
 
 @keyframes fade {
