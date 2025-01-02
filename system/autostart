@@ -1,16 +1,12 @@
+# Copy this to /home/pi/.config/lxsession/LXDE-pi/autostart
+# Documentation: https://forums.raspberrypi.com/viewtopic.php?t=294014
 @lxpanel --profile LXDE-pi
 @pcmanfm --desktop --profile LXDE-pi
 
-# @xscreensaver -no-splash  # commented out to disable screen saver
-# @point-rpi  # commented out to disable moving the mouse to the app launch button
-
-# turn off screen blanking and energy saving
+# Turn off screen blanking and energy saving
 @xset s off
 @xset s noblank
 @xset -dpms
 
-# hide the mouse cursor
-@unclutter -idle 0
-
-# start the browser
-@chromium-browser --incognito --noerrdialogs --disable-session-crashed-bubble --disable-infobars --kiosk http://localhost:5000
+# Call our autostart script
+/home/pi/mirror/system/autostart.sh

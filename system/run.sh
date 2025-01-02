@@ -39,7 +39,7 @@ docker run \
     --name="mirror" \
     -p 5000:5000 \
     --restart=always \
-    --volume="/home/pi/mirror/instance:/home/appuser/instance" \
+    --volume="/home/${USER}/mirror/instance:/home/appuser/instance" \
     -e TZ=America/Denver \
     "genericmoniker/mirror:main"
 
@@ -55,7 +55,7 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:5000/rea
     sleep 1
 done
 export DISPLAY=:0.0
-export XAUTHORITY=/home/pi/.Xauthority
+export XAUTHORITY=/home/${USER}/.Xauthority
 xdotool key --window $(xdotool getactivewindow) ctrl+shift+R
 echo
 

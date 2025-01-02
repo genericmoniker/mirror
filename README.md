@@ -4,114 +4,106 @@ Smart/Magic Mirror
 
 ![Mirror](./mirror.jpg)
 
-Note: I'm not currently seeking extensive contributions on this project, mainly because
-I want to be free to significantly change how it works without supporting an installed
-base, but feel free to use it if it seems interesting to you.
+Note: I'm not currently seeking extensive contributions on this project, mainly
+because I want to be free to significantly change how it works without
+supporting an installed base, but feel free to use it if it seems interesting to
+you.
 
 ## Raspberry Pi Setup
 
-Using Raspberry Pi OS.
+Using Raspberry Pi OS Bookworm on a Pi Model 3 B+
 
-It will probably be helpful to enable ssh access, which can be done following
-the [Remote Access
-instructions](https://www.raspberrypi.org/documentation/computers/remote-access.html).
+Things we want to accomplish:
 
-Install the unclutter package for hiding the mouse cursor, and the xdotool to
-make it easier to refresh the browser from the command line.
+1. Rotate the display as needed
+2. Hide the mouse cursor
+4. Run the mirror application under Docker
+5. Run a browser pointed at the application
+6. Turn off the display at times (optional)
+7. Automatically update the mirror application when it changes
 
-    sudo apt-get install unclutter xdotool
+Start by copying all the files in the "system" directory of this repo to the Pi,
+such as with:
 
-You might want to rotate the display if your monitor is hung vertically. Edit
-/boot/config.txt:
+```
+scp -pr system pi-hostname-or-ip:mirror/system
+```
 
-    sudo nano /boot/config.txt
+Those files will be used in subsequent steps.
 
-Add a line to the end of the file:
+### Rotate the display
 
-    display_rotate=3
+This is probably easiest to do from the desktop, with a mouse attached. Go to
+the Raspberry Pi menu > Preferences > Screen Configuration.
 
-The value indicates the orientation:
+Pick your display from the Screens drop-down menu, and choose the Rotation value
+you need.
 
-| Value | Orientation |
-| ----- | ----------- |
-| 0     | Normal      |
-| 1     | 90 degrees  |
-| 2     | 180 degrees |
-| 3     | 270 degrees |
+### Hide the mouse cursor
 
-Install docker following the instructions for Raspbian from the
-[documentation](https://docs.docker.com/engine/install/debian/#install-using-the-convenience-script),
+Install the unclutter package:
+
+```
+sudo apt-get install unclutter
+```
+
+### Run the mirror application
+
+Install Docker following the instructions for Raspbian from the
+[documentation](https://docs.docker.com/engine/install/debian),
 including adding your user to the `docker` group in the [post install
 instructions](https://docs.docker.com/engine/install/linux-postinstall/).
 
-Copy the mirror-server.service systemd service unit file from this repo and
-enable it:
+For the first start, or to manually update:
 
-    sudo cp ~/mirror/system/mirror-server.service /etc/systemd/system/
-    sudo systemctl enable mirror-server
+```
+~/mirror/system/run.sh
+```
 
-Make a backup of your autostart file (just in case):
+To have the container restart when the Pi starts up:
 
-    sudo cp /etc/xdg/lxsession/LXDE-pi/autostart /etc/xdg/lxsession/LXDE-pi/autostart.bak
+```
+mkdir -p ~/.config/systemd/user
+cp ~/mirror/system/mirror-server.service ~/.config/systemd/user/
+systemctl --user enable mirror-server
+```
 
-Copy the `autostart` file from the project:
+### Run a browser pointed at the application
 
-    sudo cp ~/mirror/system/autostart /etc/xdg/lxsession/LXDE-pi/autostart
+This installs an autostart file that will start the browser (and a couple of
+other things, like disabling screen blanking and power saving):
 
-If you want, use the `scroff.sh` and `scron.sh` scripts in a cron job to
-schedule when the screen will be off/on. Those need to be run by root. To edit
-cron jobs, run:
+```
+mkdir -p ~/.config/lxsession/LXDE-pi/
+cp ~/mirror/system/autostart ~/.config/lxsession/LXDE-pi/
+```
 
-    sudo crontab -e
+### Turn off the display at times
 
-For example, turn on at 5:45 AM, off at 11 PM, add these lines:
+```
+sudo crontab -e
+```
 
-    45 5  * * * /home/pi/mirror/system/scron.sh
-    0 23  * * * /home/pi/mirror/system/scroff.sh
+Copy desired items from sudo-crontab.txt.
 
-https://www.raspberrypi.org/documentation/linux/usage/cron.md
+
+### Automatically update the mirror application when it changes
+
+```
+sudo crontab -e
+```
+
+Copy the item from crontab.txt.
+
 
 You'll also need to create a `/home/pi/mirror/instance` directory, and
 configure services as described below.
 
-The software runs in a Docker container. You can run it the first time or update it
-later with the `system/run.sh` script.
-
-## Development
-
-The mirror application is built with Python using Starlette and htmx.
-
-Information on the mirror is provided by plugins. A plugin is a data source, plus one or
-more widgets that specify how the data is displayed. More information about developing
-plugins appears later in this document.
-
-### Setup
-
-Install [pdm](https://pdm.fming.dev/latest/), then:
-
-    pdm install --dev
-
-Run with either:
-
-    pdm run mirror
-
-or
-
-    python3 src/mirror/main.py
-
-The server runs on http://localhost:5000.
-
-### Pre-commit hook
-
-For tests, linting and other checks before commit:
-
-    pdm run pre-commit install
-
 ## Mirror Configuration
 
-Widgets can generally appear on the mirror in three zones: left and right, where all
-widgets are shown all the time, and bottom, where widgets are rotated to display them
-one at a time. The enabled widgets and their zone are configured in
+Widgets can generally appear on the mirror in three zones: left and right, where
+all widgets are shown all the time, and bottom, where widgets are rotated to
+display them one at a time. The enabled widgets and their zone are configured in
 instance/mirror.toml.
 
 ```toml
@@ -121,8 +113,8 @@ right = ["clock", "calendars-agenda", "calendars-coming_up", "calendars-countdow
 bottom = ["word_ptbr", "mail", "positivity"]
 ```
 
-To do any configuration that plugins might need, run the config utility. This can be
-done in a couple of ways:
+To do any configuration that plugins might need, run the config utility. This
+can be done in a couple of ways:
 
 In the development environment:
 
@@ -136,18 +128,18 @@ On device, when a Docker image exists:
 ~/mirror/system/config.sh
 ```
 
-That will prompt you for any settings for all plugins, storing them well-obfuscated in
-`instance/mirror.db`. Specific plugins can be configured using the `--plugins` switch.
-For example:
+That will prompt you for any settings for all plugins, storing them
+well-obfuscated in `instance/mirror.db`. Specific plugins can be configured
+using the `--plugins` switch. For example:
 
 ```
 pdm run config --plugins mail weather
 ```
 
-Some configuration requires using a web browser (such as to handle OAuth), so you'll
-either need to have a keyboard attached to the device, or you can do configuration on
-another machine (like a desktop PC) and copy `instance/mirror.db` and
-`instance/mirror.key` to the device.
+Some configuration requires using a web browser (such as to handle OAuth), so
+you'll either need to have a keyboard attached to the device, or you can do
+configuration on another machine (like a desktop PC) and copy
+`instance/mirror.db` and `instance/mirror.key` to the device.
 
 ## Plugins
 
@@ -178,8 +170,8 @@ Fitbit step count for the day.
 1. Run the mirror config and enter the prompted values. For Authorization code,
    enter the value copied from the URL in the previous step.
 
-Note: The authorization code can only be used once, so if something goes wrong, you may
-need to generate a new one and re-run configuration to try again.
+Note: The authorization code can only be used once, so if something goes wrong,
+you may need to generate a new one and re-run configuration to try again.
 
 ### Calendars
 
@@ -211,9 +203,10 @@ Calendars named "Dinner" or "Meals" show a special icon in the agenda widget.
 
 ### Mail
 
-You can send an email with "Mirror" in the subject (case-insensitive) and have that
-appear on the mirror for a week. Usually that makes the most sense rotated with other
-bottom widgets. The config utility will ask for IMAP settings. For example:
+You can send an email with "Mirror" in the subject (case-insensitive) and have
+that appear on the mirror for a week. Usually that makes the most sense rotated
+with other bottom widgets. The config utility will ask for IMAP settings. For
+example:
 
 ```python
 IMAP_HOST = 'imap.gmail.com'
@@ -222,9 +215,9 @@ IMAP_USERNAME = 'somebody@sample.com'
 IMAP_PASSWORD = 'mysecretpassword'
 ```
 
-If you want to use a Gmail account, you'll need to enable IMAP in the Gmail settings.
-Also, it might work best to use two-factor authentication and create an app
-password for the mirror.
+If you want to use a Gmail account, you'll need to enable IMAP in the Gmail
+settings. Also, it might work best to use two-factor authentication and create
+an app password for the mirror.
 
 ### Now Playing
 
@@ -267,6 +260,36 @@ Or, to see more logs:
 
     journalctl -u mirror-server
 
+## Development
+
+The mirror application is built with Python using Starlette and htmx.
+
+Information on the mirror is provided by plugins. A plugin is a data source,
+plus one or more widgets that specify how the data is displayed. More
+information about developing plugins appears later in this document.
+
+### Setup
+
+Install [pdm](https://pdm.fming.dev/latest/), then:
+
+    pdm install --dev
+
+Run with either:
+
+    pdm run mirror
+
+or
+
+    python3 src/mirror/main.py
+
+The server runs on http://localhost:5000.
+
+### Pre-commit hook
+
+For tests, linting and other checks before commit:
+
+    pdm run pre-commit install
+
 ## Plugin development
 
 A typical plugin has this structure:
@@ -281,33 +304,35 @@ mirror/plugins/my_plugin
 ```
 
 - The `static` directory has static assets needed for rendering, if any.
-- The `__init__.py` module exposes the plugin interface to the mirror application. At
-  minimum, the file must exist, but typically it will also expose any of these functions
-  that it needs:
-    - `configure_plugin` - Called by the config utility to prompt the user for config.
+- The `__init__.py` module exposes the plugin interface to the mirror
+  application. At minimum, the file must exist, but typically it will also
+  expose any of these functions that it needs:
+    - `configure_plugin` - Called by the config utility to prompt the user for
+      config.
     - `start_plugin` - Called by the main mirror app at startup time.
     - `stop_plugin` - Called by the main mirror app at shutdown time.
-- The `my_plugin.html` is the Jinja2 template to render the plugin's main widget.
+- The `my_plugin.html` is the Jinja2 template to render the plugin's main
+  widget.
 
-Templates can use `url_for("my_plugin.png")` to reference a file in the plugin's static
-directory. This is **not** the same `url_for` provided by Starlette.
+Templates can use `url_for("my_plugin.png")` to reference a file in the plugin's
+static directory. This is **not** the same `url_for` provided by Starlette.
 
-By convention, to avoid style conflicts, use #my_plugin scoping on CSS selectors. For
-example:
+By convention, to avoid style conflicts, use #my_plugin scoping on CSS
+selectors. For example:
 
 ```css
 #my_plugin p { color: white; }
 ```
 
-Return no markup if a widget doesn't have anything to display (for example, the mail
-plugin does this is there aren't any emails). Especially with the bottom zone, the
-widget is skipped while rotating if there is nothing to show, rather than being blank
-for the rotation period.
+Return no markup if a widget doesn't have anything to display (for example, the
+mail plugin does this is there aren't any emails). Especially with the bottom
+zone, the widget is skipped while rotating if there is nothing to show, rather
+than being blank for the rotation period.
 
-The mirror application provides some services to plugins via the `PluginContext` class,
-such as the ability to read and write persistent config data. A plugin should call the
-`PluginContext.widget_updated` when its data has been updated such that one of its
-widgets would display differently.
+The mirror application provides some services to plugins via the `PluginContext`
+class, such as the ability to read and write persistent config data. A plugin
+should call the `PluginContext.widget_updated` when its data has been updated
+such that one of its widgets would display differently.
 
 You can look at the existing plugins for examples of how things work, including:
 

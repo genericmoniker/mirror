@@ -1,15 +1,8 @@
+# Check for a Docker image update every 10 minutes
+*/10 * * * * /home/pi/mirror/system/run.sh
+
 # Screen on at 5:45 daily
 45 5  * * * /home/pi/mirror/system/scron.sh
 
 # Screen off at 23:00 daily
 0 23  * * * /home/pi/mirror/system/scroff.sh
-
-# Reboot Sunday and Wednesday at 4:00
-0  4  * * 0 /sbin/shutdown -r
-0  4  * * 3 /sbin/shutdown -r
-
-# Also check for loss of network hourly (and reboot)
-0  *  * * * /home/pi/mirror/system/check-offline.sh
-
-# Check for a Docker image update every 10 minutes
-*/10 * * * * /home/pi/mirror/system/run.sh
