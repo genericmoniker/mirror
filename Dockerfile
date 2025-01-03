@@ -5,14 +5,17 @@ ARG DEBIAN_RELEASE=bookworm
 # Best practice: Choose a stable base image and tag.
 FROM python:${PYTHON_VERSION}-slim-${DEBIAN_RELEASE} AS build-image
 
+# The scope for ARG is kind of wacky -- repeat here after the FROM statement
+# to make it available in the rest of the Dockerfile.
+ARG PYTHON_VERSION
+
 # Best practice: Make sure apt-get doesn't run in interactive mode.
 RUN export DEBIAN_FRONTEND=noninteractive && \
   apt-get update && \
   apt-get install -y --no-install-recommends curl build-essential python3-dev libffi-dev libssl-dev
 
 # Install PDM.
-RUN echo ### ${PYTHON_VERSION} ###
-RUN curl -sSL https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm.py | python${PYTHON_VERSION} - --version=2.19.2
+RUN curl -sSL https://pdm-project.org/install-pdm.py | python${PYTHON_VERSION} - --version=2.22.1
 ENV PATH=/root/.local/bin:${PATH}
 
 # Need Rust for Python Cryptography >=3.5 build for linux/arm/v7. (But I can't get it to
