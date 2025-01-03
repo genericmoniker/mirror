@@ -2,7 +2,7 @@
 ARG PYTHON_VERSION=3.12
 
 # Best practice: Choose a stable base image and tag.
-FROM python:${PYTHON_VERSION}-slim-buster AS build-image
+FROM python:${PYTHON_VERSION}-slim-bookworm AS build-image
 
 # Best practice: Make sure apt-get doesn't run in interactive mode.
 RUN export DEBIAN_FRONTEND=noninteractive && \
