@@ -8,7 +8,7 @@ FROM python:${PYTHON_VERSION}-slim-${DEBIAN_RELEASE} AS build-image
 # Best practice: Make sure apt-get doesn't run in interactive mode.
 RUN export DEBIAN_FRONTEND=noninteractive && \
   apt-get update && \
-  apt-get install -y --no-install-recommends curl build-essential python-dev libffi-dev libssl-dev
+  apt-get install -y --no-install-recommends curl build-essential python3-dev libffi-dev libssl-dev
 
 # Install PDM.
 RUN curl -sSL https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm.py | python3 - --version=2.12.2
