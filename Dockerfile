@@ -1,5 +1,5 @@
 # syntax = docker/dockerfile:1.2
-ARG PYTHON_VERSION=3.11
+ARG PYTHON_VERSION=3.12
 
 # Best practice: Choose a stable base image and tag.
 FROM python:${PYTHON_VERSION}-slim-buster AS build-image
