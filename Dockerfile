@@ -1,8 +1,9 @@
 # syntax = docker/dockerfile:1.2
 ARG PYTHON_VERSION=3.12
+ARG DEBIAN_RELEASE=bookworm
 
 # Best practice: Choose a stable base image and tag.
-FROM python:${PYTHON_VERSION}-slim-bookworm AS build-image
+FROM python:${PYTHON_VERSION}-slim-${DEBIAN_RELEASE} AS build-image
 
 # Best practice: Make sure apt-get doesn't run in interactive mode.
 RUN export DEBIAN_FRONTEND=noninteractive && \
@@ -32,7 +33,7 @@ RUN pdm install --prod --frozen-lockfile --no-editable
 
 # ============================================================================
 
-FROM python:${PYTHON_VERSION}-slim-buster AS run-image
+FROM python:${PYTHON_VERSION}-slim-${DEBIAN_RELEASE} AS run-image
 
 # Install security updates, and some useful packages.
 #
