@@ -11,7 +11,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
   apt-get install -y --no-install-recommends curl build-essential python3-dev libffi-dev libssl-dev
 
 # Install PDM.
-RUN curl -sSL https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm.py | python3 - --version=2.19.2
+RUN curl -sSL https://raw.githubusercontent.com/pdm-project/pdm/main/install-pdm.py | python${PYTHON_VERSION} - --version=2.19.2
 ENV PATH=/root/.local/bin:${PATH}
 
 # Need Rust for Python Cryptography >=3.5 build for linux/arm/v7. (But I can't get it to
