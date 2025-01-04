@@ -27,15 +27,13 @@ CACHE_IMAGE_WITH_BRANCH="${CACHE_IMAGE_NAME}:${GIT_BRANCH}"
 # * Record the build's version control revision and branch.
 #
 # Multiplatform build:
-# * linux/arm/v7 to run on Raspberry Pi 2
-# * linux/arm64 could be added for new Pis
 # * linux/amd64 could be added to run on desktop
 docker buildx build \
        -t "${IMAGE_WITH_COMMIT}" \
        -t "${IMAGE_WITH_BRANCH}" \
        --label "git-commit=${GIT_COMMIT}" \
        --label "git-branch=${GIT_BRANCH}" \
-       --platform linux/arm/v7 \
+       --platform linux/aarch64 \
        --progress plain \
        --push \
        --cache-from=type=registry,ref="${CACHE_IMAGE_WITH_BRANCH}" \

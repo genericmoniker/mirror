@@ -13,7 +13,7 @@ dependencies = [
     "sse-starlette>=0.6.1",
     "aiofiles>=0.6.0",
     "sqlitedict>=1.7.0",
-    "cryptography<4.0",
+    "cryptography>=44.0.0",
     "httpx>=0.23.0",
     "aiogoogle>=2.1.0",
     "google-auth-oauthlib>=0.4.2",

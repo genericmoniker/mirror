@@ -18,13 +18,6 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
 RUN curl -sSL https://pdm-project.org/install-pdm.py | python${PYTHON_VERSION} - --version=2.22.1
 ENV PATH=/root/.local/bin:${PATH}
 
-# Need Rust for Python Cryptography >=3.5 build for linux/arm/v7. (But I can't get it to
-# work, so we'll use an older version of cryptography.)
-# RUN curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain=1.72.1 -y
-# ENV PATH="/root/.cargo/bin:$PATH"
-# ENV RUSTUP_TOOLCHAIN=1.72.1
-ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
-
 # We don't create the appuser yet, but we'll still use this as the WORKDIR
 # so that shebangs in any scripts match up when we copy the virtualenv.
 ENV ROOTDIR=/home/appuser
