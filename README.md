@@ -13,91 +13,37 @@ you.
 
 Using Raspberry Pi OS Bookworm on a Pi Model 3 B+
 
-Things we want to accomplish:
+Note: Some of the scripts assume that the user is "pi" and will require editing
+if the device is set up with a differently named user.
 
-1. Rotate the display as needed
-2. Hide the mouse cursor
-4. Run the mirror application under Docker
-5. Run a browser pointed at the application
-6. Turn off the display at times (optional)
-7. Automatically update the mirror application when it changes
-
-Start by copying all the files in the "system" directory of this repo to the Pi,
-such as with:
-
-```
-scp -pr system pi-hostname-or-ip:mirror/system
-```
-
-Those files will be used in subsequent steps.
-
-### Rotate the display
-
-This is probably easiest to do from the desktop, with a mouse attached. Go to
-the Raspberry Pi menu > Preferences > Screen Configuration.
-
-Pick your display from the Screens drop-down menu, and choose the Rotation value
-you need.
-
-### Hide the mouse cursor
-
-Install the unclutter package:
-
-```
-sudo apt-get install unclutter
-```
-
-### Run the mirror application
+Rotating the display (if needed) is probably easiest to do from the desktop,
+with a mouse attached. Go to the Raspberry Pi menu > Preferences > Screen
+Configuration. Pick your display from the Screens drop-down menu, and choose the
+Rotation value you need.
 
 Install Docker following the instructions for Raspbian from the
 [documentation](https://docs.docker.com/engine/install/debian),
 including adding your user to the `docker` group in the [post install
 instructions](https://docs.docker.com/engine/install/linux-postinstall/).
 
-For the first start, or to manually update:
+Next copy all the files in the "system" directory of this repo to the Pi, such
+as with:
+
+```
+scp -rp system pi-hostname-or-ip:mirror
+```
+
+Then on the Pi device install the various system files:
+
+```
+~/mirror/system/install.sh
+```
+
+For the first start, or to manually update the mirror server container:
 
 ```
 ~/mirror/system/run.sh
 ```
-
-To have the container restart when the Pi starts up:
-
-```
-mkdir -p ~/.config/systemd/user
-cp ~/mirror/system/mirror-server.service ~/.config/systemd/user/
-systemctl --user enable mirror-server
-```
-
-### Run a browser pointed at the application
-
-This installs an autostart file that will start the browser (and a couple of
-other things, like disabling screen blanking and power saving):
-
-```
-mkdir -p ~/.config/lxsession/LXDE-pi/
-cp ~/mirror/system/autostart ~/.config/lxsession/LXDE-pi/
-```
-
-### Turn off the display at times
-
-```
-sudo crontab -e
-```
-
-Copy desired items from sudo-crontab.txt.
-
-
-### Automatically update the mirror application when it changes
-
-```
-sudo crontab -e
-```
-
-Copy the item from crontab.txt.
-
-
-You'll also need to create a `/home/pi/mirror/instance` directory, and
-configure services as described below.
 
 ## Mirror Configuration
 
@@ -254,11 +200,14 @@ If the browser doesn't show the right data when starting the Pi, it's likely
 that the Python application had an exception while starting. You can check that
 by ssh into the Pi and running:
 
-    systemctl status mirror-server
+    systemctl --user status mirror-server
 
 Or, to see more logs:
 
-    journalctl -u mirror-server
+    journalctl --user -u mirror-server
+
+There are several other systemd service units that can be checked as well. Look
+for their names in the system/install directory in the project.
 
 ## Development
 

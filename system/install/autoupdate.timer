@@ -1,0 +1,9 @@
+[Unit]
+Description=Check for updates periodically
+
+[Timer]
+OnCalendar=*:0/10
+Persistent=true
+
+[Install]
+WantedBy=timers.target

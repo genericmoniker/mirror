@@ -1,0 +1,9 @@
+[Unit]
+Description=Periodically reboot the system
+
+[Timer]
+OnCalendar=Sun,Wed 03:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

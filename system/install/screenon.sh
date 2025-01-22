@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo "Turning screen on"
+
 # Turn dpms on (so we can use it, just in case it is off)
 xset +dpms -display :0
 

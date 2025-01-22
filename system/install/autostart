@@ -9,4 +9,4 @@
 @xset -dpms
 
 # Call our autostart script
-/home/pi/mirror/system/autostart.sh
+/home/pi/mirror/system/install/autostart.sh

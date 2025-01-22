@@ -1,6 +1,0 @@
-# Reboot Sunday and Wednesday at 03:00
-0  3  * * 0 /sbin/shutdown -r
-0  3  * * 3 /sbin/shutdown -r
-
-# Also check for loss of network hourly (and reboot)
-0  *  * * * /home/pi/mirror/system/check-offline.sh
