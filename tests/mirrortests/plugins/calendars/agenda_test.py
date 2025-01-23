@@ -1,45 +1,10 @@
 """Tests for the agenda widget of the calendars plugin."""
 
-from datetime import timedelta
-
-import pytest
 from mirror.plugins.calendars import agenda
-from mirror.plugins.calendars.common import (
-    CLIENT_CREDENTIALS,
-    SUBORDINATE_FILTER,
-    USER_CREDENTIALS,
-)
-from mirror.plugins.calendars.datetime_utils import now_tz
+from mirror.plugins.calendars.common import SUBORDINATE_FILTER
 
 from mirrortests.doubles.plugin_context import PluginContext
-
-
-@pytest.fixture()
-def context() -> PluginContext:
-    context = PluginContext()
-    context.db[USER_CREDENTIALS] = "fake user creds"
-    context.db[CLIENT_CREDENTIALS] = "fake client creds"
-    return context
-
-
-def create_event(
-    summary: str = "Test Event",
-    start: str = "2024-05-28T19:00:00",
-    end: str = "2024-05-28T20:00:00",
-    calendar_id: str = "test@test.com",
-    calendar_name: str = "Test Calendar",
-) -> dict:
-    return {
-        "summary": summary,
-        "start": {"dateTime": start, "timeZone": "America/Denver"},
-        "end": {"dateTime": end, "timeZone": "America/Denver"},
-        "calendar_id": calendar_id,
-        "calendar_name": calendar_name,
-    }
-
-
-def now_offset(hours: int) -> str:
-    return (now_tz() + timedelta(hours=hours)).isoformat()
+from mirrortests.plugins.calendars.common import create_event, now_offset
 
 
 async def test_widget_updated(context: PluginContext) -> None:

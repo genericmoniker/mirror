@@ -17,7 +17,7 @@ def start_plugin(context: PluginContext) -> None:
         create_task(agenda.poll(context, get_events), name="agenda.refresh"),
     )
     tasks.append(
-        create_task(coming_up.refresh(context, get_events), name="coming_up.refresh"),
+        create_task(coming_up.poll(context, get_events), name="coming_up.refresh"),
     )
     tasks.append(
         create_task(countdown.refresh(context, get_events), name="countdown.refresh"),

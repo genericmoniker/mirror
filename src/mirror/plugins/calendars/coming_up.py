@@ -22,19 +22,21 @@ REFRESH_INTERVAL = timedelta(minutes=10)
 _logger = logging.getLogger(__name__)
 
 
-async def refresh(context: PluginContext, get_events: Callable) -> None:
+async def poll(context: PluginContext, get_events: Callable) -> None:
     while True:
         try:
-            data = await _refresh_data(context.db, get_events)
-            if data:
-                await context.widget_updated(_reshape(data), "coming_up")
+            await refresh(context, get_events)
+            await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
         except Exception:
-            _logger.exception("Error getting coming up events.")
-
-        await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
+            _logger.exception("Error getting upcoming events.")
 
 
-async def _refresh_data(db: dict, get_events: Callable) -> dict | None:
+async def refresh(context: PluginContext, get_events: Callable) -> None:
+    data = await _refresh_data(context.db, get_events)
+    await context.widget_updated(_reshape(data, context.db), "coming_up")
+
+
+async def _refresh_data(db: dict, get_events: Callable) -> dict:
     filter_pattern = db.get(common.COMING_UP_FILTER)
     filter_func = partial(_coming_up_filter, filter_pattern)
     list_args = common.range_to_list_args(_get_coming_up_event_range)
@@ -68,17 +70,20 @@ def _coming_up_filter(pattern: str, event: dict) -> bool:
     return True
 
 
-def _reshape(data: dict) -> dict:
+def _reshape(data: dict, db: dict) -> dict:
     """Reshape the data for the template."""
     return {
-        "items": [_reshape_item(item) for item in data["items"]],
+        "items": [_reshape_item(item, db) for item in data["items"]],
     }
 
 
-def _reshape_item(item: dict) -> dict:
+def _reshape_item(item: dict, db: dict) -> dict:
     start = item["start"]
     start_time = parse_date_tz(start.get("dateTime", start["date"]))
+    pattern = db.get(common.SUBORDINATE_FILTER)
+    subordinate = bool(pattern and re.match(pattern, item["calendar_id"]))
     return {
         "summary": item["summary"],
         "relative": short_relative_time(start_time),
+        "subordinate": subordinate,
     }

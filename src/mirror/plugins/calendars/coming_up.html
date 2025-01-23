@@ -2,7 +2,7 @@
     {% for item in items %}
     <tr>
         <td>{{ item.relative }}</td>
-        <td>{{ item.summary }}</td>
+        <td class={{"dim" if item.subordinate else ""}}>{{ item.summary }}</td>
     </tr>
     {% endfor %}
 </table>
