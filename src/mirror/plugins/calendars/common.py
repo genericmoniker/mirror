@@ -84,7 +84,7 @@ def reshape_events(events: Iterable[dict]) -> dict:
     items = []
     for event in events:
         new_event = Event(
-            summary=event["summary"],
+            summary=event.get("summary", "(no summary)"),
             start=event["start"],
             end=event["end"],
             calendar_id=event["calendar_id"],
