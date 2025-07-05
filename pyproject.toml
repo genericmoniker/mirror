@@ -24,6 +24,7 @@ dependencies = [
     "defusedxml>=0.7.1",
     "jinja2>=3.1.2",
     "prompt-toolkit>=3.0.47",
+    "myair-py>=0.1.1",
 ]
 name = ""  # PDM uses a blank name to indicate an application instead of a library.
 version = "4.0.0"
