@@ -21,10 +21,11 @@ class PluginContext:
     themselves.
     """
 
-    def __init__(self, plugin: Plugin, event_bus: EventBus) -> None:
+    def __init__(self, plugin: Plugin, event_bus: EventBus, config: dict) -> None:
         """Initialize the plugin context."""
         self._plugin = plugin
         self._event_bus = event_bus
+        self.config = config.get("plugin", {}).get(plugin.name, {})
         self.db = PluginDatabase(plugin.name)
 
     async def widget_updated(self, data: dict, widget_name: str | None = None) -> None:

@@ -37,11 +37,25 @@ class Plugin:
         # return HTML markup (otherwise it will be escaped). Thus ignoring S701.
         self.env = Environment(loader=FileSystemLoader(self.path))  # noqa: S701
 
-        # Widget templates can use the `url_for` and `widget` functions.
+        # Widget templates can use the `url_for` function.
         self.env.globals["url_for"] = url_for
 
     def __str__(self) -> str:
         return self.name
+
+    async def set_authorization_code(
+        self,
+        plugin_context: PluginContext,
+        code: str,
+        state: str,
+    ) -> None:
+        """Set the authorization code for the plugin.
+
+        This is typically called after the user has authorized the plugin and the
+        authorization code has been received.
+        """
+        if hasattr(self.module, "set_authorization_code"):
+            await self.module.set_authorization_code(plugin_context, code, state)
 
     def startup(self, plugin_context: PluginContext) -> None:
         """Start the plugin."""

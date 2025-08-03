@@ -21,10 +21,10 @@ class Layout:
         except FileNotFoundError:
             _logger.warning("Layout configuration file not found: %s", config_file)
             config = {}
-        widgets = config.get("widgets", {})
-        left = widgets.get("left", [])
-        right = widgets.get("right", [])
-        bottom = widgets.get("bottom", [])
+        layout = config.get("layout", {})
+        left = layout.get("left", [])
+        right = layout.get("right", [])
+        bottom = layout.get("bottom", [])
         self.left = self._valid_widgets(left, plugins)
         self.right = self._valid_widgets(right, plugins)
         self.bottom = self._valid_widgets(bottom, plugins)

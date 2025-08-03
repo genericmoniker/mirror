@@ -1,5 +1,7 @@
 """Activity data from the Fitbit API.
 
+https://dev.fitbit.com/build/reference/web-api/
+
 A note on "creds" parameters:
 
 The dict is expected to have these keys:
@@ -12,10 +14,15 @@ It may also have these keys, and they may be updated during function calls:
     - refresh_token
 """
 
+import json
+import random
 from base64 import b64encode
 from datetime import datetime
+from pathlib import Path
 
 import httpx
+
+AUTHORIZATION_URL = "https://www.fitbit.com/oauth2/authorize"
 
 
 class CredentialsError(Exception):
@@ -23,24 +30,20 @@ class CredentialsError(Exception):
 
 
 async def get_activity(creds: dict, for_date: datetime) -> dict:
-    """Get activity data for the given date."""
+    """Get activity data for the given date or raise CredentialsError."""
     # Set to True for manual testing:
     manual_test = False
+    if manual_test:
+        return _get_activity_test_data()
 
-    if not manual_test:
-        date = for_date.strftime("%Y-%m-%d")
-        url_path = f"activities/date/{date}.json"
-        return await _api_request(creds, url_path)
-
-    return _get_activity_test_data()
+    # Otherwise get the real data from the Fitbit API.
+    date = for_date.strftime("%Y-%m-%d")
+    url_path = f"activities/date/{date}.json"
+    return await _api_request(creds, url_path)
 
 
 def _get_activity_test_data() -> dict:
     """Get sample data for testing w/o authenticating to the Fitbit API."""
-    import json
-    import random
-    from pathlib import Path
-
     root_dir = Path(__file__).parent.parent.parent.parent.parent
     data_str = (root_dir / ".data_samples/fitbit-activity.json").read_text()
     data = json.loads(data_str)
@@ -52,6 +55,9 @@ async def _api_request(creds: dict, url_path: str) -> dict:
     if not creds:
         raise CredentialsError
     access_token = creds.get("access_token", "")
+    if not access_token:
+        msg = "No access token found in credentials."
+        raise CredentialsError(msg)
     async with httpx.AsyncClient(timeout=10) as client:
         url = "https://api.fitbit.com/1/user/-/" + url_path
         try:

@@ -22,7 +22,17 @@
     </canvas>
 </div>
 <div class="text" style="width: {{width}}px;">
-    {{ person.name }}
+    {% if person.login_required %}
+        <a href="{{ person.auth_url }}" target="_blank">
+            <img class="icon" src="{{ url_for('login.svg') }}" />
+            {{ person.name}}
+        </a>
+    {% else %}
+        {# Include the login image (but 0 width) to maintain a similar layout
+        with the login required case. #}
+        <img class="icon" src="{{ url_for('login.svg') }}" style="width: 0px;" />
+        {{ person.name }}
+    {% endif %}
 </div>
 {% endmacro %}
 

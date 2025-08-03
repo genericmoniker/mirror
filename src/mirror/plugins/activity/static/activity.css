@@ -2,6 +2,15 @@
     padding-left: 0px;
 }
 
+#activity a {
+    text-decoration: none;
+    color: inherit;
+}
+
+#activity a:hover {
+    text-decoration: underline;
+}
+
 #activity .text {
     text-align: center;
 }

@@ -53,7 +53,7 @@ display them one at a time. The enabled widgets and their zone are configured in
 instance/mirror.toml.
 
 ```toml
-[widgets]
+[layout]
 left = ["weather", "activity", "now_playing"]
 right = ["clock", "calendars-agenda", "calendars-coming_up", "calendars-countdown"]
 bottom = ["word_ptbr", "mail", "positivity"]

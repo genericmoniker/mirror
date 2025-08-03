@@ -5,15 +5,14 @@
     <title>Mirror</title>
     <link rel="icon" href="{{ url_for('static', path='favicon.ico') }}" type="image/x-icon" />
     <link rel="stylesheet" href="{{ url_for('static', path='main.css') }}">
-    {# Include plugin scripts: #}
+    {# Include plugin-specific elements: #}
     {% for plugin in plugins %}
-    {% for script in plugin.scripts %}
-    <script src="{{ url_for(plugin.name, path=script) }}"></script>
-    {% endfor %}
-    {# Include plugin stylesheets: #}
-    {% for stylesheet in plugin.stylesheets %}
-    <link rel="stylesheet" href="{{ url_for(plugin.name, path=stylesheet) }}">
-    {% endfor %}
+        {% for script in plugin.scripts %}
+        <script src="{{ url_for(plugin.name, path=script) }}"></script>
+        {% endfor %}
+        {% for stylesheet in plugin.stylesheets %}
+        <link rel="stylesheet" href="{{ url_for(plugin.name, path=stylesheet) }}">
+        {% endfor %}
     {% endfor %}
     <script src="{{ url_for('static', path='htmx.min.js') }}"></script>
     <script src="{{ url_for('static', path='sse.js') }}"></script>
