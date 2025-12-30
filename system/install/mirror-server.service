@@ -6,7 +6,7 @@ After=network-online.target
 [Service]
 Restart=always
 WorkingDirectory=%h/mirror
-ExecStart=%h/.local/bin/uv uvicorn --host 0.0.0.0 --port 5000 --app-dir src --log-config conf/uvicorn.logger.json mirror.main:app
+ExecStart=%h/.local/bin/uv run uvicorn --host 0.0.0.0 --port 5000 --app-dir src --log-config conf/uvicorn.logger.json mirror.main:app
 
 [Install]
 WantedBy=default.target
