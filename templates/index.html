@@ -19,6 +19,10 @@
     <script src="{{ url_for('static', path='class-tools.js') }}"></script>
     {# Disable Chromium's kiosk-unfriendly Translate infobar. #}
     <meta name="google" content="notranslate">
+    {# Auto-refresh when no widgets configured #}
+    {% if not layout.left and not layout.right and not layout.bottom %}
+    <meta http-equiv="refresh" content="30">
+    {% endif %}
 </head>
 
 {% from "macros.html" import add_widgets %}
