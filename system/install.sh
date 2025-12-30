@@ -11,6 +11,14 @@ if ! command -v uv &> /dev/null; then
     curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
+# Install required system packages
+sudo apt-get update
+sudo apt-get install -y \
+    build-essential \
+    python3-dev \
+    libffi-dev \
+    libssl-dev \
+
 # Install the mirror server dependencies
 cd ~/mirror
 ${HOME}/.local/bin/uv sync --no-dev
