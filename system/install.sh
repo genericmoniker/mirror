@@ -7,13 +7,13 @@ set -euo pipefail
 
 # Install uv if it isn't already installed
 if ! command -v uv &> /dev/null; then
-    echo "uv could not be found, installing..."
+    echo "Installing uv..."
     curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
 # Install the mirror server dependencies
 cd ~/mirror
-uv sync --no-dev
+${HOME}/.local/bin/uv sync --no-dev
 
 # Make the instance directory if it doesn't exist
 mkdir -p ~/mirror/instance
