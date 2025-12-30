@@ -36,23 +36,27 @@ loginctl enable-linger
 # Install the mirror service
 mkdir -p ~/.config/systemd/user
 cp ~/mirror/system/install/mirror-server.service ~/.config/systemd/user/
-systemctl --user enable --now mirror-server
 
 # Install the screen on/off services
 cp ~/mirror/system/install/screenon.service  ~/.config/systemd/user/
 cp ~/mirror/system/install/screenon.timer    ~/.config/systemd/user/
 cp ~/mirror/system/install/screenoff.service ~/.config/systemd/user/
 cp ~/mirror/system/install/screenoff.timer   ~/.config/systemd/user/
-systemctl --user enable --now screenon.timer
-systemctl --user enable --now screenoff.timer
 
 # Install the autoupdate service
 cp ~/mirror/system/install/autoupdate.service ~/.config/systemd/user/
 cp ~/mirror/system/install/autoupdate.timer   ~/.config/systemd/user/
-systemctl --user enable --now autoupdate.timer
 
 # Install the reboot service (requires sudo -- passwordless sudo is usually set
 # up automatically by Raspberry Pi OS)
 sudo cp ~/mirror/system/install/reboot.service /etc/systemd/system/
 sudo cp ~/mirror/system/install/reboot.timer   /etc/systemd/system/
+
+# Enable/start all of the services
+systemctl --user daemon-reload
+systemctl --user enable --now mirror-server
+systemctl --user enable --now screenon.timer
+systemctl --user enable --now screenoff.timer
+systemctl --user enable --now autoupdate.timer
+sudo systemctl daemon-reload
 sudo systemctl enable --now reboot.timer
