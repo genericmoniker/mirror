@@ -26,8 +26,17 @@ dependencies = [
     "prompt-toolkit>=3.0.47",
 ]
 name = ""  # PDM uses a blank name to indicate an application instead of a library.
-version = "4.0.0"
+version = "5.0.0"
 description = "A life dashboard application for Raspberry Pi"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.3.0",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "ruff>=0.12.9",
+]
+
 
 [tool.pdm.scripts]
 

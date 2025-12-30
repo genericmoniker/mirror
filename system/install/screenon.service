@@ -3,4 +3,4 @@ Description=Turn the screen on
 
 [Service]
 Type=oneshot
-ExecStart=/home/pi/mirror/system/install/screenon.sh
+ExecStart=%h/mirror/system/install/screenon.sh

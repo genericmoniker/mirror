@@ -45,7 +45,7 @@ async def oauth_redirect(request: Request) -> Response:
     """Handle an OAuth redirect request for a plugin.
 
     The redirect URI (as registered with the API) is expected to match this format:
-    http://{mirror_hostname}:5000/oauth/{plugin_name}
+    http://localhost:5000/oauth/{plugin_name}
     """
     plugin_name = request.path_params.get("plugin")
     plugins = request.app.state.plugins
