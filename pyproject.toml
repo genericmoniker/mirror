@@ -8,7 +8,7 @@ authors = [
     {name = "Eric Smith", email = "eric@esmithy.net"},
 ]
 license = {text = "MIT"}
-requires-python = ">=3.14"
+requires-python = "==3.13.*"  # No cryptography wheel for 3.14 yet (as of 2025-12-30)
 dependencies = [
     "starlette>=0.14.1",
     "uvicorn>=0.12.2",
@@ -66,6 +66,8 @@ ignore = [
     "S105",     # Possible hardcoded password
     "S106",     # Possible hardcoded password
     "T201",     # `print` found
+    "TC001",    # Move standard library import to a type-checking block
+    "TC003",    # Move third-party import to a type-checking block
     "TD002",    # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`
     "TD003",    # Missing issue link on the line following this TODO
     "TRY300",   # Consider moving this statement to an `else` block

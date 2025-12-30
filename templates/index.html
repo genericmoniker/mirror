@@ -25,22 +25,29 @@
 {% from "macros.html" import add_widget %}
 
 <body>
-    {#
-    Make the single SSE connection for the entire page.
-    Widgets swap in their content in response to SSE events.
-    #}
-    <main hx-ext="sse" sse-connect="/events">
-        <section id="left">
-            {{ add_widgets(layout.left) }}
-        </section>
-        <section id="right">
-            {{ add_widgets(layout.right) }}
-        </section>
-        <section id="bottom">
-            {% include "rotator.html" %}
-        </section>
-        {{ add_widget("connectivity") }}
-    </main>
+    {% if not layout.left and not layout.right and not layout.bottom %}
+        <main>
+            <h1>No widgets configured</h1>
+            <p>The mirror is working but no widgets are configured in the configuration file.</p>
+        </main>
+    {% else %}
+        {#
+        Make the single SSE connection for the entire page.
+        Widgets swap in their content in response to SSE events.
+        #}
+        <main hx-ext="sse" sse-connect="/events">
+            <section id="left">
+                {{ add_widgets(layout.left) }}
+            </section>
+            <section id="right">
+                {{ add_widgets(layout.right) }}
+            </section>
+            <section id="bottom">
+                {% include "rotator.html" %}
+            </section>
+            {{ add_widget("connectivity") }}
+        </main>
+    {% endif %}
 </body>
 
 </html>
