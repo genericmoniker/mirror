@@ -12,33 +12,35 @@
         <td colspan="5">Feels like {{ feels|round|int }}°</td>
     </tr>
     <tr>
-        <td colspan="5">
-            <i class="wi wi-strong-wind"></i>
+        <td><i class="wi wi-strong-wind"></i></td>
+        <td colspan="4">
             {{ wind|round|int}}
             <sup class="small">mph</sup>
         </td>
     </tr>
     <tr>
-        <td colspan="5">
+        <td><img id="weather-uvi" src="{{ url_for('weather-glasses.svg') }}" alt="uv index" width="30px" /></td>
+        <td colspan="4">
             <div style="display:flex;align-items:center;">
-                <img id="weather-uvi" src="{{ url_for('weather-glasses.svg') }}" alt="uv index" width="40px" />
                 &nbsp;{{ uvi|round }}&nbsp; ↑ {{ uviMax|round }}
             </div>
         </td>
     </tr>
     <tr>
-        <td colspan="5">
+        <td><img style="filter: invert(100%);" src="{{ url_for('air_quality.svg') }}" alt="aqi" width="30px" /></td>
+        <td colspan="4">
             <div style="display:flex;align-items:center;" class="overflow">
-            <img style="filter: invert(100%);" src="{{ url_for('air_quality.svg') }}" alt="aqi" width="40px" />
-            &nbsp;{{ air_quality.category }} {%if air_quality.aqi >= 0 %}({{ air_quality.aqi }}&nbsp;<sup class="small">aqi</sup>){%endif%}
+            {{ air_quality.category }} {%if air_quality.aqi >= 0 %}({{ air_quality.aqi }}&nbsp;<sup class="small">aqi</sup>){%endif%}
             </div>
         </td>
     </tr>
     <tr>
-        <td colspan="5"><i class="wi wi-sunrise"></i> {{ sunrise }}</td>
+        <td><i class="wi wi-sunrise"></i></td>
+        <td colspan="4">{{ sunrise }}</td>
     </tr>
     <tr>
-        <td colspan="5"><i class="wi wi-sunset"></i> {{ sunset }}</td>
+        <td><i class="wi wi-sunset"></i></td>
+        <td colspan="4">{{ sunset }}</td>
     </tr>
 
     <tr>
@@ -48,7 +50,7 @@
     {% for day in daily %}
     <tr>
         <td>{{ day.day }}</td>
-        <td><i class="{{ day.icon_class}}"></i></td>
+        <td><i class="{{ day.icon }}"></i></td>
         <td>↑ <b>{{ day.temp_max|round|int}}</b>°</td>
         <td>↓ {{ day.temp_min|round|int }}°</td>
         <td>
