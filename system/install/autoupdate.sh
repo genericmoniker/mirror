@@ -14,7 +14,7 @@ echo "Starting update check..."
 # Run from this script's parent directory
 cd "$(dirname "$0")/.."
 
-current_hash=$(git rev-parse HEAD)
+current_hash=$(git rev-parse main)
 latest_hash=$(git ls-remote origin -h refs/heads/main | cut -f1)
 
 if [ "$current_hash" != "$latest_hash" ]; then
