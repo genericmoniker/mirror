@@ -6,10 +6,10 @@
 set -euo pipefail
 
 # Log all output
-exec 1> >(logger --tag called-update --priority user.info)
-exec 2> >(logger --tag called-update --priority user.error)
+exec 1> >(logger --tag autoupdate --priority user.info)
+exec 2> >(logger --tag autoupdate --priority user.error)
 
-echo "Starting update check..."
+echo "==> Starting update check..."
 
 # Run from this script's parent directory
 cd "$(dirname "$0")/.."
@@ -21,7 +21,7 @@ if [ "$current_hash" != "$latest_hash" ]; then
     echo "Application update available. Updating to commit hash ${latest_hash}..."
     git pull || { echo "Failed to pull latest changes"; exit 1; }
     ./install.sh || { echo "Failed to run install script"; exit 1; }
-    echo "Application updated."
+    echo "==> Application updated. <=="
 else
     echo "Application is up to date at commit hash ${current_hash}."
 fi
