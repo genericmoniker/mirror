@@ -26,10 +26,6 @@ ${HOME}/.local/bin/uv sync --no-dev
 # Make the instance directory if it doesn't exist
 mkdir -p ~/mirror/instance
 
-# Install the autostart desktop file
-mkdir -p ~/.config/autostart/
-cp ~/mirror/system/install/browser.desktop ~/.config/autostart/
-
 # Enable lingering (user services w/o the user logged in)
 loginctl enable-linger
 
