@@ -15,9 +15,10 @@ fi
 sudo apt-get update
 sudo apt-get install -y \
     build-essential \
-    python3-dev \
+    dex \
     libffi-dev \
     libssl-dev \
+    python3-dev \
 
 # Install the mirror server dependencies
 cd ~/mirror
@@ -60,3 +61,7 @@ systemctl --user enable --now screenoff.timer
 systemctl --user enable --now autoupdate.timer
 sudo systemctl daemon-reload
 sudo systemctl enable --now reboot.timer
+
+# Restart the browser to pick up any changes
+pkill -f chromium || true
+dex ~/.config/autostart/browser.desktop || true
