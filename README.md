@@ -11,7 +11,7 @@ you.
 
 ## Raspberry Pi Setup
 
-Using Raspberry Pi OS Bookworm on a Pi Model 3 B+
+Using Raspberry Pi OS Bookworm on a Pi Model 5
 
 Note: Some of the scripts assume that the user is "pi" and will require editing
 if the device is set up with a differently named user.
@@ -21,29 +21,19 @@ with a mouse attached. Go to the Raspberry Pi menu > Preferences > Screen
 Configuration. Pick your display from the Screens drop-down menu, and choose the
 Rotation value you need.
 
-Install Docker following the instructions for Raspbian from the
-[documentation](https://docs.docker.com/engine/install/debian),
-including adding your user to the `docker` group in the [post install
-instructions](https://docs.docker.com/engine/install/linux-postinstall/).
-
-Next copy all the files in the "system" directory of this repo to the Pi, such
-as with:
+On the Pi device, clone this repo with git in the home directory:
 
 ```
-scp -rp system pi-hostname-or-ip:mirror
+git clone https://github.com/genericmoniker/mirror.git
 ```
 
-Then on the Pi device install the various system files:
+Then install the various system files:
 
 ```
 ~/mirror/system/install.sh
 ```
 
-For the first start, or to manually update the mirror server container:
-
-```
-~/mirror/system/run.sh
-```
+The mirror server and browser in kiosk mode should start automatically.
 
 ## Mirror Configuration
 
@@ -58,6 +48,8 @@ left = ["weather", "activity", "now_playing"]
 right = ["clock", "calendars-agenda", "calendars-coming_up", "calendars-countdown"]
 bottom = ["word_ptbr", "mail", "positivity"]
 ```
+
+TODO: Update the following...
 
 To do any configuration that plugins might need, run the config utility. This
 can be done in a couple of ways:
