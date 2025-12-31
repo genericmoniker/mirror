@@ -1,47 +1,65 @@
 #!/usr/bin/env bash
 
 # Install the various system components.
-# Maybe expand to install Docker?
 
 set -x
 set -euo pipefail
 
+# Install uv if it isn't already installed
+if ! command -v uv &> /dev/null; then
+    echo "Installing uv..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
+
+# Install required system packages
+sudo apt-get update
+sudo apt-get install -y \
+    build-essential \
+    libffi-dev \
+    libssl-dev \
+    python3-dev \
+
+# Install the mirror server dependencies
+cd ~/mirror
+${HOME}/.local/bin/uv sync --no-dev
+
 # Make the instance directory if it doesn't exist
 mkdir -p ~/mirror/instance
-
-# Install the autostart script
-mkdir -p ~/.config/lxsession/LXDE-pi/
-cp ~/mirror/system/install/autostart ~/.config/lxsession/LXDE-pi/
 
 # Enable lingering (user services w/o the user logged in)
 loginctl enable-linger
 
+# We're using --user systemd services, so make sure the user systemd directory exists
+mkdir -p ~/.config/systemd/user/
+
 # Install the mirror service
-mkdir -p ~/.config/systemd/user
 cp ~/mirror/system/install/mirror-server.service ~/.config/systemd/user/
-systemctl --user enable mirror-server
 
 # Install the screen on/off services
 cp ~/mirror/system/install/screenon.service  ~/.config/systemd/user/
 cp ~/mirror/system/install/screenon.timer    ~/.config/systemd/user/
 cp ~/mirror/system/install/screenoff.service ~/.config/systemd/user/
 cp ~/mirror/system/install/screenoff.timer   ~/.config/systemd/user/
-systemctl --user enable screenon.timer
-systemctl --user start  screenon.timer
-systemctl --user enable screenoff.timer
-systemctl --user start  screenoff.timer
 
 # Install the autoupdate service
 cp ~/mirror/system/install/autoupdate.service ~/.config/systemd/user/
 cp ~/mirror/system/install/autoupdate.timer   ~/.config/systemd/user/
-systemctl --user enable autoupdate.timer
-systemctl --user start  autoupdate.timer
 
-# Install the reboot service (requires sudo)
+# Install the browser service
+cp ~/mirror/system/install/browser.service ~/.config/systemd/user/
+
+# Install the reboot service (requires sudo -- passwordless sudo is usually set
+# up automatically by Raspberry Pi OS)
 sudo cp ~/mirror/system/install/reboot.service /etc/systemd/system/
 sudo cp ~/mirror/system/install/reboot.timer   /etc/systemd/system/
-sudo systemctl enable reboot.timer
-sudo systemctl start  reboot.timer
 
-# Install unclutter to hide the mouse cursor when it is not being used
-sudo apt-get install unclutter -y
+# Enable/restart all of the services
+systemctl --user daemon-reload
+systemctl --user enable mirror-server && systemctl --user restart mirror-server
+systemctl --user enable --now screenon.timer && systemctl --user restart screenon.timer
+systemctl --user enable --now screenoff.timer && systemctl --user restart screenoff.timer
+systemctl --user enable --now autoupdate.timer && systemctl --user restart autoupdate.timer
+systemctl --user enable --now browser.service && systemctl --user restart browser.service
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now reboot.timer && sudo systemctl restart reboot.timer

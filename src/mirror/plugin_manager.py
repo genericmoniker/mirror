@@ -1,9 +1,8 @@
 """Plugin management module."""
 
-import contextlib
 import logging
 import tomllib
-from collections.abc import Generator, Iterator
+from collections.abc import Iterator
 from pathlib import Path
 
 from mirror.event_bus import EventBus
@@ -39,14 +38,26 @@ class PluginManager:
     def startup(self) -> None:
         """Start all discovered plugins."""
         for plugin in self._discovered_plugins:
-            with plugin_error_logger(plugin.name, "start_plugin"):
+            try:
                 plugin.startup(self.get_plugin_context(plugin.name))
+            except Exception as ex:  # noqa: BLE001
+                _logger.error(  # noqa: TRY400
+                    "Error from plugin '%s' (start_plugin): %s",
+                    plugin.name,
+                    ex,
+                )
 
     def shutdown(self) -> None:
         """Stop all discovered plugins."""
         for plugin in self._discovered_plugins:
-            with plugin_error_logger(plugin.name, "stop_plugin"):
+            try:
                 plugin.shutdown(self.get_plugin_context(plugin.name))
+            except Exception as ex:  # noqa: BLE001
+                _logger.error(  # noqa: TRY400
+                    "Error from plugin '%s' (stop_plugin): %s",
+                    plugin.name,
+                    ex,
+                )
 
     def get_plugin_context(self, plugin_name: str) -> PluginContext:
         """Get the PluginContext for a specific plugin by name."""
@@ -67,16 +78,3 @@ class PluginManager:
                 return plugin.render(context=None, widget=widget_name, n=n)
         msg = f"Unknown plugin: {plugin_name}"
         raise ValueError(msg)
-
-
-@contextlib.contextmanager
-def plugin_error_logger(name: str, action: str) -> Generator:
-    try:
-        yield
-    except Exception as ex:  # noqa: BLE001
-        _logger.error(  # noqa: TRY400
-            "Error from plugin '%s' (%s): %s",
-            name,
-            action,
-            ex,
-        )

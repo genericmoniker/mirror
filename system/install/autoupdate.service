@@ -3,4 +3,5 @@ Description=Auto-update check
 
 [Service]
 Type=oneshot
-ExecStart=/home/pi/mirror/system/run.sh
+WorkingDirectory=%h/mirror/system/install
+ExecStart=%h/mirror/system/install/autoupdate.sh

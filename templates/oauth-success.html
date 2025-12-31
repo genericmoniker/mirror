@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Authorization Successful</title>
+    <link rel="icon" href="{{ url_for('static', path='favicon.ico') }}" type="image/x-icon" />
+    <link rel="stylesheet" href="{{ url_for('static', path='main.css') }}">
+    <meta name="google" content="notranslate">
+    <script>
+        // Close the window after 5 seconds
+        setTimeout(function() {
+            window.close();
+        }, 5000);
+    </script>
+</head>
+
+<body>
+    <main style="text-align: center; margin-top: 100px;">
+        <h1>✓ Authorization Successful!</h1>
+        <p>This page will close automatically in 5 seconds.</p>
+    </main>
+</body>
+
+</html>

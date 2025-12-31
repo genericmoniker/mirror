@@ -1,39 +1,31 @@
 # See https://pre-commit.com/ for usage and config
-default_stages: [commit]
+
 repos:
 
-# Make sure the lock file is up-to-date with pyproject.toml.
-- repo: https://github.com/pdm-project/pdm
-  rev: 2.22.1
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.14.10
   hooks:
-    - id: pdm-lock-check
+    # Run the linter.
+    - id: ruff-check
+      args: [ --fix ]
+    # Run the formatter.
+    - id: ruff-format
+
+
+
+# Make sure the lock file is up-to-date with pyproject.toml.
+- repo: https://github.com/astral-sh/uv-pre-commit
+  # uv version.
+  rev: 0.9.21
+  hooks:
+    - id: uv-lock
 
 - repo: local
   hooks:
-  - id: ruff
-    name: ruff
-    stages: [commit]
-    language: system
-    entry: pdm run ruff check --fix --exit-non-zero-on-fix --respect-gitignore
-    types: [python]
-
-  - id: black
-    name: black
-    language: system
-    entry: pdm run black --quiet
-    types: [python]
-
-  - id: mypy
-    name: mypy
-    language: system
-    entry: pdm run mypy
-    types: [python]
-    pass_filenames: false
-
   - id: pytest
     name: pytest
     language: system
-    entry: pdm run pytest tests
+    entry: uv run pytest tests
     types: [python]
     pass_filenames: false
 

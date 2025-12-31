@@ -1,0 +1,14 @@
+[Unit]
+Description=Mirror Browser
+After=graphical-session.target mirror-server.service
+Wants=mirror-server.service
+
+[Service]
+Type=simple
+ExecStartPre=/bin/bash -c 'until curl --output /dev/null --silent --head --fail http://localhost:5000/ready; do sleep 1; done'
+ExecStart=/usr/bin/chromium --incognito --noerrdialogs --disable-session-crashed-bubble --disable-infobars --kiosk http://localhost:5000
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target

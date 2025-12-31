@@ -17,30 +17,42 @@
     <script src="{{ url_for('static', path='htmx.min.js') }}"></script>
     <script src="{{ url_for('static', path='sse.js') }}"></script>
     <script src="{{ url_for('static', path='class-tools.js') }}"></script>
+    <script src="{{ url_for('static', path='cursor-hide.js') }}"></script>
     {# Disable Chromium's kiosk-unfriendly Translate infobar. #}
     <meta name="google" content="notranslate">
+    {# Auto-refresh when no widgets configured #}
+    {% if not layout.left and not layout.right and not layout.bottom %}
+    <meta http-equiv="refresh" content="30">
+    {% endif %}
 </head>
 
 {% from "macros.html" import add_widgets %}
 {% from "macros.html" import add_widget %}
 
 <body>
-    {#
-    Make the single SSE connection for the entire page.
-    Widgets swap in their content in response to SSE events.
-    #}
-    <main hx-ext="sse" sse-connect="/events">
-        <section id="left">
-            {{ add_widgets(layout.left) }}
-        </section>
-        <section id="right">
-            {{ add_widgets(layout.right) }}
-        </section>
-        <section id="bottom">
-            {% include "rotator.html" %}
-        </section>
-        {{ add_widget("connectivity") }}
-    </main>
+    {% if not layout.left and not layout.right and not layout.bottom %}
+        <main>
+            <h1>No widgets configured</h1>
+            <p>The mirror is working but no widgets are configured in the configuration file.</p>
+        </main>
+    {% else %}
+        {#
+        Make the single SSE connection for the entire page.
+        Widgets swap in their content in response to SSE events.
+        #}
+        <main hx-ext="sse" sse-connect="/events">
+            <section id="left">
+                {{ add_widgets(layout.left) }}
+            </section>
+            <section id="right">
+                {{ add_widgets(layout.right) }}
+            </section>
+            <section id="bottom">
+                {% include "rotator.html" %}
+            </section>
+            {{ add_widget("connectivity") }}
+        </main>
+    {% endif %}
 </body>
 
 </html>
