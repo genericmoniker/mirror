@@ -68,9 +68,11 @@ async def oauth_redirect(request: Request) -> Response:
         code=code,
         state=state,
     )
-    return Response(
-        content="Authorization successful!",
-        status_code=200,
+
+    template_context = build_template_context(request)
+    return request.app.state.templates.TemplateResponse(
+        "oauth-success.html",
+        template_context,
         background=task,
     )
 
