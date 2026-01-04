@@ -111,7 +111,7 @@ class _AuthHTTPServer:
     """
 
     class _AuthServerHandler(BaseHTTPRequestHandler):
-        def do_GET(self) -> None:  # noqa: N802
+        def do_GET(self) -> None:
             self.send_response(200)
             self.end_headers()
             if _get_authorize_response_error(self.path):  # path includes query string

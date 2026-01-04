@@ -2,16 +2,18 @@
 
 from dataclasses import dataclass
 
+from mirror.plugin_context import PluginContext as BasePluginContext
+
 
 @dataclass
 class WidgetUpdate:
     """A widget update."""
 
-    widget_name: str
+    widget_name: str | None
     data: dict
 
 
-class PluginContext:
+class PluginContext(BasePluginContext):
     """A PluginContext test double."""
 
     def __init__(self) -> None:
@@ -19,7 +21,7 @@ class PluginContext:
         self.updates = []
 
     @property
-    def update(self) -> WidgetUpdate | None:
+    def update(self) -> WidgetUpdate:
         """Return the most recent widget update."""
         assert self.updates, "No widget updates"
         return self.updates[-1]

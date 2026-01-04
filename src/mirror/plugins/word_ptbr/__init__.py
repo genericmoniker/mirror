@@ -6,6 +6,7 @@ from datetime import timedelta
 
 import httpx
 from defusedxml import ElementTree
+
 from mirror.plugin_context import PluginContext
 
 REFRESH_INTERVAL = timedelta(hours=8)

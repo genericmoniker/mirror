@@ -12,6 +12,7 @@ from functools import partial
 
 import httpx
 from authlib.integrations.httpx_client import AsyncOAuth2Client
+
 from mirror.plugin_configure_context import PluginConfigureContext
 from mirror.plugin_context import PluginContext
 

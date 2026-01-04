@@ -1,7 +1,8 @@
-# ruff: noqa: ANN201, D100, S101
+# ruff: noqa: ANN201
 from datetime import datetime
 
 from cryptography.fernet import Fernet
+
 from mirror.plugin_context import PluginDatabase
 
 

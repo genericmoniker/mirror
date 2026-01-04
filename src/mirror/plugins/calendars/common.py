@@ -15,7 +15,7 @@ COMING_UP_FILTER = "coming-up-filter"
 SUBORDINATE_FILTER = "subordinate-filter"
 
 
-class Event(dict):
+class Event(dict):  # noqa: PLW1641
     """Event after reshaping for the client."""
 
     def __eq__(self, value: object) -> bool:
@@ -42,7 +42,7 @@ async def refresh_data(
 
     :param db: Database dict.
     :param get_events: Callable that can fetch events from a calendar service.
-    :param list_args: Arguments to pass to the `get_events_func`.
+    :param list_args: Arguments to pass to the `get_events` callable.
     :param filter_func: Callable that can filter out individual events. The function
         should accept an event and return True to include it or False to exclude it. If
         unspecified, all events will be included.

@@ -4,6 +4,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import httpx
+
 from mirror.plugin_context import PluginContext
 
 REFRESH_INTERVAL = timedelta(seconds=60)

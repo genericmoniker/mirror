@@ -1,6 +1,5 @@
 from mirror.plugins.calendars import coming_up
 from mirror.plugins.calendars.common import SUBORDINATE_FILTER
-
 from mirrortests.doubles.plugin_context import PluginContext
 from mirrortests.plugins.calendars.common import create_all_day_event
 
