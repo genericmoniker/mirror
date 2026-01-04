@@ -32,6 +32,23 @@ async def test_duplicates_collapsed(context: PluginContext) -> None:
     assert len(context.update.data["items"]) == 1
 
 
+async def test_duplicates_collapsed_different_timezone(context: PluginContext) -> None:
+    """Duplicate events on different calendars are collapsed into a single item.
+
+    This is true even if the events are in different time zones.
+    """
+
+    async def get_events(*_args, **_kwargs) -> list[dict]:
+        return [
+            create_event(calendar_id="foo@test.com", start="2026-01-04T09:00:00-07:00"),
+            create_event(calendar_id="bar@test.com", start="2026-01-04T10:00:00-06:00"),
+        ]
+
+    await agenda.refresh(context, get_events)
+
+    assert len(context.update.data["items"]) == 1
+
+
 async def test_current_event(context: PluginContext) -> None:
     """An event happening right now is marked as current."""
 

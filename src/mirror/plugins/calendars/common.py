@@ -3,6 +3,7 @@
 import asyncio
 import logging
 from collections.abc import Callable, Iterable
+from datetime import datetime
 
 from .google_calendar import CredentialsError
 
@@ -83,6 +84,7 @@ def reshape_events(events: Iterable[dict]) -> dict:
     """Optimize events for clients."""
     items = []
     for event in events:
+        _event_to_local_time(event)
         new_event = Event(
             summary=event.get("summary", "(no summary)"),
             start=event["start"],
@@ -98,3 +100,28 @@ def reshape_events(events: Iterable[dict]) -> dict:
             items.append(new_event)
 
     return {"items": items}
+
+
+def _event_to_local_time(event: dict) -> None:
+    """Convert event start and end time strings to a local datetime, in-place.
+
+    For all-day events, no conversion is done.
+
+    Example event start and end format (for time-specific events):
+
+    {'dateTime': '2026-01-04T12:00:00-07:00', 'timeZone': 'America/Denver'}
+
+    or (for all-day events, no time zone at all):
+
+    {'date': '2026-01-04'}
+
+    Note that dateTime includes the time zone offset, but there is also a timeZone
+    field, so we can know the original time zone if needed.
+    """
+    start = event["start"]
+    end = event["end"]
+    if "dateTime" in event["start"]:
+        start_dt = datetime.fromisoformat(event["start"]["dateTime"]).astimezone()
+        end_dt = datetime.fromisoformat(event["end"]["dateTime"]).astimezone()
+        start["dateTime"] = start_dt
+        end["dateTime"] = end_dt

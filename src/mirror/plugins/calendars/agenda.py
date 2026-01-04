@@ -69,9 +69,9 @@ def _reshape_item(item: dict, db: dict) -> dict:
             "current": False,
         }
 
-    start_time = datetime.fromisoformat(item["start"]["dateTime"])
-    end_time = datetime.fromisoformat(item["end"]["dateTime"])
-    now = datetime.now(tz=start_time.tzinfo)
+    start_time = item["start"]["dateTime"]
+    end_time = item["end"]["dateTime"]
+    now = datetime.now().astimezone()
     return data | {
         "start": start_time.strftime("%-I:%M %p"),
         "summary": item["summary"],
