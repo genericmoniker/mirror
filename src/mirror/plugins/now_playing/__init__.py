@@ -136,12 +136,20 @@ def _transform_currently_playing_track(response: httpx.Response) -> dict:
 
     raw = response.json()
 
+    # When something is playing, the "item" object may be:
+    # 1. None, which is currently the case for audio books -- no API support for info.
+    # 2. A track object for music information.
+    # 3. An episode object for podcast information.
+    item = raw.get("item")
+    if not item:
+        return {}
+
     return {
-        "name": raw["item"]["name"],
-        "artists": [artist["name"] for artist in raw["item"]["artists"]],
-        "duration_ms": raw["item"]["duration_ms"],
+        "name": item["name"],
+        "artists": [artist["name"] for artist in item["artists"]],
+        "duration_ms": item["duration_ms"],
         "progress_ms": raw["progress_ms"],
-        "is_playing": raw["is_playing"],
+        "is_playing": raw["is_playing"],  # May be paused at the moment if False.
     }
 
 
