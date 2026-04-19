@@ -100,7 +100,7 @@ async def _refresh(context: PluginContext) -> None:
         except httpx.TransportError as ex:
             # https://www.python-httpx.org/exceptions/
             context.vote_disconnected(ex)
-            _logger.exception("Network error getting weather data.")
+            _logger.error("Network error getting weather data. %s", ex)  # noqa: TRY400
         except Exception:
             _logger.exception("Error getting weather data.")
         await sleep(REFRESH_INTERVAL.total_seconds())
