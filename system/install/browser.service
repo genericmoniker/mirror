@@ -5,10 +5,13 @@ Wants=mirror-server.service
 
 [Service]
 Type=simple
-ExecStartPre=/bin/bash -c 'until curl --output /dev/null --silent --head --fail http://localhost:5000/ready; do sleep 1; done'
+Environment=WAYLAND_DISPLAY=wayland-0
+Environment=XDG_RUNTIME_DIR=/run/user/%U
+TimeoutStartSec=300
+ExecStartPre=/bin/bash -c 'for i in {1..300}; do curl --output /dev/null --silent --head --fail http://localhost:5000/ready && exit 0; sleep 1; done; exit 1'
 ExecStart=/usr/bin/chromium --incognito --noerrdialogs --disable-session-crashed-bubble --disable-infobars --kiosk http://localhost:5000
 Restart=on-failure
 RestartSec=5
 
 [Install]
-WantedBy=graphical-session.target
+WantedBy=default.target
