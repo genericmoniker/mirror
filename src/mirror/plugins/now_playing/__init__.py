@@ -4,23 +4,28 @@ Spotify authorization guide:
 https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
 """
 
+import asyncio
+import base64
+import contextlib
 import json
 import logging
-from asyncio import Task, create_task, sleep
+import secrets
+from asyncio import create_task, sleep
 from datetime import timedelta
 from functools import partial
+from urllib.parse import urlencode
 
 import httpx
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 
-from mirror.plugin_configure_context import PluginConfigureContext
+from mirror.errors import AuthError
 from mirror.plugin_context import PluginContext
 
 API_URL = "https://api.spotify.com/"
 AUTH_URL = "https://accounts.spotify.com/authorize"
 TOKEN_URL = "https://accounts.spotify.com/api/token"
 SCOPE = "user-read-currently-playing"
-REDIRECT_URI = "http://localhost:5050/auth"
+REDIRECT_URI = "http://127.0.0.1:5000/oauth/now_playing"  # http requires loopback IP
 
 REFRESH_INTERVAL = timedelta(seconds=30)
 
@@ -29,66 +34,80 @@ _state = {}
 
 
 def start_plugin(context: PluginContext) -> None:
-    if context.db.get("client_id"):
-        task = create_task(_refresh(context), name="now_playing.refresh")
-        task.add_done_callback(_task_done)
-        _state["task"] = task
-    else:
-        _logger.info("Plugin not configured.")
+    if not context.config.get("client_id"):
+        _logger.info("Plugin not configured (missing client_id in config).")
+        return
+    task = create_task(_refresh(context), name="now_playing.refresh")
+    _state["task"] = task
 
 
 def stop_plugin(context: PluginContext) -> None:  # noqa: ARG001
     task = _state.get("task")
     if task:
-        task.remove_done_callback(_task_done)
         task.cancel()
 
 
-def _task_done(task: Task) -> None:
-    _logger.warning("Now playing task unexpectedly done: %s", task.exception())
-
-
-def configure_plugin(config_context: PluginConfigureContext) -> None:
-    db = config_context.db
-    oauth = config_context.oauth
-    print("Now Playing Plugin Set Up")
-    client_id = input("Spotify app client ID: ").strip()
-    client_secret = input("Spotify app client secret: ").strip()
-
-    # FYI - Spotify auth also supports PKCE, which if used doesn't ever require
-    # using the client secret.
-
-    try:
-        response, state = oauth.authorize(
-            AUTH_URL,
-            client_id,
-            None,
-            SCOPE,
-            REDIRECT_URI,
-            show_dialog=True,
-        )
-        token = oauth.fetch_token(
+async def set_authorization_code(context: PluginContext, code: str, state: str) -> None:
+    stored_state = context.db.get("oauth_state")
+    if not stored_state or stored_state != state:
+        raise AuthError("OAuth state mismatch for now_playing.")
+    client_id = context.config["client_id"]
+    client_secret = context.config["client_secret"]
+    credentials = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
+    async with httpx.AsyncClient(timeout=10) as client:
+        response = await client.post(
             TOKEN_URL,
-            client_id,
-            client_secret,
-            REDIRECT_URI,
-            response,
-            state,
+            headers={"Authorization": f"Basic {credentials}"},
+            data={
+                "grant_type": "authorization_code",
+                "code": code,
+                "redirect_uri": REDIRECT_URI,
+            },
         )
-        db["client_id"] = client_id
-        db["client_secret"] = client_secret
-        db["state"] = state
-        db["token"] = json.dumps(token)
-        print("Authorization succeeded")
-    except Exception as ex:  # noqa: BLE001
-        print("Authorization failed:", ex)
+        response.raise_for_status()
+        token = response.json()
+    context.db["token"] = json.dumps(token)
+    del context.db["oauth_state"]
+    _logger.info("Spotify authorization successful.")
+    _wake_refresh_loop()
+
+
+def _get_auth_url(context: PluginContext) -> str:
+    state = context.db.get("oauth_state")
+    if not state:
+        state = secrets.token_urlsafe(16)
+        context.db["oauth_state"] = state
+    params = {
+        "response_type": "code",
+        "client_id": context.config["client_id"],
+        "scope": SCOPE,
+        "redirect_uri": REDIRECT_URI,
+        "state": state,
+        "show_dialog": "true",
+    }
+    return AUTH_URL + "?" + urlencode(params)
+
+
+def _wake_refresh_loop() -> None:
+    event = _state.get("wake_event")
+    if event:
+        event.set()
 
 
 async def _refresh(context: PluginContext) -> None:
+    wake_event = asyncio.Event()
+    _state["wake_event"] = wake_event
     while True:
         sleep_time = REFRESH_INTERVAL.total_seconds()
         try:
-            response = await _get_currently_playing(context.db)
+            if not context.db.get("token"):
+                auth_url = _get_auth_url(context)
+                await context.widget_updated(
+                    {"login_required": True, "auth_url": auth_url}
+                )
+                await sleep(sleep_time)
+                continue
+            response = await _get_currently_playing(context)
             data = _transform_currently_playing_track(response)
             await context.widget_updated(data)
             context.vote_connected()
@@ -100,18 +119,20 @@ async def _refresh(context: PluginContext) -> None:
         except Exception:
             _logger.exception("Error getting now playing data.")
         _logger.debug("sleep time: %s", sleep_time)
-        await sleep(sleep_time)
+        wake_event.clear()
+        with contextlib.suppress(TimeoutError):
+            await asyncio.wait_for(wake_event.wait(), timeout=sleep_time)
 
 
-async def _get_currently_playing(db: dict) -> httpx.Response:
+async def _get_currently_playing(context: PluginContext) -> httpx.Response:
     # We use the OAuth client, which is a subclass of httpx.AsyncClient,
     # to automatically send the authorization header and handle refresh
     # tokens.
-    token = json.loads(db["token"])
-    update_partial = partial(_update_token, db)
+    token = json.loads(context.db["token"])
+    update_partial = partial(_update_token, context.db)
     async with AsyncOAuth2Client(
-        client_id=db["client_id"],
-        client_secret=db["client_secret"],
+        client_id=context.config["client_id"],
+        client_secret=context.config["client_secret"],
         token=token,
         token_endpoint=TOKEN_URL,
         update_token=update_partial,

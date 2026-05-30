@@ -12,48 +12,69 @@ https://developers.google.com/identity/protocols/oauth2#expiration
 """
 
 import logging
+from datetime import UTC, datetime, timedelta
 from typing import Any
+from urllib.parse import urlencode
 
+import httpx
 from aiogoogle import Aiogoogle, HTTPError
 from aiogoogle.auth import UserCreds
 from aiogoogle.auth.creds import ClientCreds
-from google_auth_oauthlib.flow import InstalledAppFlow
 
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
+
+GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/auth"
+GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
+REDIRECT_URI = "http://localhost:5000/oauth/calendars"
 
 
 _logger = logging.getLogger(__name__)
 
 
-def obtain_user_permission(client_creds: dict) -> dict:
-    """Run the authorization flow to grant permission to access a user's calendar.
+def build_auth_url(client_id: str, state: str) -> str:
+    """Build the Google OAuth2 authorization URL."""
+    params = {
+        "client_id": client_id,
+        "redirect_uri": REDIRECT_URI,
+        "scope": " ".join(SCOPES),
+        "response_type": "code",
+        "access_type": "offline",
+        "prompt": "consent",
+        "state": state,
+    }
+    return GOOGLE_AUTH_URL + "?" + urlencode(params)
 
-    If the user doesn't authorize the application, this will just block...
 
-    :return: user credentials that can be used when calling `get_events`.
-    """
-    # We're using Google's synchronous OAuth library here instead of aiogoogle since:
-    #
-    # 1. Configuration doesn't need or benefit from parallelism
-    # 2. This handles the whole flow in just a couple of lines of code
-    #
-    # The creds dicts are mostly compatible between both libraries, but require some
-    #    conversion.
-    #
+async def exchange_code_for_creds(
+    client_id: str, client_secret: str, code: str
+) -> dict:
+    """Exchange an authorization code for user credentials."""
+    async with httpx.AsyncClient(timeout=10) as client:
+        response = await client.post(
+            GOOGLE_TOKEN_URL,
+            data={
+                "code": code,
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "redirect_uri": REDIRECT_URI,
+                "grant_type": "authorization_code",
+            },
+        )
+        response.raise_for_status()
+        token_data = response.json()
 
-    # Convert client creds from aiogoogle format:
-    client_creds = {"installed": client_creds}
+    expires_at = (
+        datetime.now(UTC) + timedelta(seconds=token_data["expires_in"])
+    ).isoformat()
 
-    flow = InstalledAppFlow.from_client_config(client_creds, SCOPES)
-    creds = flow.run_local_server(port=0).__getstate__()
-
-    # Convert user creds to aiogoogle format:
-    return UserCreds(
-        access_token=creds["token"],
-        refresh_token=creds["_refresh_token"],
-        expires_at=creds["expiry"].isoformat(),
-        token_uri=creds["_token_uri"],
-        token_type="Bearer",
+    return dict(
+        UserCreds(
+            access_token=token_data["access_token"],
+            refresh_token=token_data.get("refresh_token"),
+            expires_at=expires_at,
+            token_uri=GOOGLE_TOKEN_URL,
+            token_type="Bearer",
+        )
     )
 
 

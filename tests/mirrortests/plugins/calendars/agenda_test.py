@@ -77,7 +77,7 @@ async def test_current_event(context: PluginContext) -> None:
 async def test_subordinate_filter(context: PluginContext) -> None:
     """Events on subordinate calendars are marked as such."""
 
-    context.db[SUBORDINATE_FILTER] = "adria|caleen"
+    context.config[SUBORDINATE_FILTER] = "adria|caleen"
 
     async def get_events(*_args, **_kwargs) -> list[dict]:
         return [

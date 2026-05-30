@@ -11,6 +11,7 @@ from urllib.parse import urlencode
 import httpx
 from httpx import TransportError
 
+from mirror.errors import AuthError
 from mirror.plugin_context import PluginContext
 
 from .fitbit import AUTHORIZATION_URL, CredentialsError, get_access_token, get_activity
@@ -54,12 +55,10 @@ async def set_authorization_code(context: PluginContext, code: str, state: str) 
     # Figure out which person this is for, then fetch the access token.
     state_map = context.db.get(STATE_MAP, {})
     if not state_map:
-        _logger.error("OAuth state map is empty.")
-        return
+        raise AuthError("OAuth state map is empty.")
     name = state_map.pop(state, None)
     if not name:
-        _logger.error("OAuth state not found: %s", state)
-        return
+        raise AuthError(f"OAuth state not found: {state}")
     creds = _get_creds(context, name)
     async with httpx.AsyncClient(timeout=10) as client:
         access_token, refresh_token = await get_access_token(

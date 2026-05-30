@@ -4,7 +4,6 @@ import logging
 
 from sse_starlette.sse import EventSourceResponse
 from starlette.applications import Starlette
-from starlette.background import BackgroundTask
 from starlette.requests import Request
 from starlette.responses import Response
 from starlette.routing import Mount, Route
@@ -12,6 +11,7 @@ from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
 from mirror.diagnostics import log_task_stacks
+from mirror.errors import AuthError
 from mirror.event_bus import EventBus
 from mirror.layout import Layout
 from mirror.paths import INSTANCE_DIR, ROOT_DIR
@@ -62,18 +62,19 @@ async def oauth_redirect(request: Request) -> Response:
 
     context = plugins.get_plugin_context(plugin_name)
 
-    task = BackgroundTask(
-        plugin.set_authorization_code,
-        plugin_context=context,
-        code=code,
-        state=state,
-    )
+    try:
+        await plugin.set_authorization_code(
+            plugin_context=context, code=code, state=state
+        )
+    except AuthError as e:
+        _logger.exception("OAuth failed for plugin: %s", plugin_name)
+        return Response(
+            status_code=500, content=f"Error processing authorization code. {e}"
+        )
 
     template_context = build_template_context(request)
     return request.app.state.templates.TemplateResponse(
-        "oauth-success.html",
-        template_context,
-        background=task,
+        "oauth-success.html", template_context
     )
 
 

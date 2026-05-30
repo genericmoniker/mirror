@@ -1,6 +1,7 @@
 """Plugin module for getting events from the calendar agenda."""
 
 import asyncio
+import contextlib
 import logging
 import re
 from collections.abc import Callable
@@ -16,22 +17,36 @@ REFRESH_INTERVAL = timedelta(minutes=5)
 _logger = logging.getLogger(__name__)
 
 
-async def poll(context: PluginContext, get_events: Callable) -> None:
+async def poll(
+    context: PluginContext, get_events: Callable, wake_event: asyncio.Event
+) -> None:
     while True:
         try:
             await refresh(context, get_events)
-            await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
         except Exception:
             _logger.exception("Error getting agenda events.")
+        wake_event.clear()
+        with contextlib.suppress(TimeoutError):
+            await asyncio.wait_for(
+                wake_event.wait(), timeout=REFRESH_INTERVAL.total_seconds()
+            )
 
 
 async def refresh(context: PluginContext, get_events: Callable) -> None:
     data = await common.refresh_data(
-        context.db,
+        context,
         get_events,
         common.range_to_list_args(_get_agenda_event_range),
     )
-    await context.widget_updated(_reshape(data, context.db), "agenda")
+    if data.get("login_required"):
+        widget_data = {
+            "login_required": True,
+            "auth_url": common.get_auth_url(context),
+            "items": [],
+        }
+    else:
+        widget_data = _reshape(data, context.config)
+    await context.widget_updated(widget_data, "agenda")
 
 
 def _get_agenda_event_range() -> tuple[str, str]:
@@ -42,16 +57,16 @@ def _get_agenda_event_range() -> tuple[str, str]:
     return start.isoformat(), stop.isoformat()
 
 
-def _reshape(data: dict, db: dict) -> dict:
+def _reshape(data: dict, config: dict) -> dict:
     """Reshape the data for the template."""
     return {
-        "items": [_reshape_item(item, db) for item in data["items"]],
+        "items": [_reshape_item(item, config) for item in data["items"]],
     }
 
 
-def _reshape_item(item: dict, db: dict) -> dict:
+def _reshape_item(item: dict, config: dict) -> dict:
     data = {}
-    pattern = db.get(common.SUBORDINATE_FILTER)
+    pattern = config.get(common.SUBORDINATE_FILTER)
     if pattern and re.match(pattern, item["calendar_id"]):
         data["subordinate"] = True
     else:

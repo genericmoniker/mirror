@@ -11,14 +11,13 @@ from zoneinfo import ZoneInfo
 
 import httpx
 
-from mirror.plugin_configure_context import PluginConfigureContext
 from mirror.plugin_context import PluginContext
 
-# database keys:
-API_KEY = "api-key"
+# config keys (mirror.toml [plugin.weather])
+API_KEY = "api_key"
 LOCATION = "location"
-AIR_API_KEY = "air-api-key"
-AIR_LOCATION = "air-location"
+AIR_API_KEY = "air_api_key"
+AIR_LOCATION = "air_location"
 
 # Open Weather Map allows 1000 calls per day to their "One Call API". Leaving some room
 # for development where we might be making double the number of requests for a while on
@@ -38,17 +37,6 @@ _logger = logging.getLogger(__name__)
 _state = {}
 
 
-def configure_plugin(config_context: PluginConfigureContext) -> None:
-    db = config_context.db
-    print("Weather Plugin Set Up")
-    db[API_KEY] = input("Open Weather Map API key: ").strip()
-    db[LOCATION] = input("Weather location (lat,lon): ").strip()
-    db[AIR_API_KEY] = input("AirNow API key: ").strip()
-    db[AIR_LOCATION] = input("Zip Code: ").strip()
-    # TODO: General config setting implementation?
-    # TODO: Only require the user to enter the location once with conversion.
-
-
 def start_plugin(context: PluginContext) -> None:
     task = create_task(_refresh(context), name="weather.refresh")
     _state["task"] = task
@@ -66,8 +54,8 @@ async def _refresh(context: PluginContext) -> None:
     :return: dict of weather data.
     """
     while True:
-        key = context.db.get(API_KEY)
-        loc = context.db.get(LOCATION)
+        key = context.config.get(API_KEY)
+        loc = context.config.get(LOCATION)
         if not key or not loc:
             _logger.warning("Weather plugin not configured.")
             await sleep(CONFIG_REFRESH_INTERVAL.total_seconds())
@@ -84,8 +72,8 @@ async def _refresh(context: PluginContext) -> None:
         air_params = {
             "format": "application/json",
             "distance": 25,
-            "zipCode": context.db[AIR_LOCATION],
-            "API_KEY": context.db[AIR_API_KEY],
+            "zipCode": context.config[AIR_LOCATION],
+            "API_KEY": context.config[AIR_API_KEY],
         }
         try:
             async with httpx.AsyncClient(timeout=10) as client:

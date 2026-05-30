@@ -26,6 +26,15 @@ b,strong {
     font-weight: 700;
 }
 
+a {
+    color: #fff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
 .huge {
     font-size: 100px;
 }

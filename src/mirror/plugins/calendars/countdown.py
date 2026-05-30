@@ -1,6 +1,7 @@
 """Module for countdown to a calendar event."""
 
 import asyncio
+import contextlib
 import logging
 from collections.abc import Callable
 from datetime import timedelta
@@ -15,19 +16,24 @@ REFRESH_INTERVAL = timedelta(minutes=20)
 _logger = logging.getLogger(__name__)
 
 
-async def refresh(context: PluginContext, get_events: Callable) -> None:
+async def refresh(
+    context: PluginContext, get_events: Callable, wake_event: asyncio.Event
+) -> None:
     while True:
         try:
-            data = await _refresh_data(context.db, get_events)
-            if data:
+            data = await _refresh_data(context, get_events)
+            if data and not data.get("login_required"):
                 await context.widget_updated(_reshape(data), "countdown")
         except Exception:
             _logger.exception("Error getting countdown events.")
+        wake_event.clear()
+        with contextlib.suppress(TimeoutError):
+            await asyncio.wait_for(
+                wake_event.wait(), timeout=REFRESH_INTERVAL.total_seconds()
+            )
 
-        await asyncio.sleep(REFRESH_INTERVAL.total_seconds())
 
-
-async def _refresh_data(db: dict, get_events: Callable) -> dict | None:
+async def _refresh_data(context: PluginContext, get_events: Callable) -> dict | None:
     """Get events tagged in the calendar for long-term countdowns.
 
     This includes future events with "mirror-countdown" in them.
@@ -36,7 +42,7 @@ async def _refresh_data(db: dict, get_events: Callable) -> dict | None:
     query = "mirror-countdown"
     list_args = {"timeMin": start, "q": query}
     _logger.info("countdown start: %s", start)
-    return await common.refresh_data(db, get_events, list_args)
+    return await common.refresh_data(context, get_events, list_args)
 
 
 def _reshape(data: dict) -> dict:

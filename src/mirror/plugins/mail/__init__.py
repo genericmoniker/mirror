@@ -14,33 +14,21 @@ import functools
 import logging
 from collections.abc import Callable
 from datetime import datetime, timedelta
-from getpass import getpass
 
 from imapclient import IMAPClient
 
-from mirror.plugin_configure_context import PluginConfigureContext
 from mirror.plugin_context import PluginContext
 
-# database keys
-IMAP_HOST = "IMAP_HOST"
-IMAP_PORT = "IMAP_PORT"
-IMAP_USERNAME = "IMAP_USERNAME"
-IMAP_PASSWORD = "IMAP_PASSWORD"
+# config keys (mirror.toml [plugin.mail])
+IMAP_HOST = "imap_host"
+IMAP_PORT = "imap_port"
+IMAP_USERNAME = "imap_username"
+IMAP_PASSWORD = "imap_password"
 
 REFRESH_INTERVAL = timedelta(minutes=5)
 
 _logger = logging.getLogger(__name__)
 _state = {}
-
-
-def configure_plugin(config_context: PluginConfigureContext) -> None:
-    db = config_context.db
-    print("Mail Plugin Set Up")
-
-    db[IMAP_HOST] = input("IMAP email server host: ").strip()
-    db[IMAP_PORT] = input("IMAP email server port: ").strip()
-    db[IMAP_USERNAME] = input("Email username: ").strip()
-    db[IMAP_PASSWORD] = getpass("Email password: ").strip()
 
 
 def start_plugin(context: PluginContext) -> None:
@@ -57,7 +45,7 @@ def stop_plugin(_context: PluginContext) -> None:
 async def _refresh(context: PluginContext) -> None:
     while True:
         try:
-            emails = await _fetch_messages(context.db)
+            emails = await _fetch_messages(context.config)
             data = {"items": emails}
             await context.widget_updated(data)
             context.vote_connected()
@@ -80,7 +68,7 @@ def run_in_executor(func: Callable) -> Callable:
 
 
 @run_in_executor
-def _fetch_messages(db: dict) -> list[dict[str, str | list[str]]]:
+def _fetch_messages(config: dict) -> list[dict[str, str | list[str]]]:
     """Fetch email messages from the configured IMAP account.
 
     Only messages from the past week that have "Mirror" in the subject are
@@ -89,10 +77,10 @@ def _fetch_messages(db: dict) -> list[dict[str, str | list[str]]]:
     :return: list of dict with:
         {'sender': <sender>, 'body': <body>, 'body_lines': [<lines>]}.
     """
-    if not db.get(IMAP_HOST):
+    if not config.get(IMAP_HOST):
         return []
-    with IMAPClient(host=db.get(IMAP_HOST), port=db.get(IMAP_PORT)) as client:
-        client.login(db.get(IMAP_USERNAME), db.get(IMAP_PASSWORD))
+    with IMAPClient(host=config.get(IMAP_HOST), port=config.get(IMAP_PORT)) as client:
+        client.login(config.get(IMAP_USERNAME), config.get(IMAP_PASSWORD))
         client.select_folder("INBOX")
         since = (datetime.now() - timedelta(days=6)).date()  # noqa: DTZ005
         message_ids = client.search(

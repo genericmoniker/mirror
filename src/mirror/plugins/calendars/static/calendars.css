@@ -23,3 +23,10 @@
     height: 25px;
     filter: invert(100%);
 }
+
+#calendars-agenda .login-icon {
+    padding-top: 30px;
+    width: 30px;
+    height: 30px;
+    filter: invert(100%);
+}

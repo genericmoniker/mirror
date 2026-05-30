@@ -2,18 +2,24 @@
 
 import asyncio
 import logging
+import secrets
 from collections.abc import Callable, Iterable
 from datetime import datetime
 
-from .google_calendar import CredentialsError
+from .google_calendar import CredentialsError, build_auth_url
 
 _logger = logging.getLogger(__name__)
 
-# database keys:
-CLIENT_CREDENTIALS = "client-creds"
+# DB key for stored OAuth tokens:
 USER_CREDENTIALS = "user-creds"
-COMING_UP_FILTER = "coming-up-filter"
-SUBORDINATE_FILTER = "subordinate-filter"
+OAUTH_STATE_KEY = "oauth_state"
+
+# config keys (mirror.toml [plugin.calendars]):
+COMING_UP_FILTER = "coming_up_filter"
+SUBORDINATE_FILTER = "subordinate_filter"
+
+
+_credentials_lock = asyncio.Lock()
 
 
 class Event(dict):  # noqa: PLW1641
@@ -33,30 +39,40 @@ def range_to_list_args(event_range_func: Callable) -> dict:
     return {"timeMin": start, "timeMax": stop}
 
 
+def get_auth_url(context: object) -> str:
+    """Generate a Google OAuth2 authorization URL and store the state in the DB."""
+    state = secrets.token_urlsafe(16)
+    context.db[OAUTH_STATE_KEY] = state  # type: ignore[attr-defined]
+    return build_auth_url(context.config["client_id"], state)  # type: ignore[attr-defined]
+
+
 async def refresh_data(
-    db: dict,
+    context: object,
     get_events: Callable,
     list_args: dict,
     filter_func: Callable | None = None,
 ) -> dict:
     """Refresh calendar events.
 
-    :param db: Database dict.
+    :param context: PluginContext for user creds (db) and client creds (config).
     :param get_events: Callable that can fetch events from a calendar service.
     :param list_args: Arguments to pass to the `get_events` callable.
     :param filter_func: Callable that can filter out individual events. The function
         should accept an event and return True to include it or False to exclude it. If
         unspecified, all events will be included.
-    :return: dict with a list of events in "items", which may be empty if credentials
-        are missing or invalid.
+    :return: dict with a list of events in "items", or {"items": [], "login_required":
+        True} if credentials are missing or invalid.
     """
     try:
         # Lock so that only one caller needs to refresh the creds, which happens
         # behind the scenes when we call `get_events`.
-        async with asyncio.Lock():
-            user_creds = db.get(USER_CREDENTIALS)
-            client_creds = db.get(CLIENT_CREDENTIALS)
-            if user_creds is None or client_creds is None:
+        async with _credentials_lock:
+            user_creds = context.db.get(USER_CREDENTIALS)  # type: ignore[attr-defined]
+            client_creds = {
+                "client_id": context.config.get("client_id"),  # type: ignore[attr-defined]
+                "client_secret": context.config.get("client_secret"),  # type: ignore[attr-defined]
+            }
+            if user_creds is None or not client_creds["client_id"]:
                 raise CredentialsError  # noqa: TRY301
             events = await get_events(
                 user_creds,
@@ -65,14 +81,13 @@ async def refresh_data(
             )
 
             # Save potentially refreshed user creds.
-            db[USER_CREDENTIALS] = user_creds
+            context.db[USER_CREDENTIALS] = user_creds  # type: ignore[attr-defined]
 
         filter_func = filter_func or _no_filter
         return reshape_events(e for e in events if filter_func(e))
 
     except CredentialsError:
-        _logger.error("Please run `mirror-config --plugins=calendars`")  # noqa: TRY400
-        return {"items": []}
+        return {"items": [], "login_required": True}
 
 
 def _no_filter(_event: dict) -> bool:

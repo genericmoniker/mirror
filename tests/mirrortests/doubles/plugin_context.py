@@ -18,6 +18,7 @@ class PluginContext(BasePluginContext):
 
     def __init__(self) -> None:
         self.db = {}
+        self.config = {}
         self.updates = []
 
     @property

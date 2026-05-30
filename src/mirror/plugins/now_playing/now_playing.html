@@ -1,4 +1,10 @@
-{% if name %}
+{% if login_required %}
+<div id="component">
+    <a href="{{ auth_url }}" target="_blank">
+        <img src="/static/login.svg" alt="login" width="40px" /> Login to see your currently playing song
+    </a>
+</div>
+{% elif name %}
 <div id="component">
     <div id="text">
         {% if is_playing %}

@@ -1,9 +1,6 @@
 import pytest
 
-from mirror.plugins.calendars.common import (
-    CLIENT_CREDENTIALS,
-    USER_CREDENTIALS,
-)
+from mirror.plugins.calendars.common import USER_CREDENTIALS
 from mirrortests.doubles.plugin_context import PluginContext
 
 
@@ -11,5 +8,6 @@ from mirrortests.doubles.plugin_context import PluginContext
 def context() -> PluginContext:
     context = PluginContext()
     context.db[USER_CREDENTIALS] = "fake user creds"
-    context.db[CLIENT_CREDENTIALS] = "fake client creds"
+    context.config["client_id"] = "fake_client_id"
+    context.config["client_secret"] = "fake_client_secret"
     return context

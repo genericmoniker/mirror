@@ -19,7 +19,6 @@ dependencies = [
     "cryptography>=44.0.0",
     "httpx>=0.23.0",
     "aiogoogle>=2.1.0",
-    "google-auth-oauthlib>=0.4.2",
     "personalcapital>=1.0.1",
     "IMAPClient>=2.2.0",
     "Authlib>=0.15.5",
@@ -52,6 +51,7 @@ select = ["ALL"]
 ignore = [
     "ANN002",   # Missing type annotation for `*args`
     "ANN003",   # Missing type annotation for `**kwargs`
+    "COM812",   # Missing trailing comma in a list or tuple
     "D107",     # Missing docstring in `__init__`
     "D102",     # Missing docstring in public method
     "D103",     # Missing docstring in public function
@@ -59,6 +59,8 @@ ignore = [
     "D105",     # Missing docstring in magic method
     "D203",     # 1 blank line required before class docstring
     "D213",     # Multi-line docstring summary should start at the second line
+    "EM101",    # Exception must not use a string literal, assign to variable first
+    "EM102",    # Exception must not use an f-string literal, assign to variable first
     "FIX002",   # Line contains TODO, consider resolving the issue
     "PGH003",   # Use specific rule codes when ignoring type issues
     "RET504",   # Unnecessary variable assignment before `return` statement
@@ -69,6 +71,7 @@ ignore = [
     "TC003",    # Move third-party import to a type-checking block
     "TD002",    # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`
     "TD003",    # Missing issue link on the line following this TODO
+    "TRY003",   # Avoid long messages
     "TRY300",   # Consider moving this statement to an `else` block
 ]
 

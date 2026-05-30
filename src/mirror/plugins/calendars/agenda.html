@@ -1,3 +1,8 @@
+{% if login_required %}
+<a href="{{ auth_url }}" target="_blank">
+    <img class="login-icon" src="/static/login.svg" alt="login" /> Login to see your calendars
+</a>
+{% else %}
 <table>
     {% for item in items %}
     <tr>
@@ -12,3 +17,4 @@
     </tr>
     {% endfor %}
 </table>
+{% endif %}

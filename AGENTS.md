@@ -9,7 +9,6 @@ uv sync                                    # Install all dependencies
 uv run python src/mirror/main.py           # Start dev server (localhost:5000)
 uv run pytest                              # Run all tests
 uv run pytest -k <name>                    # Filter tests by name
-uv run python src/mirror/main_config.py    # Interactive plugin configuration CLI
 ```
 
 Type checking: `mypy` (configured in [mypy.ini](mypy.ini)). Linting: `ruff` (configured in [pyproject.toml](pyproject.toml)).
@@ -39,7 +38,6 @@ my_plugin/
 Optional hook functions exported from `__init__.py`:
 - `start_plugin(context: PluginContext)` — launch background async task
 - `stop_plugin(context: PluginContext)` — cancel tasks
-- `configure_plugin(context: PluginConfigureContext)` — interactive setup CLI
 - `set_authorization_code(plugin_context, code, state)` — OAuth callback
 
 **Multi-widget plugins** (e.g., `calendars`): widget name is `<plugin>-<widget>` in layout config (e.g., `calendars-agenda`). Pass `widget_name=` to `context.widget_updated()`. Template filename matches widget name: `agenda.html`.
@@ -55,7 +53,7 @@ Optional hook functions exported from `__init__.py`:
 
 - Tests live in [tests/mirrortests/](tests/mirrortests/)
 - All tests are `async def` — `asyncio_mode = "auto"` in pytest config
-- Use [tests/mirrortests/doubles/plugin_context.py](tests/mirrortests/doubles/plugin_context.py) as the mock `PluginContext`; it collects updates in `context.update` instead of broadcasting via SSE
+- Use [tests/mirrortests/doubles/plugin_context.py](tests/mirrortests/doubles/plugin_context.py) as the mock `PluginContext`; it collects updates in `context.update` instead of broadcasting via SSE. Set `context.config` (dict) and `context.db` (dict) directly in tests.
 - Inject a fake data-fetcher function to avoid real network calls; see [tests/mirrortests/plugins/calendars/](tests/mirrortests/plugins/calendars/) for examples
 
 ## Configuration & Paths
