@@ -6,6 +6,8 @@ import secrets
 from collections.abc import Callable, Iterable
 from datetime import datetime
 
+from mirror.plugin_context import PluginContext
+
 from .google_calendar import CredentialsError, build_auth_url
 
 _logger = logging.getLogger(__name__)
@@ -39,15 +41,17 @@ def range_to_list_args(event_range_func: Callable) -> dict:
     return {"timeMin": start, "timeMax": stop}
 
 
-def get_auth_url(context: object) -> str:
+def get_auth_url(context: PluginContext) -> str:
     """Generate a Google OAuth2 authorization URL and store the state in the DB."""
-    state = secrets.token_urlsafe(16)
-    context.db[OAUTH_STATE_KEY] = state  # type: ignore[attr-defined]
-    return build_auth_url(context.config["client_id"], state)  # type: ignore[attr-defined]
+    state = context.db.get(OAUTH_STATE_KEY)
+    if not state:
+        state = secrets.token_urlsafe(16)
+        context.db[OAUTH_STATE_KEY] = state
+    return build_auth_url(context.config["client_id"], state)
 
 
 async def refresh_data(
-    context: object,
+    context: PluginContext,
     get_events: Callable,
     list_args: dict,
     filter_func: Callable | None = None,
@@ -67,10 +71,10 @@ async def refresh_data(
         # Lock so that only one caller needs to refresh the creds, which happens
         # behind the scenes when we call `get_events`.
         async with _credentials_lock:
-            user_creds = context.db.get(USER_CREDENTIALS)  # type: ignore[attr-defined]
+            user_creds = context.db.get(USER_CREDENTIALS)
             client_creds = {
-                "client_id": context.config.get("client_id"),  # type: ignore[attr-defined]
-                "client_secret": context.config.get("client_secret"),  # type: ignore[attr-defined]
+                "client_id": context.config.get("client_id"),
+                "client_secret": context.config.get("client_secret"),
             }
             if user_creds is None or not client_creds["client_id"]:
                 raise CredentialsError  # noqa: TRY301
@@ -81,7 +85,7 @@ async def refresh_data(
             )
 
             # Save potentially refreshed user creds.
-            context.db[USER_CREDENTIALS] = user_creds  # type: ignore[attr-defined]
+            context.db[USER_CREDENTIALS] = user_creds
 
         filter_func = filter_func or _no_filter
         return reshape_events(e for e in events if filter_func(e))
