@@ -3,7 +3,7 @@ from contextlib import suppress
 from datetime import timedelta
 from pathlib import Path
 
-import httpx
+import httpx2
 
 from mirror.plugin_context import PluginContext
 
@@ -30,12 +30,12 @@ async def _refresh(context: PluginContext) -> None:
     while True:
         data = {"connected": True, "error": ""}
         try:
-            async with httpx.AsyncClient(timeout=10) as client:
+            async with httpx2.AsyncClient(timeout=10) as client:
                 response = await client.get("https://api.ipify.org?format=json")
                 response.raise_for_status()
                 context.vote_connected()
                 data = response.json()
-        except httpx.RequestError as ex:
+        except httpx2.RequestError as ex:
             context.vote_disconnected(ex)
             data.update({"error": str(ex) or repr(ex)})
 

@@ -20,7 +20,7 @@ from base64 import b64encode
 from datetime import datetime
 from pathlib import Path
 
-import httpx
+import httpx2
 
 AUTHORIZATION_URL = "https://www.fitbit.com/oauth2/authorize"
 
@@ -58,22 +58,22 @@ async def _api_request(creds: dict, url_path: str) -> dict:
     if not access_token:
         msg = "No access token found in credentials."
         raise CredentialsError(msg)
-    async with httpx.AsyncClient(timeout=10) as client:
+    async with httpx2.AsyncClient(timeout=10) as client:
         url = "https://api.fitbit.com/1/user/-/" + url_path
         try:
             return await _do_resource_get(client, access_token, url)
-        except httpx.HTTPStatusError as ex:
+        except httpx2.HTTPStatusError as ex:
             if ex.response.status_code == 401:  # noqa: PLR2004
                 try:
                     access_token = await _refresh_access_token(client, creds)
                     return await _do_resource_get(client, access_token, url)
-                except httpx.HTTPStatusError as ex:
+                except httpx2.HTTPStatusError as ex:
                     raise CredentialsError(ex.response.json()) from ex
             raise
 
 
 async def get_access_token(
-    client: httpx.AsyncClient,
+    client: httpx2.AsyncClient,
     authorization_code: str,
     client_id: str,
     client_secret: str,
@@ -92,7 +92,7 @@ async def get_access_token(
     return data["access_token"], data["refresh_token"]
 
 
-async def _refresh_access_token(client: httpx.AsyncClient, creds: dict) -> str:
+async def _refresh_access_token(client: httpx2.AsyncClient, creds: dict) -> str:
     """Exchange a refresh token for a new access token and refresh token.
 
     The new tokens are stored in the creds dict and the access token is returned.
@@ -115,7 +115,7 @@ async def _refresh_access_token(client: httpx.AsyncClient, creds: dict) -> str:
 
 
 async def _do_resource_get(
-    client: httpx.AsyncClient,
+    client: httpx2.AsyncClient,
     access_token: str,
     url: str,
 ) -> dict:
@@ -127,7 +127,7 @@ async def _do_resource_get(
 
 
 async def _do_auth_post(
-    client: httpx.AsyncClient,
+    client: httpx2.AsyncClient,
     client_id: str,
     client_secret: str,
     post_data: dict,

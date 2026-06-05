@@ -16,7 +16,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 from urllib.parse import urlencode
 
-import httpx
+import httpx2
 from aiogoogle import Aiogoogle, HTTPError
 from aiogoogle.auth import UserCreds
 from aiogoogle.auth.creds import ClientCreds
@@ -49,7 +49,7 @@ async def exchange_code_for_creds(
     client_id: str, client_secret: str, code: str
 ) -> dict:
     """Exchange an authorization code for user credentials."""
-    async with httpx.AsyncClient(timeout=10) as client:
+    async with httpx2.AsyncClient(timeout=10) as client:
         response = await client.post(
             GOOGLE_TOKEN_URL,
             data={

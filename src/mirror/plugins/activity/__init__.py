@@ -8,8 +8,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from urllib.parse import urlencode
 
-import httpx
-from httpx import TransportError
+import httpx2
+from httpx2 import TransportError
 
 from mirror.errors import AuthError
 from mirror.plugin_context import PluginContext
@@ -60,7 +60,7 @@ async def set_authorization_code(context: PluginContext, code: str, state: str) 
     if not name:
         raise AuthError(f"OAuth state not found: {state}")
     creds = _get_creds(context, name)
-    async with httpx.AsyncClient(timeout=10) as client:
+    async with httpx2.AsyncClient(timeout=10) as client:
         access_token, refresh_token = await get_access_token(
             client,
             code,
@@ -130,7 +130,6 @@ async def _refresh(context: PluginContext) -> None:
             await context.widget_updated(data)
             context.vote_connected()
         except TransportError as ex:
-            # https://www.python-httpx.org/exceptions/
             context.vote_disconnected(ex)
             _logger.exception("Network error updating activity data.")
         except Exception:

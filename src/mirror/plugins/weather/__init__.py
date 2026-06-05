@@ -9,7 +9,7 @@ from asyncio import create_task, sleep
 from datetime import UTC, datetime, timedelta
 from zoneinfo import ZoneInfo
 
-import httpx
+import httpx2
 
 from mirror.plugin_context import PluginContext
 
@@ -76,7 +76,7 @@ async def _refresh(context: PluginContext) -> None:
             "API_KEY": context.config[AIR_API_KEY],
         }
         try:
-            async with httpx.AsyncClient(timeout=10) as client:
+            async with httpx2.AsyncClient(timeout=10) as client:
                 weather_response = await client.get(WEATHER_URL, params=weather_params)
                 air_response = await client.get(AIR_QUALITY_URL, params=air_params)
             weather_response.raise_for_status()
@@ -85,8 +85,7 @@ async def _refresh(context: PluginContext) -> None:
             data["air_quality"] = _reshape_air(air_response.json())
             await context.widget_updated(data)
             context.vote_connected()
-        except httpx.TransportError as ex:
-            # https://www.python-httpx.org/exceptions/
+        except httpx2.TransportError as ex:
             context.vote_disconnected(ex)
             _logger.error("Network error getting weather data. %s", ex)  # noqa: TRY400
         except Exception:

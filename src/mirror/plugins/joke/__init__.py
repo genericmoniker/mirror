@@ -4,7 +4,7 @@ import logging
 from asyncio import create_task, sleep
 from datetime import timedelta
 
-import httpx
+import httpx2
 
 from mirror.plugin_context import PluginContext
 
@@ -30,15 +30,14 @@ async def _refresh(context: PluginContext) -> None:
     url = "https://v2.jokeapi.dev/joke/Any?safe-mode"
     while True:
         try:
-            transport = httpx.AsyncHTTPTransport(retries=3)
-            async with httpx.AsyncClient(transport=transport, timeout=10) as client:
+            transport = httpx2.AsyncHTTPTransport(retries=3)
+            async with httpx2.AsyncClient(transport=transport, timeout=10) as client:
                 response = await client.get(url)
             response.raise_for_status()
             data = response.json()
             await context.widget_updated(data)
             context.vote_connected()
-        except httpx.TransportError as ex:
-            # https://www.python-httpx.org/exceptions/
+        except httpx2.TransportError as ex:
             context.vote_disconnected(ex)
             _logger.exception("Network error getting joke data.")
         except Exception:

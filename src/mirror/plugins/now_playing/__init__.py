@@ -12,11 +12,9 @@ import logging
 import secrets
 from asyncio import create_task, sleep
 from datetime import timedelta
-from functools import partial
 from urllib.parse import urlencode
 
-import httpx
-from authlib.integrations.httpx_client import AsyncOAuth2Client
+import httpx2
 
 from mirror.errors import AuthError
 from mirror.plugin_context import PluginContext
@@ -54,7 +52,7 @@ async def set_authorization_code(context: PluginContext, code: str, state: str) 
     client_id = context.config["client_id"]
     client_secret = context.config["client_secret"]
     credentials = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
-    async with httpx.AsyncClient(timeout=10) as client:
+    async with httpx2.AsyncClient(timeout=10) as client:
         response = await client.post(
             TOKEN_URL,
             headers={"Authorization": f"Basic {credentials}"},
@@ -112,8 +110,8 @@ async def _refresh(context: PluginContext) -> None:
             await context.widget_updated(data)
             context.vote_connected()
             sleep_time = _get_next_poll_seconds(data)
-        except httpx.TransportError as ex:
-            # https://www.python-httpx.org/exceptions/
+        except httpx2.TransportError as ex:
+            # https://www.python-httpx2.org/exceptions/
             context.vote_disconnected(ex)
             _logger.exception("Network error getting now playing data.")
         except Exception:
@@ -124,30 +122,49 @@ async def _refresh(context: PluginContext) -> None:
             await asyncio.wait_for(wake_event.wait(), timeout=sleep_time)
 
 
-async def _get_currently_playing(context: PluginContext) -> httpx.Response:
-    # We use the OAuth client, which is a subclass of httpx.AsyncClient,
-    # to automatically send the authorization header and handle refresh
-    # tokens.
+async def _get_currently_playing(context: PluginContext) -> httpx2.Response:
     token = json.loads(context.db["token"])
-    update_partial = partial(_update_token, context.db)
-    async with AsyncOAuth2Client(
-        client_id=context.config["client_id"],
-        client_secret=context.config["client_secret"],
-        token=token,
-        token_endpoint=TOKEN_URL,
-        update_token=update_partial,
-        timeout=10,
-    ) as client:
-        url = API_URL + "v1/me/player/currently-playing"
-        return await client.get(url)
+    client_id = context.config["client_id"]
+    client_secret = context.config["client_secret"]
+    url = API_URL + "v1/me/player/currently-playing"
+    async with httpx2.AsyncClient(timeout=10) as client:
+        response = await client.get(
+            url,
+            headers={"Authorization": f"Bearer {token['access_token']}"},
+        )
+        if response.status_code == 401:  # noqa: PLR2004
+            token = await _refresh_token(client, token, client_id, client_secret)
+            context.db["token"] = json.dumps(token)
+            response = await client.get(
+                url,
+                headers={"Authorization": f"Bearer {token['access_token']}"},
+            )
+        return response
 
 
-async def _update_token(db: dict, token: dict, **_kwargs: dict) -> None:
-    # update old token
-    db["token"] = json.dumps(token)
+async def _refresh_token(
+    client: httpx2.AsyncClient,
+    token: dict,
+    client_id: str,
+    client_secret: str,
+) -> dict:
+    credentials = base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
+    response = await client.post(
+        TOKEN_URL,
+        headers={"Authorization": f"Basic {credentials}"},
+        data={
+            "grant_type": "refresh_token",
+            "refresh_token": token["refresh_token"],
+        },
+    )
+    response.raise_for_status()
+    new_token = response.json()
+    if "refresh_token" not in new_token:
+        new_token["refresh_token"] = token["refresh_token"]
+    return new_token
 
 
-def _transform_currently_playing_track(response: httpx.Response) -> dict:
+def _transform_currently_playing_track(response: httpx2.Response) -> dict:
     """Create a simplified view of the currently playing track."""
     response.raise_for_status()
 

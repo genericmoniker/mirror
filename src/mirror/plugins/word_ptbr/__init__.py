@@ -4,7 +4,7 @@ import logging
 from asyncio import create_task, sleep
 from datetime import timedelta
 
-import httpx
+import httpx2
 from defusedxml import ElementTree
 
 from mirror.plugin_context import PluginContext
@@ -31,15 +31,14 @@ async def _refresh(context: PluginContext) -> None:
     url = "https://wotd.transparent.com/rss/pt-widget.xml"
     while True:
         try:
-            transport = httpx.AsyncHTTPTransport(retries=3)
-            async with httpx.AsyncClient(transport=transport, timeout=10) as client:
+            transport = httpx2.AsyncHTTPTransport(retries=3)
+            async with httpx2.AsyncClient(transport=transport, timeout=10) as client:
                 response = await client.get(url)
             response.raise_for_status()
             data = _parse(response.text)
             await context.widget_updated(data)
             context.vote_connected()
-        except httpx.TransportError as ex:
-            # https://www.python-httpx.org/exceptions/
+        except httpx2.TransportError as ex:
             context.vote_disconnected(ex)
             _logger.exception("Network error getting word-of-the-day data.")
         except Exception:
