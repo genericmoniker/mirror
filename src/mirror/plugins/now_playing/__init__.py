@@ -111,9 +111,16 @@ async def _refresh(context: PluginContext) -> None:
             context.vote_connected()
             sleep_time = _get_next_poll_seconds(data)
         except httpx2.TransportError as ex:
-            # https://www.python-httpx2.org/exceptions/
             context.vote_disconnected(ex)
             _logger.exception("Network error getting now playing data.")
+        except httpx2.HTTPStatusError as ex:
+            if ex.response.status_code == 401:  # noqa: PLR2004
+                # If we get here, it means that trying to use the refresh token failed.
+                # Clear the token to require reauthorization.
+                _logger.warning("Spotify needs reauthorization.")
+                context.db.pop("token", None)
+            else:
+                _logger.exception("HTTP error getting now playing data.")
         except Exception:
             _logger.exception("Error getting now playing data.")
         _logger.debug("sleep time: %s", sleep_time)
@@ -123,7 +130,7 @@ async def _refresh(context: PluginContext) -> None:
 
 
 async def _get_currently_playing(context: PluginContext) -> httpx2.Response:
-    token = json.loads(context.db["token"])
+    token: dict[str, str] = json.loads(context.db["token"])
     client_id = context.config["client_id"]
     client_secret = context.config["client_secret"]
     url = API_URL + "v1/me/player/currently-playing"
@@ -144,7 +151,7 @@ async def _get_currently_playing(context: PluginContext) -> httpx2.Response:
 
 async def _refresh_token(
     client: httpx2.AsyncClient,
-    token: dict,
+    token: dict[str, str],
     client_id: str,
     client_secret: str,
 ) -> dict:
