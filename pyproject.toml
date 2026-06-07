@@ -10,7 +10,6 @@ authors = [
 license = {text = "MIT"}
 requires-python = "==3.13.*"  # No cryptography wheel for 3.14 yet (as of 2025-12-30)
 dependencies = [
-    "starlette>=0.14.1",
     "uvicorn>=0.12.2",
     "gunicorn>=20.0.4",
     "sse-starlette>=0.6.1",
@@ -25,6 +24,7 @@ dependencies = [
     "jinja2>=3.1.2",
     "prompt-toolkit>=3.0.47",
     "httpx2>=2.3.0",
+    "starlette>=1.2.1",
 ]
 
 [dependency-groups]

@@ -1,6 +1,8 @@
 """The main entry point for the backend server."""
 
+import contextlib
 import logging
+from collections.abc import AsyncGenerator
 
 from sse_starlette.sse import EventSourceResponse
 from starlette.applications import Starlette
@@ -38,7 +40,7 @@ async def ready(request: Request) -> Response:  # noqa: ARG001
 async def rotator(request: Request) -> Response:
     app = request.app
     context = build_template_context(request)
-    return app.state.templates.TemplateResponse("rotator.html", context)
+    return app.state.templates.TemplateResponse(request, "rotator.html", context)
 
 
 async def oauth_redirect(request: Request) -> Response:
@@ -74,14 +76,14 @@ async def oauth_redirect(request: Request) -> Response:
 
     template_context = build_template_context(request)
     return request.app.state.templates.TemplateResponse(
-        "oauth-success.html", template_context
+        request, "oauth-success.html", template_context
     )
 
 
 async def index(request: Request) -> Response:
     app = request.app
     context = build_template_context(request)
-    return app.state.templates.TemplateResponse("index.html", context)
+    return app.state.templates.TemplateResponse(request, "index.html", context)
 
 
 def build_template_context(request: Request, extra: dict | None = None) -> dict:
@@ -94,6 +96,19 @@ def build_template_context(request: Request, extra: dict | None = None) -> dict:
     }
     context.update(extra)
     return context
+
+
+@contextlib.asynccontextmanager
+async def lifespan(app: Starlette) -> AsyncGenerator:
+    # Before serving any requests:
+    app.state.plugins.startup()
+    try:
+        yield
+    finally:
+        # After the server is signaled to shutdown and connections are closed. Need to
+        # rethink this because connections are not closed when SSE is connected.
+        app.state.plugins.shutdown()
+        app.state.event_bus.shutdown()
 
 
 def create_app() -> Starlette:
@@ -126,12 +141,7 @@ def create_app() -> Starlette:
         *plugin_static_mounts,
     ]
 
-    application = Starlette(
-        debug=True,
-        routes=routes,
-        on_startup=[plugins.startup],
-        on_shutdown=[plugins.shutdown, event_bus.shutdown],
-    )
+    application = Starlette(debug=True, routes=routes, lifespan=lifespan)
     state = application.state
     state.layout = layout
     state.templates = Jinja2Templates(directory=template_dir)
