@@ -12,7 +12,6 @@ requires-python = "==3.13.*"  # No cryptography wheel for 3.14 yet (as of 2025-1
 dependencies = [
     "uvicorn>=0.12.2",
     "gunicorn>=20.0.4",
-    "sse-starlette>=0.6.1",
     "aiofiles>=0.6.0",
     "sqlitedict>=1.7.0",
     "cryptography>=44.0.0",
@@ -25,6 +24,7 @@ dependencies = [
     "prompt-toolkit>=3.0.47",
     "httpx2>=2.3.0",
     "starlette>=1.2.1",
+    "sse-starlette>=3.4.4",
 ]
 
 [dependency-groups]

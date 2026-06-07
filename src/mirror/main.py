@@ -108,7 +108,7 @@ async def lifespan(app: Starlette) -> AsyncGenerator:
         # After the server is signaled to shutdown and connections are closed. Need to
         # rethink this because connections are not closed when SSE is connected.
         app.state.plugins.shutdown()
-        app.state.event_bus.shutdown()
+        await app.state.event_bus.shutdown()
 
 
 def create_app() -> Starlette:
