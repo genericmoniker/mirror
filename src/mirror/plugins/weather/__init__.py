@@ -31,7 +31,7 @@ REFRESH_INTERVAL = timedelta(minutes=5)
 CONFIG_REFRESH_INTERVAL = timedelta(minutes=1)
 
 WEATHER_URL = "https://api.openweathermap.org/data/3.0/onecall"
-AIR_QUALITY_URL = "https://www.airnowapi.org/aq/observation/zipCode/current/"
+AIR_QUALITY_URL = "https://www.airnowapi.org//aq/observation/current/ziplatLong"
 
 _logger = logging.getLogger(__name__)
 _state = {}
@@ -73,7 +73,7 @@ async def _refresh(context: PluginContext) -> None:
             "format": "application/json",
             "distance": 25,
             "zipCode": context.config[AIR_LOCATION],
-            "API_KEY": context.config[AIR_API_KEY],
+            "api_key": context.config[AIR_API_KEY],
         }
         try:
             async with httpx2.AsyncClient(timeout=10) as client:
@@ -81,7 +81,7 @@ async def _refresh(context: PluginContext) -> None:
                 air_response = await client.get(AIR_QUALITY_URL, params=air_params)
             weather_response.raise_for_status()
             air_response.raise_for_status()
-            data = _reshape(weather_response.json())
+            data = _reshape_weather(weather_response.json())
             data["air_quality"] = _reshape_air(air_response.json())
             await context.widget_updated(data)
             context.vote_connected()
@@ -93,7 +93,7 @@ async def _refresh(context: PluginContext) -> None:
         await sleep(REFRESH_INTERVAL.total_seconds())
 
 
-def _reshape(data: dict) -> dict:
+def _reshape_weather(data: dict) -> dict:
     """Reshape the data from the API to be easier to work with."""
     tz = ZoneInfo(data["timezone"])
     return {
@@ -157,6 +157,6 @@ def _reshape_air(data_list: list) -> dict:
         }
     data: dict = data_list[0]
     return {
-        "aqi": data["AQI"],
-        "category": data["Category"]["Name"],
+        "aqi": data["nowcastAQI"],
+        "category": data["aqiCategoryName"],
     }
