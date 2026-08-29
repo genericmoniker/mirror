@@ -39,7 +39,7 @@ def build_auth_url(client_id: str, state: str) -> str:
         "scope": " ".join(SCOPES),
         "response_type": "code",
         "access_type": "offline",
-        "prompt": "consent",
+        "prompt": "select_account consent",
         "state": state,
     }
     return GOOGLE_AUTH_URL + "?" + urlencode(params)
