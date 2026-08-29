@@ -1,4 +1,4 @@
-"""Step count from the Fitbit API."""
+"""Step count from the Google Health API."""
 
 import asyncio
 import logging
@@ -14,7 +14,13 @@ from httpx2 import TransportError
 from mirror.errors import AuthError
 from mirror.plugin_context import PluginContext
 
-from .fitbit import AUTHORIZATION_URL, CredentialsError, get_access_token, get_activity
+from .google_health import (
+    AUTHORIZATION_URL,
+    SCOPES,
+    CredentialsError,
+    get_access_token,
+    get_activity,
+)
 
 # A forum post said that devices tend to sync every 15 minutes when in range of a phone.
 REFRESH_INTERVAL = timedelta(minutes=15)
@@ -22,7 +28,6 @@ REFRESH_INTERVAL = timedelta(minutes=15)
 # database keys per person:
 CLIENT_ID = "client_id"
 CLIENT_SECRET = "client_secret"
-AUTHORIZATION_CODE = "authorization_code"
 ACCESS_TOKEN = "access_token"
 REFRESH_TOKEN = "refresh_token"
 
@@ -117,8 +122,14 @@ async def _refresh(context: PluginContext) -> None:
                     person["auth_url"] = _get_auth_url(context, name)
                     continue
                 context.db[name] = creds  # potentially update creds
-                person["steps_goal"] = activity_data["goals"]["steps"]
-                person["steps"] = activity_data["summary"]["steps"]
+                config_item = next(
+                    item for item in context.config if item["name"] == name
+                )
+
+                # Should be able to get this from the API at some point.
+                person["steps_goal"] = config_item["steps_goal"]
+
+                person["steps"] = activity_data["steps"]
                 person["percent"] = person["steps"] / person["steps_goal"]
                 _logger.info(
                     "%s steps goal: %s, steps: %s (%s%%)",
@@ -163,11 +174,14 @@ def _get_auth_url(context: PluginContext, name: str) -> str:
     context.db[STATE_MAP] = state_map
 
     creds = _get_creds(context, name)
+
     params = {
         "response_type": "code",
-        "scope": "activity",
+        "scope": " ".join(SCOPES),
         "client_id": creds[CLIENT_ID],
         "state": state,
         "redirect_uri": REDIRECT_URI,
+        "access_type": "offline",
+        "prompt": "select_account consent",
     }
     return AUTHORIZATION_URL + "?" + urlencode(params)
